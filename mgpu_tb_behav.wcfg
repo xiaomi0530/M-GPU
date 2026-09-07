@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="mgpu_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="mgpu_tb" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="389.084 ns"></ZoomStartTime>
+      <ZoomEndTime time="694.585 ns"></ZoomEndTime>
+      <Cursor1Time time="573.584 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="226"></NameColumnWidth>
+      <ValueColumnWidth column_width="91"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="36" />
+   <wvobject fp_name="/mgpu_tb/u_mgpu/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/rst" type="logic">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/start" type="logic">
+      <obj_property name="ElementShortName">start</obj_property>
+      <obj_property name="ObjectShortName">start</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/x0" type="array">
+      <obj_property name="ElementShortName">x0[9:0]</obj_property>
+      <obj_property name="ObjectShortName">x0[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/y0" type="array">
+      <obj_property name="ElementShortName">y0[9:0]</obj_property>
+      <obj_property name="ObjectShortName">y0[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/x1" type="array">
+      <obj_property name="ElementShortName">x1[9:0]</obj_property>
+      <obj_property name="ObjectShortName">x1[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/y1" type="array">
+      <obj_property name="ElementShortName">y1[9:0]</obj_property>
+      <obj_property name="ObjectShortName">y1[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/x2" type="array">
+      <obj_property name="ElementShortName">x2[9:0]</obj_property>
+      <obj_property name="ObjectShortName">x2[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/y2" type="array">
+      <obj_property name="ElementShortName">y2[9:0]</obj_property>
+      <obj_property name="ObjectShortName">y2[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/clor0" type="array">
+      <obj_property name="ElementShortName">clor0[7:0]</obj_property>
+      <obj_property name="ObjectShortName">clor0[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/clor1" type="array">
+      <obj_property name="ElementShortName">clor1[7:0]</obj_property>
+      <obj_property name="ObjectShortName">clor1[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/clor2" type="array">
+      <obj_property name="ElementShortName">clor2[7:0]</obj_property>
+      <obj_property name="ObjectShortName">clor2[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/clear_color" type="array">
+      <obj_property name="ElementShortName">clear_color[7:0]</obj_property>
+      <obj_property name="ObjectShortName">clear_color[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/busy" type="logic">
+      <obj_property name="ElementShortName">busy</obj_property>
+      <obj_property name="ObjectShortName">busy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/done" type="logic">
+      <obj_property name="ElementShortName">done</obj_property>
+      <obj_property name="ObjectShortName">done</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/i" type="array">
+      <obj_property name="ElementShortName">i[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/norm_cR0" type="array">
+      <obj_property name="ElementShortName">norm_cR0[14:0]</obj_property>
+      <obj_property name="ObjectShortName">norm_cR0[14:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/bound_x0" type="array">
+      <obj_property name="ElementShortName">bound_x0[9:0]</obj_property>
+      <obj_property name="ObjectShortName">bound_x0[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/reg_x0" type="array">
+      <obj_property name="ElementShortName">reg_x0[9:0]</obj_property>
+      <obj_property name="ObjectShortName">reg_x0[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/cR0" type="array">
+      <obj_property name="ElementShortName">cR0[7:0]</obj_property>
+      <obj_property name="ObjectShortName">cR0[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/dx10" type="array">
+      <obj_property name="ElementShortName">dx10[10:0]</obj_property>
+      <obj_property name="ObjectShortName">dx10[10:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/area" type="array">
+      <obj_property name="ElementShortName">area[21:0]</obj_property>
+      <obj_property name="ObjectShortName">area[21:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/scan_x" type="array">
+      <obj_property name="ElementShortName">scan_x[9:0]</obj_property>
+      <obj_property name="ObjectShortName">scan_x[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/ini_clor_R" type="array">
+      <obj_property name="ElementShortName">ini_clor_R[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ini_clor_R[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/A0" type="array">
+      <obj_property name="ElementShortName">A0[20:0]</obj_property>
+      <obj_property name="ObjectShortName">A0[20:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/ef_v0" type="array">
+      <obj_property name="ElementShortName">ef_v0[20:0]</obj_property>
+      <obj_property name="ObjectShortName">ef_v0[20:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/ef_i0" type="array">
+      <obj_property name="ElementShortName">ef_i0[20:0]</obj_property>
+      <obj_property name="ObjectShortName">ef_i0[20:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/frag_x" type="array">
+      <obj_property name="ElementShortName">frag_x[9:0]</obj_property>
+      <obj_property name="ObjectShortName">frag_x[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/frag_clor" type="array">
+      <obj_property name="ElementShortName">frag_clor[7:0]</obj_property>
+      <obj_property name="ObjectShortName">frag_clor[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/frag_shad_valid" type="logic">
+      <obj_property name="ElementShortName">frag_shad_valid</obj_property>
+      <obj_property name="ObjectShortName">frag_shad_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/dclorR_x" type="array">
+      <obj_property name="ElementShortName">dclorR_x[14:0]</obj_property>
+      <obj_property name="ObjectShortName">dclorR_x[14:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/dclorR_x_num" type="array">
+      <obj_property name="ElementShortName">dclorR_x_num[31:0]</obj_property>
+      <obj_property name="ObjectShortName">dclorR_x_num[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/cur_clor_R" type="array">
+      <obj_property name="ElementShortName">cur_clor_R[31:0]</obj_property>
+      <obj_property name="ObjectShortName">cur_clor_R[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/delta_x" type="array">
+      <obj_property name="ElementShortName">delta_x[10:0]</obj_property>
+      <obj_property name="ObjectShortName">delta_x[10:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/if_inside" type="logic">
+      <obj_property name="ElementShortName">if_inside</obj_property>
+      <obj_property name="ObjectShortName">if_inside</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mgpu_tb/u_mgpu/gpu_status" type="array">
+      <obj_property name="ElementShortName">gpu_status[3:0]</obj_property>
+      <obj_property name="ObjectShortName">gpu_status[3:0]</obj_property>
+   </wvobject>
+</wave_config>

@@ -1,0 +1,22 @@
+# Generated simulation output
+out/
+
+# Vivado generated/cache directories
+MGPU.cache/
+MGPU.hw/
+MGPU.sim/
+MGPU.ip_user_files/
+
+# Common Vivado generated files
+*.jou
+*.log
+*.str
+*.backup.jou
+*.backup.log
+*.wdb
+*.vcd
+*.vvp
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
