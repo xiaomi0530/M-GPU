@@ -1,28 +1,40 @@
 # M-GPU
 
-This project is a teaching-oriented minimal GPU prototype written in Verilog.
+完全无GPU基础，边做边学，纯老一辈手工敲代码项目。
 
-## What it does
+基于VGA屏幕**640*480** **RGB332**。<br><br>
 
-- Accepts one triangle at a time
-- Rasterizes it into a 640x480 RGB332 framebuffer
-- Supports per-vertex color interpolation
-- Dumps the framebuffer through simulation for inspection
 
-## Main files
+#### **已经做的**
 
-- `MGPU.srcs/sources_1/new/mgpu.v`: top-level GPU core
-- `MGPU.srcs/sim_1/new/mgpu_tb.v`: simulation testbench
-- `tools/view_framebuffer.py`: framebuffer viewer
+- ***ver1.0 基于纯FSM的Rasterize和直接写Frame buffer***
 
-## Run simulation
+<figure>
+    <img src="out/triangle_test0.png">
+    <figcaption>
+    <small>
+        测试光栅化与颜色插值 (python脚本直接读，无上板)
+    </small>
+    </figcaption>
+</figure><br>
 
-```bash
-make run
-make image
-```
+- ***ver1.1 分离Rasterizer出来到rasterizer.v***
+<figure>
+    <img src="out/ver1_1_figure.png">
+    <figcaption>
+    <small>
+        再见了一坨中间变量>0<
+    </small>
+    </figcaption>
+</figure><br>
 
-## Notes
+#### **将要做的**
+- 做一个Fragment FIFO。
+- 做一个Shader
+- 引入Depth
+- 做一个VGA模块，上板收敛时序
+  <br>
 
-- `out/` contains generated simulation output
-- Vivado cache and simulation directories are not meant to be versioned
+#### **目标做的**
+  ***用C命令CPU命令GPU渲染一个3D旋转Cube在VGA屏幕上转圈圈！！！***
+  
