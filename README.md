@@ -44,10 +44,13 @@
 
 <br><br>
 
+- **ver1.2 加入RAST-SHAD-FIFO衔接两模块**
+
+<br><br>
 
 ## **将要做的**
 
-- 做一个Fragment FIFO。
+- ~~做一个Fragment FIFO。~~
 
 - 做一个Shader
 
