@@ -1,6 +1,6 @@
 OUT_DIR := out
 
-SRC := MGPU.srcs/sources_1/new/mgpu.v
+SRC := MGPU.srcs/sources_1/new/*.v
 TB  := MGPU.srcs/sim_1/new/mgpu_tb.v
 
 SIM_EXE := $(OUT_DIR)/mgpu_tb.vvp
