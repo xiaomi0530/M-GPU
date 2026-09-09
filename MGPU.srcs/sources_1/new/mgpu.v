@@ -19,8 +19,8 @@ module mgpu #(
     input  wire [7:0] clor1, 
     input  wire [7:0] clor2, 
     input  wire [7:0] clear_color,
-    output wire        busy,
-    output wire        done
+    output wire       gpu_busy,
+    output wire       gpu_done
 );
     reg [7:0] frame_buffer [0:FB_PIXELS-1];
 
@@ -97,19 +97,19 @@ module mgpu #(
     wire         frag_valid;
 
     assign rast_start = start;
-    assign rast_valid = !rast_shad_full;
-    assign busy = rast_busy;
-    assign done = rast_done;
+    assign rast_valid = !fifo_rs_full;
+    assign gpu_busy = rast_busy;
+    assign gpu_done = rast_done;
 
-    wire [27:0] w_data;
-    wire        w_en;
-    reg         r_en;
-    wire [27:0] r_data;
-    wire        rast_shad_empty;
-    wire        rast_shad_full;
+    wire [27:0] fifo_rs_wdata;
+    wire        fifo_rs_wen;
+    reg         fifo_rs_ren;
+    wire [27:0] fifo_rs_rdata;
+    wire        fifo_rs_empty;
+    wire        fifo_rs_full;
     
-    assign w_data = {frag_x,frag_y,Q312_to_RGB332(frag_clor_R,frag_clor_G,frag_clor_B)};
-    assign w_en = frag_valid && rast_valid;
+    assign fifo_rs_wdata = {frag_x,frag_y,Q312_to_RGB332(frag_clor_R,frag_clor_G,frag_clor_B)};
+    assign fifo_rs_wen = frag_valid && rast_valid;
 
     rasterizer u_rasterizer(
         .clk         (clk         ),
@@ -140,14 +140,14 @@ module mgpu #(
         .DEPTH_BITS(6),
         .WIDTH(28)
     ) rast_shad_fifo (
-        .clk    (clk                ),
-        .rst    (rst                ),
-        .w_data (w_data             ),
-        .w_en   (w_en               ),
-        .r_en   (r_en               ),
-        .r_data (r_data             ),
-        .empty  (rast_shad_empty    ),
-        .full   (rast_shad_full     )
+        .clk            (clk                        ),
+        .rst            (rst                        ),
+        .w_data         (fifo_rs_wdata              ),
+        .w_en           (fifo_rs_wen                ),
+        .r_en           (fifo_rs_ren                ),
+        .r_data         (fifo_rs_rdata              ),
+        .empty          (fifo_rs_empty              ),
+        .full           (fifo_rs_full               )
     );
 
     
@@ -161,31 +161,31 @@ module mgpu #(
     always @(posedge clk) begin
         if(rst)begin
             debug_shad_state <= IDLE;
-            r_en <= 1'b0;
+            fifo_rs_ren <= 1'b0;
         end else begin
             case(debug_shad_state)
                 IDLE:begin
-                    if(!rast_shad_empty)begin
+                    if(!fifo_rs_empty)begin
                         debug_shad_state <= GET_FRAG_1;
                     end else begin
                         debug_shad_state <= IDLE;
                     end
                 end
                 GET_FRAG_1:begin
-                    r_en <= 1'b1;
+                    fifo_rs_ren <= 1'b1;
                     debug_shad_state <= GET_FRAG_2;
                 end
                 GET_FRAG_2:begin
-                    r_en <= 1'b0;
+                    fifo_rs_ren <= 1'b0;
                     debug_shad_state <= GET_FRAG_3;
                 end
                 GET_FRAG_3:begin
-                    debug_shad_data <= r_data;
+                    debug_shad_data <= fifo_rs_rdata;
                     debug_shad_state <= WRTIE_BUFFER;
                 end
                 WRTIE_BUFFER:begin
                     frame_buffer[pixel_addr(debug_shad_data[27:18],debug_shad_data[17:8])] <= debug_shad_data[7:0];
-                    debug_shad_state <= (rast_shad_empty)? IDLE : GET_FRAG_1;
+                    debug_shad_state <= (fifo_rs_empty)? IDLE : GET_FRAG_1;
                 end
                 default: debug_shad_state <= IDLE;
             endcase

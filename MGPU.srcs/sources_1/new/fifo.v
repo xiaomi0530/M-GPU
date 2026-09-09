@@ -21,6 +21,12 @@ module fifo#(
     reg [DEPTH_BITS-1:0] w_ptr;
     reg [DEPTH_BITS-1:0] r_ptr;
 
+    wire write;
+    wire read;
+    
+    assign write = w_en && !full;
+    assign read  = r_en && !empty;
+
     always @(posedge clk) begin
         if(rst)begin
             count <= 1'b0;
@@ -31,14 +37,17 @@ module fifo#(
             if(w_en && !full)begin
                 fifo[w_ptr] <= w_data;
                 w_ptr <= w_ptr + 1'b1;
-                count <= count + 1'b1;
             end
             if(r_en && !empty)begin
-                fifo[r_ptr] <= 1'b0;
                 r_data <= fifo[r_ptr];
                 r_ptr <= r_ptr + 1'b1;
-                count <= count - 1'b1;
             end
+            case({write,read})
+                2'b00: count <= count;
+                2'b01: count <= count - 1'b1;
+                2'b10: count <= count + 1'b1;
+                2'b11: count <= count;
+            endcase
         end
     end
     
@@ -48,7 +57,6 @@ module fifo#(
         end else begin
             empty = 1'b0;
         end
-            
         if(count == DEPTH)begin
             full = 1'b1;
         end else begin

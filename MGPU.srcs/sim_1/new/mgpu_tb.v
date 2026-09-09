@@ -60,8 +60,8 @@ module mgpu_tb;
         .clor1(clor1),
         .clor2(clor2),
         .clear_color(clear_color),
-        .busy(busy),
-        .done(done)
+        .gpu_busy(busy),
+        .gpu_done(done)
     );
 
     initial begin
