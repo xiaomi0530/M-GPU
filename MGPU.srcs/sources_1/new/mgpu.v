@@ -97,10 +97,20 @@ module mgpu #(
     wire         frag_valid;
 
     assign rast_start = start;
-    assign rast_valid = 1'b1;
+    assign rast_valid = !rast_shad_full;
     assign busy = rast_busy;
     assign done = rast_done;
+
+    wire [27:0] w_data;
+    wire        w_en;
+    reg         r_en;
+    wire [27:0] r_data;
+    wire        rast_shad_empty;
+    wire        rast_shad_full;
     
+    assign w_data = {frag_x,frag_y,Q312_to_RGB332(frag_clor_R,frag_clor_G,frag_clor_B)};
+    assign w_en = frag_valid && rast_valid;
+
     rasterizer u_rasterizer(
         .clk         (clk         ),
         .rst         (rst         ),
@@ -125,13 +135,60 @@ module mgpu #(
         .rast_done   (rast_done   )
     );
 
-    always@(posedge clk)begin
+    fifo#(
+        .DEPTH(64),
+        .DEPTH_BITS(6),
+        .WIDTH(28)
+    ) rast_shad_fifo (
+        .clk    (clk                ),
+        .rst    (rst                ),
+        .w_data (w_data             ),
+        .w_en   (w_en               ),
+        .r_en   (r_en               ),
+        .r_data (r_data             ),
+        .empty  (rast_shad_empty    ),
+        .full   (rast_shad_full     )
+    );
+
+    
+    reg [2:0]  debug_shad_state;
+    reg [27:0] debug_shad_data;
+    parameter IDLE = 3'd0;
+    parameter GET_FRAG_1 = 3'd1;
+    parameter GET_FRAG_2 = 3'd2;
+    parameter GET_FRAG_3 = 3'd3;
+    parameter WRTIE_BUFFER = 3'd4;
+    always @(posedge clk) begin
         if(rst)begin
-            
+            debug_shad_state <= IDLE;
+            r_en <= 1'b0;
         end else begin
-            if(frag_valid)begin
-                frame_buffer[pixel_addr(frag_x,frag_y)] <= Q312_to_RGB332(frag_clor_R,frag_clor_G,frag_clor_B);
-            end
+            case(debug_shad_state)
+                IDLE:begin
+                    if(!rast_shad_empty)begin
+                        debug_shad_state <= GET_FRAG_1;
+                    end else begin
+                        debug_shad_state <= IDLE;
+                    end
+                end
+                GET_FRAG_1:begin
+                    r_en <= 1'b1;
+                    debug_shad_state <= GET_FRAG_2;
+                end
+                GET_FRAG_2:begin
+                    r_en <= 1'b0;
+                    debug_shad_state <= GET_FRAG_3;
+                end
+                GET_FRAG_3:begin
+                    debug_shad_data <= r_data;
+                    debug_shad_state <= WRTIE_BUFFER;
+                end
+                WRTIE_BUFFER:begin
+                    frame_buffer[pixel_addr(debug_shad_data[27:18],debug_shad_data[17:8])] <= debug_shad_data[7:0];
+                    debug_shad_state <= (rast_shad_empty)? IDLE : GET_FRAG_1;
+                end
+                default: debug_shad_state <= IDLE;
+            endcase
         end
     end
     

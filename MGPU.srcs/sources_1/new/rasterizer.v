@@ -229,6 +229,8 @@ module rasterizer (
     wire if_inside;
     assign if_inside = is_inside(ef_i0,ef_i1,ef_i2);
 
+    reg [3:0] wait_state;
+
     reg [3:0] rast_state;
     localparam IDLE       = 4'd0;
     localparam BOUND      = 4'd1;
@@ -238,9 +240,10 @@ module rasterizer (
     localparam COLOR_ini_1= 4'd5;
     localparam COLOR_ini_2= 4'd6;
     localparam RAST_I_jud = 4'd7;
-    localparam SHADE      = 4'd8;
+//    localparam SHADE      = 4'd8;
     localparam RAST_I_nex = 4'd9;
     localparam DONE       = 4'd10;
+    localparam WAIT       = 4'd11;
 
     always@(posedge clk)begin
         if(rst)begin
@@ -301,7 +304,13 @@ module rasterizer (
                     norm_cB1 <= ($signed({1'b0,cB1}) <<< 12) / 3;
                     norm_cB2 <= ($signed({1'b0,cB2}) <<< 12) / 3;
 
-                    rast_state <= RAST_V_1;
+                    if(rast_valid)begin
+                        rast_state <= RAST_V_1;
+                    end else begin
+                        rast_state <= WAIT;
+                        wait_state <= RAST_V_1;
+                    end
+                    
                 end
                 RAST_V_1:begin
                     A0 <= edge_A(reg_x0,reg_y0,reg_x1,reg_y1);
@@ -327,7 +336,12 @@ module rasterizer (
                     delta_x <= $signed({1'b0,bound_x0}) - $signed({1'b0,reg_x0});
                     delta_y <= $signed({1'b0,bound_y0}) - $signed({1'b0,reg_y0});
 
-                    rast_state <= RAST_V_2;
+                    if(rast_valid)begin
+                        rast_state <= RAST_V_2;
+                    end else begin
+                        rast_state <= WAIT;
+                        wait_state <= RAST_V_2;
+                    end
                 end
                 RAST_V_2:begin
                     ef_v0 <= edge_func(bound_x0,bound_y0,A0,B0,C0);
@@ -337,7 +351,12 @@ module rasterizer (
                     scan_x <= bound_x0;
                     scan_y <= bound_y0;
 
-                    rast_state <= RAST_I_ini;
+                    if(rast_valid)begin
+                        rast_state <= RAST_I_ini;
+                    end else begin
+                        rast_state <= WAIT;
+                        wait_state <= RAST_I_ini;
+                    end
                 end
                 RAST_I_ini:begin
                     ef_i0 <= ef_v0;
@@ -351,19 +370,36 @@ module rasterizer (
                     dclorB_x <= dclorB_x_num / area;
                     dclorB_y <= dclorB_y_num / area;
 
-                    rast_state <= COLOR_ini_1;
+                    if(rast_valid)begin
+                        rast_state <= COLOR_ini_1;
+                    end else begin
+                        rast_state <= WAIT;
+                        wait_state <= COLOR_ini_1;
+                    end
                 end
                 COLOR_ini_1:begin
                     ini_clor_R <= norm_cR0 + dclorR_x*delta_x + dclorR_y*delta_y;
                     ini_clor_G <= norm_cG0 + dclorG_x*delta_x + dclorG_y*delta_y;
                     ini_clor_B <= norm_cB0 + dclorB_x*delta_x + dclorB_y*delta_y;
-                    rast_state <= COLOR_ini_2;
+                    
+                    if(rast_valid)begin
+                        rast_state <= COLOR_ini_2;
+                    end else begin
+                        rast_state <= WAIT;
+                        wait_state <= COLOR_ini_2;
+                    end
                 end
                 COLOR_ini_2:begin
                     cur_clor_R <= ini_clor_R;
                     cur_clor_G <= ini_clor_G;
                     cur_clor_B <= ini_clor_B;
-                    rast_state <= RAST_I_jud;
+                    
+                    if(rast_valid)begin
+                        rast_state <= RAST_I_jud;
+                    end else begin
+                        rast_state <= WAIT;
+                        wait_state <= RAST_I_jud;
+                    end
                 end
                 RAST_I_jud:begin
                     frag_x <= scan_x;
@@ -371,14 +407,21 @@ module rasterizer (
                     frag_clor_R <= cur_clor_R;
                     frag_clor_G <= cur_clor_G;
                     frag_clor_B <= cur_clor_B;
-                    if(if_inside)begin
+                    if(if_inside && rast_valid)begin
                         frag_valid <= 1'b1;
                     end else begin
                         frag_valid <= 1'b0;
                     end
-                    rast_state <= RAST_I_nex;
+                    
+                    if(rast_valid)begin
+                        rast_state <= RAST_I_nex;
+                    end else begin
+                        rast_state <= WAIT;
+                        wait_state <= RAST_I_jud;
+                    end
                 end
                 RAST_I_nex:begin
+                    frag_valid <= 1'b0;
                     if(scan_x < bound_x1)begin
                         scan_x <= scan_x + 1'b1;
                         ef_i0 <= ef_i0 + A0;
@@ -387,7 +430,13 @@ module rasterizer (
                         cur_clor_R <= cur_clor_R + dclorR_x;
                         cur_clor_G <= cur_clor_G + dclorG_x;
                         cur_clor_B <= cur_clor_B + dclorB_x;
-                        rast_state <= RAST_I_jud;
+                        
+                        if(rast_valid)begin
+                            rast_state <= RAST_I_jud;
+                        end else begin
+                            rast_state <= WAIT;
+                            wait_state <= RAST_I_jud;
+                        end
                     end else begin
                         scan_x <= bound_x0;
                         if(scan_y < bound_y1)begin
@@ -404,7 +453,13 @@ module rasterizer (
                             ini_clor_R <= ini_clor_R + dclorR_y;
                             ini_clor_G <= ini_clor_G + dclorG_y;
                             ini_clor_B <= ini_clor_B + dclorB_y;
-                            rast_state <= RAST_I_jud;
+                            
+                            if(rast_valid)begin
+                                rast_state <= RAST_I_jud;
+                            end else begin
+                                rast_state <= WAIT;
+                                wait_state <= RAST_I_jud;
+                            end
                         end else begin
                             rast_state <= DONE;
                         end
@@ -414,6 +469,13 @@ module rasterizer (
                     rast_busy <= 1'b0;
                     rast_done <= 1'b1;
                     rast_state <= IDLE;
+                end
+                WAIT:begin
+                    if(rast_valid)begin
+                        rast_state <= wait_state;
+                    end else begin
+                        rast_state <= WAIT;
+                    end
                 end
                 default: rast_state <= IDLE;
             endcase
