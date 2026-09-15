@@ -11,6 +11,7 @@ module fifo#(
     input wire              w_en,
     input wire              r_en,
     output reg [WIDTH-1:0]  r_data,
+    output reg              r_valid,
     output reg              empty,
     output reg              full
 );
@@ -33,6 +34,7 @@ module fifo#(
             r_data <= 1'b0;
             w_ptr  <= 1'b0;
             r_ptr  <= 1'b0;
+            r_valid <= 1'b0;
         end else begin
             if(w_en && !full)begin
                 fifo[w_ptr] <= w_data;
@@ -40,7 +42,10 @@ module fifo#(
             end
             if(r_en && !empty)begin
                 r_data <= fifo[r_ptr];
+                r_valid <= 1'b1;
                 r_ptr <= r_ptr + 1'b1;
+            end else begin
+                r_valid <= 1'b0;
             end
             case({write,read})
                 2'b00: count <= count;

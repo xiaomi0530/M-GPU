@@ -103,8 +103,9 @@ module mgpu #(
 
     wire [27:0] fifo_rs_wdata;
     wire        fifo_rs_wen;
-    reg         fifo_rs_ren;
+    wire        fifo_rs_ren;
     wire [27:0] fifo_rs_rdata;
+    wire        fifo_rs_rvalid;
     wire        fifo_rs_empty;
     wire        fifo_rs_full;
     
@@ -145,52 +146,43 @@ module mgpu #(
         .w_data         (fifo_rs_wdata              ),
         .w_en           (fifo_rs_wen                ),
         .r_en           (fifo_rs_ren                ),
+        .r_valid        (fifo_rs_rvalid             ),
         .r_data         (fifo_rs_rdata              ),
         .empty          (fifo_rs_empty              ),
         .full           (fifo_rs_full               )
     );
 
+
+    wire shad_start;
+    wire shad_done;
+    wire shad_busy;
+    wire [9:0] pixel_x;
+    wire [9:0] pixel_y;
+    wire [2:0] pixel_R;
+    wire [2:0] pixel_G;
+    wire [1:0] pixel_B;
+    assign shad_start = start;
+    shader u_shader(
+        .clk             (clk             ),
+        .rst             (rst             ),
+        .fifo_empty      (fifo_rs_empty  ),
+        .read_fifo_data  (fifo_rs_rdata  ),
+        .read_fifo_en    (fifo_rs_ren    ),
+        .read_fifo_valid (fifo_rs_rvalid ),
+        .shad_start      (shad_start      ),
+        .shad_busy       (shad_busy       ),
+        .shad_done       (shad_done       ),
+        .pixel_x         (pixel_x         ),
+        .pixel_y         (pixel_y         ),
+        .pixel_R         (pixel_R         ),
+        .pixel_G         (pixel_G         ),
+        .pixel_B         (pixel_B         )
+    );
     
-    reg [2:0]  debug_shad_state;
-    reg [27:0] debug_shad_data;
-    parameter IDLE = 3'd0;
-    parameter GET_FRAG_1 = 3'd1;
-    parameter GET_FRAG_2 = 3'd2;
-    parameter GET_FRAG_3 = 3'd3;
-    parameter WRTIE_BUFFER = 3'd4;
     always @(posedge clk) begin
-        if(rst)begin
-            debug_shad_state <= IDLE;
-            fifo_rs_ren <= 1'b0;
-        end else begin
-            case(debug_shad_state)
-                IDLE:begin
-                    if(!fifo_rs_empty)begin
-                        debug_shad_state <= GET_FRAG_1;
-                    end else begin
-                        debug_shad_state <= IDLE;
-                    end
-                end
-                GET_FRAG_1:begin
-                    fifo_rs_ren <= 1'b1;
-                    debug_shad_state <= GET_FRAG_2;
-                end
-                GET_FRAG_2:begin
-                    fifo_rs_ren <= 1'b0;
-                    debug_shad_state <= GET_FRAG_3;
-                end
-                GET_FRAG_3:begin
-                    debug_shad_data <= fifo_rs_rdata;
-                    debug_shad_state <= WRTIE_BUFFER;
-                end
-                WRTIE_BUFFER:begin
-                    frame_buffer[pixel_addr(debug_shad_data[27:18],debug_shad_data[17:8])] <= debug_shad_data[7:0];
-                    debug_shad_state <= (fifo_rs_empty)? IDLE : GET_FRAG_1;
-                end
-                default: debug_shad_state <= IDLE;
-            endcase
+        if(shad_done)begin
+            frame_buffer[pixel_addr(pixel_x,pixel_y)] <= {pixel_R,pixel_G,pixel_B};
         end
     end
-    
     
 endmodule
