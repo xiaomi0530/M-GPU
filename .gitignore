@@ -14,6 +14,14 @@ MGPU.ip_user_files/
 *.wdb
 *.vcd
 *.vvp
+*.trace
+__pycache__/
+out/image_scene.tri
+out/image_scene.json
+out/image_expected.hex
+out/image_target.png
+out/image_prediction.png
+out/mgpu_image_tb.v
 
 # OS/editor noise
 .DS_Store

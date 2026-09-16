@@ -7,7 +7,7 @@ SIM_EXE := $(OUT_DIR)/mgpu_tb.vvp
 FB_HEX  := $(OUT_DIR)/framebuffer.hex
 FB_PNG  := $(OUT_DIR)/framebuffer.png
 
-.PHONY: all run image clean
+.PHONY: all run image gui live simulate-image clean
 
 all: $(FB_PNG)
 
@@ -15,13 +15,23 @@ run: $(FB_HEX)
 
 image: $(FB_PNG)
 
+gui:
+	python tools/view_framebuffer.py
+
+live:
+	python tools/view_framebuffer.py --live
+
+simulate-image:
+	iverilog -g2012 -s mgpu_image_tb -o $(OUT_DIR)/mgpu_image_tb.vvp $(SRC) $(OUT_DIR)/mgpu_image_tb.v
+	vvp $(OUT_DIR)/mgpu_image_tb.vvp
+
 $(OUT_DIR):
 	mkdir $(OUT_DIR)
 
 $(SIM_EXE): $(SRC) $(TB) | $(OUT_DIR)
 	iverilog -g2012 -o $(SIM_EXE) $(SRC) $(TB)
 
-$(FB_HEX): $(SIM_EXE) | $(OUT_DIR)
+$(FB_HEX): $(SIM_EXE) $(wildcard $(OUT_DIR)/image_scene.tri) | $(OUT_DIR)
 	vvp $(SIM_EXE)
 
 $(FB_PNG): $(FB_HEX) tools/view_framebuffer.py | $(OUT_DIR)

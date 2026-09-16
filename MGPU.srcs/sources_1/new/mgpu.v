@@ -74,9 +74,11 @@ module mgpu #(
                 clamp_B = B;
             end
 
-            r8 = (clamp_R * 7) >> 12;
-            g8 = (clamp_G * 7) >> 12;
-            b8 = (clamp_B * 3) >> 12;
+            // Round to nearest. Truncating both RGB332 -> Q12 and Q12 ->
+            // RGB332 made constant colors such as R=1 return as R=0.
+            r8 = (clamp_R * 7 + 2048) >> 12;
+            g8 = (clamp_G * 7 + 2048) >> 12;
+            b8 = (clamp_B * 3 + 2048) >> 12;
 
             Q312_to_RGB332 = {r8,g8,b8};
 

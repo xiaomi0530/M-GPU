@@ -148,9 +148,9 @@ module rasterizer (
                 clamp_B = B;
             end
 
-            r8 = (clamp_R * 7) >> 12;
-            g8 = (clamp_G * 7) >> 12;
-            b8 = (clamp_B * 3) >> 12;
+            r8 = (clamp_R * 7 + 2048) >> 12;
+            g8 = (clamp_G * 7 + 2048) >> 12;
+            b8 = (clamp_B * 3 + 2048) >> 12;
 
             Q312_to_RGB332 = {r8,g8,b8};
 

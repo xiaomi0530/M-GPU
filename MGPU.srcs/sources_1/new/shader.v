@@ -144,6 +144,7 @@ module shader (
                             get_frag_state <= 4'b1000;
                         end
                         4'b1000:begin
+                            regs_w_en <= 1'b0;
                             get_frag_state <= 1'b0;
                             shad_state <= OUT_PIXL;
                         end
