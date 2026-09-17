@@ -139,8 +139,8 @@ module mgpu #(
     );
 
     fifo#(
-        .DEPTH(64),
-        .DEPTH_BITS(6),
+        .DEPTH(256),
+        .DEPTH_BITS(8),
         .WIDTH(28)
     ) rast_shad_fifo (
         .clk            (clk                        ),

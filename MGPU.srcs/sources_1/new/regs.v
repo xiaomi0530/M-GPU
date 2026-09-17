@@ -28,7 +28,7 @@ module regs#(
                 r_data <= 1'b0;
             end
             if(w_en && w_addr!=1'b0)begin
-                regs[w_addr] = w_data;
+                regs[w_addr] <= w_data;
             end
         end
     end
