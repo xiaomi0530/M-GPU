@@ -1,0 +1,98 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2025.1 (win64) Build 6140274 Thu May 22 00:12:29 MDT 2025
+| Date         : Thu Sep 17 20:07:41 2026
+| Host         : XiaomiROG running 64-bit major release  (build 9200)
+| Command      : report_drc -file C:/Users/xiaom/Documents/Vivado_Project/MGPU/out/vga_build/snapshot/drc.rpt
+| Design       : nexys_a7_vga_top
+| Device       : xc7a100tcsg324-1
+| Speed File   : -1
+| Design State : Fully Routed
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Report DRC
+
+Table of Contents
+-----------------
+1. REPORT SUMMARY
+2. REPORT DETAILS
+
+1. REPORT SUMMARY
+-----------------
+            Netlist: nexys_a7_vga_top
+          Floorplan: design_1
+      Design limits: <entire design considered>
+           Ruledeck: default
+             Max checks: <unlimited>
+             Checks found: 12
++----------+----------+--------------------------------------------------------------+--------+
+| Rule     | Severity | Description                                                  | Checks |
++----------+----------+--------------------------------------------------------------+--------+
+| DPOP-1   | Warning  | PREG Output pipelining                                       | 1      |
+| DPOP-2   | Warning  | MREG Output pipelining                                       | 1      |
+| PDCN-137 | Warning  | enum_RAM_EXTENSION_A_not_NONE_connects_ADDRARDADDRL15_Tieoff | 10     |
++----------+----------+--------------------------------------------------------------+--------+
+
+2. REPORT DETAILS
+-----------------
+DPOP-1#1 Warning
+PREG Output pipelining  
+DSP u_vga/fb_addr0 output u_vga/fb_addr0/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-2#1 Warning
+MREG Output pipelining  
+DSP u_vga/fb_addr0 multiplier stage u_vga/fb_addr0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+PDCN-137#1 Warning
+enum_RAM_EXTENSION_A_not_NONE_connects_ADDRARDADDRL15_Tieoff  
+RAMB36E1 site RAMB36_X1Y28 has BlockRam (u_framebuffer/memory_reg_0_0) with RAM_EXTENSION_A attribute set to LOWER and ADDRARADDRL15 pin tied to LOGIC 0 (GND). In this case only the Lower BRAM will be used.
+Related violations: <none>
+
+PDCN-137#2 Warning
+enum_RAM_EXTENSION_A_not_NONE_connects_ADDRARDADDRL15_Tieoff  
+RAMB36E1 site RAMB36_X1Y29 has BlockRam (u_framebuffer/memory_reg_1_0) with RAM_EXTENSION_A attribute set to UPPER and ADDRARADDRL15 pin tied to LOGIC 0 (GND). In this case only the Lower BRAM will be used.
+Related violations: <none>
+
+PDCN-137#3 Warning
+enum_RAM_EXTENSION_A_not_NONE_connects_ADDRARDADDRL15_Tieoff  
+RAMB36E1 site RAMB36_X2Y26 has BlockRam (u_framebuffer/memory_reg_8_0) with RAM_EXTENSION_A attribute set to LOWER and ADDRARADDRL15 pin tied to LOGIC 0 (GND). In this case only the Lower BRAM will be used.
+Related violations: <none>
+
+PDCN-137#4 Warning
+enum_RAM_EXTENSION_A_not_NONE_connects_ADDRARDADDRL15_Tieoff  
+RAMB36E1 site RAMB36_X2Y27 has BlockRam (u_framebuffer/memory_reg_9_0) with RAM_EXTENSION_A attribute set to UPPER and ADDRARADDRL15 pin tied to LOGIC 0 (GND). In this case only the Lower BRAM will be used.
+Related violations: <none>
+
+PDCN-137#5 Warning
+enum_RAM_EXTENSION_A_not_NONE_connects_ADDRARDADDRL15_Tieoff  
+RAMB36E1 site RAMB36_X2Y28 has BlockRam (u_framebuffer/memory_reg_6_0) with RAM_EXTENSION_A attribute set to LOWER and ADDRARADDRL15 pin tied to LOGIC 0 (GND). In this case only the Lower BRAM will be used.
+Related violations: <none>
+
+PDCN-137#6 Warning
+enum_RAM_EXTENSION_A_not_NONE_connects_ADDRARDADDRL15_Tieoff  
+RAMB36E1 site RAMB36_X2Y29 has BlockRam (u_framebuffer/memory_reg_7_0) with RAM_EXTENSION_A attribute set to UPPER and ADDRARADDRL15 pin tied to LOGIC 0 (GND). In this case only the Lower BRAM will be used.
+Related violations: <none>
+
+PDCN-137#7 Warning
+enum_RAM_EXTENSION_A_not_NONE_connects_ADDRARDADDRL15_Tieoff  
+RAMB36E1 site RAMB36_X3Y26 has BlockRam (u_framebuffer/memory_reg_2_0) with RAM_EXTENSION_A attribute set to LOWER and ADDRARADDRL15 pin tied to LOGIC 0 (GND). In this case only the Lower BRAM will be used.
+Related violations: <none>
+
+PDCN-137#8 Warning
+enum_RAM_EXTENSION_A_not_NONE_connects_ADDRARDADDRL15_Tieoff  
+RAMB36E1 site RAMB36_X3Y27 has BlockRam (u_framebuffer/memory_reg_3_0) with RAM_EXTENSION_A attribute set to UPPER and ADDRARADDRL15 pin tied to LOGIC 0 (GND). In this case only the Lower BRAM will be used.
+Related violations: <none>
+
+PDCN-137#9 Warning
+enum_RAM_EXTENSION_A_not_NONE_connects_ADDRARDADDRL15_Tieoff  
+RAMB36E1 site RAMB36_X3Y28 has BlockRam (u_framebuffer/memory_reg_4_0) with RAM_EXTENSION_A attribute set to LOWER and ADDRARADDRL15 pin tied to LOGIC 0 (GND). In this case only the Lower BRAM will be used.
+Related violations: <none>
+
+PDCN-137#10 Warning
+enum_RAM_EXTENSION_A_not_NONE_connects_ADDRARDADDRL15_Tieoff  
+RAMB36E1 site RAMB36_X3Y29 has BlockRam (u_framebuffer/memory_reg_5_0) with RAM_EXTENSION_A attribute set to UPPER and ADDRARADDRL15 pin tied to LOGIC 0 (GND). In this case only the Lower BRAM will be used.
+Related violations: <none>
+
+
