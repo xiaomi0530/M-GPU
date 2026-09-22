@@ -47,10 +47,6 @@ module shader (
     reg [9:0]  frag_x;
     reg [9:0]  frag_y;
 
-
-    
-
-
     reg [2:0] shad_state;
     reg [3:0] get_frag_state;
     reg [3:0] out_pixel_state;

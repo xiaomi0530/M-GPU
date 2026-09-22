@@ -1,28 +1,42 @@
+# Vivado generated directories
+/.Xil/
+/*.cache/
+/*.hw/
+/*.sim/
+/*.runs/
+/*.ip_user_files/
+/*.gen/
+/MGPU.srcs/utils_1/
 
-# Vivado generated/cache directories
-MGPU.cache/
-MGPU.hw/
-MGPU.sim/
-MGPU.ip_user_files/
+# Simulation, export and build outputs
+/out/
+/assets/logo/rgb332.npy
+/assets/lowpoly_space/background.npy
 
-# Common Vivado generated files
+# Generated files and logs
 *.jou
 *.log
 *.str
-*.backup.jou
-*.backup.log
 *.wdb
 *.vcd
 *.vvp
 *.trace
-__pycache__/
-out/image_scene.tri
-out/image_scene.json
-out/image_expected.hex
-out/image_target.png
-out/image_prediction.png
-out/mgpu_image_tb.v
+*.dcp
+*.bit
+/clockInfo.txt
+/dfx_runtime.txt
 
-# OS/editor noise
+# Python and local environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# OS/editor noise and local secrets
 .DS_Store
 Thumbs.db
+*.swp
+.env
+.env.*
+!.env.example

@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import time
+import queue
+import threading
 from bisect import bisect_left, bisect_right
 from pathlib import Path
 import tkinter as tk
@@ -53,6 +55,10 @@ class FramebufferViewer:
         self._timer = None
         self._closed = False
         self.image_studio = None
+        self.project = Path(__file__).resolve().parents[1]
+        self.simulation_owner = None
+        self.sim_cancel = threading.Event()
+        self.sim_messages = queue.Queue()
         self.tree_page = 0
         self._styles()
         self._layout()
@@ -118,7 +124,7 @@ class FramebufferViewer:
         title = tk.Frame(top, bg=BG)
         title.pack(side="left", padx=20)
         self._label(title, "FRAMEBUFFER STUDIO", TEXT, 12, BG).pack(anchor="w")
-        self._label(title, "像素事件 · 实时观察与时间回放", MUTED, 9, BG).pack(anchor="w")
+        self._label(title, "top.v → GPU → framebuffer · 实时观察与回放", MUTED, 9, BG).pack(anchor="w")
         self.live_button = ttk.Button(top, text="●  实时追踪", style="Accent.TButton", command=self.go_live)
         self.live_button.pack(side="right")
         ttk.Button(top, text="导出当前画面", command=self.export).pack(side="right", padx=8)
@@ -130,6 +136,20 @@ class FramebufferViewer:
         self.source_text = self._label(source, str(self.tail.path), MUTED, 9, anchor="w")
         self.source_text.pack(side="left", fill="x", expand=True)
         ttk.Button(source, text="打开日志…", command=self.open_file).pack(side="right")
+
+        simulation = tk.Frame(self.root, bg=BG)
+        simulation.pack(fill="x", padx=26, pady=(8,0))
+        self.sim_stage = tk.StringVar(value="Logo 开屏")
+        self.sim_fast = tk.BooleanVar(value=True)
+        ttk.Combobox(simulation,textvariable=self.sim_stage,state="readonly",width=15,
+                     values=("Logo 开屏","校准图","太空背景","卫星一圈")).pack(side="left")
+        self.sim_button=ttk.Button(simulation,text="运行 top.v",command=self.simulate_top)
+        self.sim_button.pack(side="left",padx=8)
+        self.sim_stop=ttk.Button(simulation,text="停止仿真",command=self.sim_cancel.set,state="disabled")
+        self.sim_stop.pack(side="left")
+        ttk.Checkbutton(simulation,text="加速功能仿真（50 MHz / 短停留）",variable=self.sim_fast).pack(side="left",padx=12)
+        self.sim_status=self._label(simulation,"仿真顶层 top_tb，设计顶层 top",MUTED,9,BG)
+        self.sim_status.pack(side="right")
 
         stats = tk.Frame(self.root, bg=BG)
         stats.pack(fill="x", padx=26, pady=14)
@@ -241,11 +261,58 @@ class FramebufferViewer:
 
     def close(self):
         self._closed = True
+        self.sim_cancel.set()
         if self.image_studio and not self.image_studio.closed:
             self.image_studio.close()
         if self._timer:
             self.root.after_cancel(self._timer)
         self.root.destroy()
+
+    def claim_simulation(self, owner):
+        if self.simulation_owner is not None:
+            return False
+        self.simulation_owner=owner
+        return True
+
+    def release_simulation(self, owner):
+        if self.simulation_owner is owner:
+            self.simulation_owner=None
+
+    def simulate_top(self):
+        if not self.claim_simulation(self):
+            messagebox.showinfo("仿真进行中","请先停止当前仿真。",parent=self.root)
+            return
+        from top_simulation import run_top,SimulationCancelled
+        stage={"Logo 开屏":"logo","校准图":"calibration","太空背景":"background","卫星一圈":"animation"}[self.sim_stage.get()]
+        fast=self.sim_fast.get()
+        output=self.project/"out/studio_top"
+        self.sim_cancel.clear()
+        self.sim_button.configure(state="disabled");self.sim_stop.configure(state="normal")
+        self.watch_trace(output/"framebuffer.trace")
+        def work():
+            try:
+                paths=run_top(self.project,output,self.sim_cancel,stage=stage,frames=32 if stage=="animation" else 1,
+                              fast=fast,progress=lambda text:self.sim_messages.put(("progress",text)))
+                from view_framebuffer import read_hex_framebuffer,rgb332_to_rgb888,save_with_pillow
+                pixels=read_hex_framebuffer(paths["framebuffer"])
+                save_with_pillow([rgb332_to_rgb888(v) for v in pixels],output/"framebuffer.png")
+                self.sim_messages.put(("done","top.v 仿真完成 · 可回放实际像素写入"))
+            except SimulationCancelled:
+                self.sim_messages.put(("done","仿真已停止 · 已写入的轨迹可继续回放"))
+            except Exception as exc:
+                self.sim_messages.put(("error",str(exc)))
+            finally:
+                self.release_simulation(self)
+        threading.Thread(target=work,daemon=True).start()
+
+    def poll_simulation(self):
+        while True:
+            try:kind,text=self.sim_messages.get_nowait()
+            except queue.Empty:break
+            self.sim_status.configure(text=text)
+            if kind!="progress":
+                self.sim_button.configure(state="normal");self.sim_stop.configure(state="disabled")
+                if kind=="error":messagebox.showerror("top.v 仿真",text,parent=self.root)
 
     def open_image_studio(self):
         if self.image_studio and not self.image_studio.closed:
@@ -540,6 +607,7 @@ class FramebufferViewer:
     def _tick(self):
         if self._closed:
             return
+        self.poll_simulation()
         now = time.perf_counter()
         elapsed = min(now - self.last_tick, .2)
         self.last_tick = now

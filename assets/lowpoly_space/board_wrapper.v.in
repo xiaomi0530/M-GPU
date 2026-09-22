@@ -1,0 +1,88 @@
+`timescale 1ns / 1ps
+
+// Board wrapper for Nexys A7-100T (xc7a100tcsg324-1).
+// Automatic sequence: alignment target -> RGB triangle -> holographic rotating core.
+// BTNU skips the current completed-picture hold. CPU_RESETN restarts the
+// sequence; clearing is performed with triangles through the existing GPU.
+module top #(
+    parameter BUTTON_FILTER_BITS = 16,
+    // Default /16 = 6.25 MHz, leaves time for the original combinational
+    // dividers. If changed for hardware, update the XDC generated clock too.
+    parameter GPU_CLK_DIV_LOG2 = 4,
+    parameter STAGE_HOLD_MS = 4000,
+    parameter CUBE_HOLD_MS = 40,
+    // Half edge length in pixels before rotation (recommended 32..128).
+    parameter CUBE_HALF_SIZE = 96
+)(
+    input  wire       CLK100MHZ,
+    input  wire       CPU_RESETN,
+    input  wire       BTNU,
+    output wire [3:0] VGA_R,
+    output wire [3:0] VGA_G,
+    output wire [3:0] VGA_B,
+    output wire       VGA_HS,
+    output wire       VGA_VS
+);
+    // Configuration initialization also guarantees a reset without a button.
+    // Both assertion and release are synchronized: an asynchronous reset
+    // must not directly change a block RAM's read/write enable pins.
+    (* ASYNC_REG = "TRUE", SHREG_EXTRACT = "NO" *) reg [3:0] reset_pipe = 4'b1111;
+    always @(posedge CLK100MHZ) begin
+        reset_pipe <= {reset_pipe[2:0], !CPU_RESETN};
+    end
+    wire vga_rst = reset_pipe[3];
+
+    // Free-running divider, routed through a dedicated global clock buffer.
+    // Never gate or restart this clock with a button.
+    reg [GPU_CLK_DIV_LOG2-1:0] gpu_divider = 0;
+    always @(posedge CLK100MHZ)
+        gpu_divider <= gpu_divider + 1'b1;
+    wire gpu_clk;
+`ifdef __ICARUS__
+    // Icarus does not provide Xilinx primitives; BUFG is logically a wire.
+    assign gpu_clk = gpu_divider[GPU_CLK_DIV_LOG2-1];
+`else
+    BUFG u_gpu_clk_buf (.I(gpu_divider[GPU_CLK_DIV_LOG2-1]), .O(gpu_clk));
+`endif
+
+    (* ASYNC_REG = "TRUE", SHREG_EXTRACT = "NO" *) reg [3:0] gpu_reset_pipe = 4'b1111;
+    always @(posedge gpu_clk) begin
+        gpu_reset_pipe <= {gpu_reset_pipe[2:0], !CPU_RESETN};
+    end
+    wire rst = gpu_reset_pipe[3];
+
+    (* ASYNC_REG = "TRUE" *) reg [1:0] button_sync;
+    reg [BUTTON_FILTER_BITS-1:0] button_count;
+    reg button_level;
+    reg button_press;
+    always @(posedge gpu_clk) begin
+        if (rst) begin
+            button_sync  <= 2'b00;
+            button_count <= 0;
+            button_level <= 1'b0;
+            button_press <= 1'b0;
+        end else begin
+            button_sync <= {button_sync[0], BTNU};
+            button_press <= 1'b0;
+            if (button_sync[1] == button_level) begin
+                button_count <= 0;
+            end else if (&button_count) begin
+                button_level <= button_sync[1];
+                button_press <= button_sync[1];
+                button_count <= 0;
+            end else begin
+                button_count <= button_count + 1'b1;
+            end
+        end
+    end
+
+// GENERATED_CONTROLLER
+    mgpu u_mgpu (
+        .clk(gpu_clk), .rst(rst), .start(demo_start),
+        .x0(gpu_x0), .y0(gpu_y0), .x1(gpu_x1), .y1(gpu_y1), .x2(gpu_x2), .y2(gpu_y2),
+        .clor0(gpu_c0), .clor1(gpu_c1), .clor2(gpu_c2),
+        .clear_color(8'h00), .gpu_busy(gpu_busy), .gpu_done(gpu_done),
+        .vga_clk(CLK100MHZ), .vga_rst(vga_rst),
+        .vga_r(VGA_R), .vga_g(VGA_G), .vga_b(VGA_B), .vga_hs(VGA_HS), .vga_vs(VGA_VS)
+    );
+endmodule

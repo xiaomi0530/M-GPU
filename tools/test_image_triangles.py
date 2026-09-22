@@ -96,12 +96,12 @@ class ImageMeshTests(unittest.TestCase):
             testbench.mkdir(parents=True)
             for path in (PROJECT/"MGPU.srcs/sources_1/new").glob("*.v"):
                 shutil.copy2(path,sources/path.name)
-            shutil.copy2(PROJECT/"MGPU.srcs/sim_1/new/mgpu_tb.v",testbench/"mgpu_tb.v")
+            shutil.copy2(PROJECT/"MGPU.srcs/sim_1/new/top_tb.v",testbench/"top_tb.v")
             mesh = triangulate(specimen(),Placement(16,20,48,32),0,160000)
             paths = save_bundle(mesh,project,"RGBA test fixture")
             self.assertTrue(paths["scene"].exists())
             binary = project/"out/check.vvp"
-            compile_result = subprocess.run([shutil.which("iverilog"),"-g2012","-s","mgpu_image_tb","-o",str(binary),
+            compile_result = subprocess.run([shutil.which("iverilog"),"-g2012","-DSTUDIO_SIMULATION","-Ptop_image_tb.GPU_CLK_DIV_LOG2=1","-s","top_image_tb","-o",str(binary),
                                              *map(str,sources.glob("*.v")),str(paths["testbench"])],
                                             cwd=project,capture_output=True,text=True,timeout=60)
             self.assertEqual(compile_result.returncode,0,compile_result.stderr)

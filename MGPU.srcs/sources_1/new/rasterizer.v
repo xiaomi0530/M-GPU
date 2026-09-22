@@ -248,6 +248,7 @@ module rasterizer (
     always@(posedge clk)begin
         if(rst)begin
             rast_state <= IDLE;
+            rast_busy <= 1'b0;
             rast_done <= 1'b0;
             frag_x <= 1'b0;
             frag_y <= 1'b0;

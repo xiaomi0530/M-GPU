@@ -21,6 +21,17 @@ def parse(text):
 
 
 class TraceTests(unittest.TestCase):
+    def test_clear_writes_between_triangles_are_reversible(self):
+        model = parse('MGPU_TRACE 1 2 1 ff ns\n'
+                      'P 1 0 0 0 00\nP 2 0 1 0 00\n'
+                      'B 3 1 0 0 1 0 0 0\nP 4 1 0 0 e0\nE 5 1\n'
+                      'P 6 0 0 0 00\nD 7 1 4\n')
+        self.assertEqual(model.seek_count(4), bytes([0, 0]))
+        self.assertEqual(model.seek_count(3), bytes([224, 0]))
+        self.assertEqual(model.seek_count(0), bytes([255, 255]))
+        with self.assertRaises(ValueError):
+            parse('MGPU_TRACE 1 2 1 00 ns\nB 1 1 0 0 1 0 0 0\nP 2 0 0 0 00\n')
+
     def test_overlap_undo_and_timestamp_boundaries(self):
         model = parse(SAMPLE)
         self.assertEqual(model.count_at(19), 0)
@@ -102,7 +113,7 @@ class TraceTests(unittest.TestCase):
 
     def test_full_simulation_recording_matches_framebuffer(self):
         project = Path(__file__).resolve().parents[1]
-        path = project / "out/framebuffer.trace"
+        path = project / "out/studio_top/framebuffer.trace"
         if not path.exists():
             self.skipTest("Run the RTL simulation first for end-to-end comparison")
         tail = TraceTail(path)
@@ -111,14 +122,22 @@ class TraceTests(unittest.TestCase):
         self.assertIsNone(tail.error)
         self.assertTrue(tail.model.complete)
         expected = bytes(int(line, 16) for line in
-                         (project / "out/framebuffer.hex").read_text().splitlines())
+                         (project / "out/studio_top/framebuffer.hex").read_text().splitlines())
         self.assertEqual(tail.model.seek_count(len(tail.model.times)), expected)
-        for triangle in tail.model.triangles:
-            count = triangle.last_pixel
-            frame = bytearray([tail.model.clear]) * len(expected)
-            for i in range(count):
-                frame[tail.model.addresses[i]] = tail.model.colors[i]
-            self.assertEqual(tail.model.seek_count(count), frame)
+        # Check bounded, evenly spaced triangle boundaries. Replaying every
+        # prefix is quadratic for board demos with tens of thousands of draws.
+        triangles=tail.model.triangles
+        stride=max(1,len(triangles)//32)
+        targets={t.last_pixel for t in triangles[::stride]}
+        targets.add(len(tail.model.times))
+        frame=bytearray([tail.model.clear])*len(expected)
+        previous=0
+        for count in sorted(targets):
+            for i in range(previous,count):
+                frame[tail.model.addresses[i]]=tail.model.colors[i]
+            self.assertEqual(tail.model.seek_count(count),frame)
+            previous=count
+
 
 
 if __name__ == "__main__":

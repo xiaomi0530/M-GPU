@@ -9,6 +9,7 @@ module mgpu #(
     input  wire       clk,
     input  wire       rst,
     input  wire       start,
+    input  wire       clear,
     input  wire [9:0] x0,
     input  wire [9:0] y0,
     input  wire [9:0] x1,
@@ -20,7 +21,16 @@ module mgpu #(
     input  wire [7:0] clor2, 
     input  wire [7:0] clear_color,
     output wire       gpu_busy,
-    output wire       gpu_done
+    output wire       gpu_done,
+
+    // VGA board outputs (scanout implementation is isolated at file end).
+    input  wire       vga_clk,
+    input  wire       vga_rst,
+    output wire [3:0] vga_r,
+    output wire [3:0] vga_g,
+    output wire [3:0] vga_b,
+    output wire       vga_hs,
+    output wire       vga_vs
 );
     reg [7:0] frame_buffer [0:FB_PIXELS-1];
 
@@ -90,6 +100,7 @@ module mgpu #(
     wire        rast_valid;
     wire        rast_done;
     wire        rast_busy;
+    reg         rast_finished;
     
     wire  [9:0]  frag_x;
     wire  [9:0]  frag_y;
@@ -100,8 +111,8 @@ module mgpu #(
 
     assign rast_start = start;
     assign rast_valid = !fifo_rs_full;
-    assign gpu_busy = rast_busy;
-    assign gpu_done = rast_done;
+    assign gpu_busy = rast_busy | clear_busy; 
+    assign gpu_done = rast_finished && fifo_rs_empty && shad_done;
 
     wire [27:0] fifo_rs_wdata;
     wire        fifo_rs_wen;
@@ -113,6 +124,18 @@ module mgpu #(
     
     assign fifo_rs_wdata = {frag_x,frag_y,Q312_to_RGB332(frag_clor_R,frag_clor_G,frag_clor_B)};
     assign fifo_rs_wen = frag_valid && rast_valid;
+
+    always @(posedge clk) begin
+        if(rst)begin
+            rast_finished <= 1'b0;
+        end else begin
+            if(rast_done)begin
+                rast_finished <= 1'b1;
+            end else if(rast_start) begin
+                rast_finished <= 1'b0;
+            end
+        end
+    end
 
     rasterizer u_rasterizer(
         .clk         (clk         ),
@@ -180,11 +203,61 @@ module mgpu #(
         .pixel_G         (pixel_G         ),
         .pixel_B         (pixel_B         )
     );
-    
+    reg [31:0]   clear_count;
+    reg         clear_reg;
+    reg         clear_busy;
+
     always @(posedge clk) begin
-        if(shad_done)begin
+        if(rst)begin
+            clear_reg <= 1'b0;
+            clear_busy <= 1'b0;
+            clear_count <= 1'b0;
+        end else if(clear && !clear_reg)begin
+            clear_reg <= 1'b1;
+            clear_busy <= 1'b1;
+        end else if(shad_done && !clear_reg)begin
             frame_buffer[pixel_addr(pixel_x,pixel_y)] <= {pixel_R,pixel_G,pixel_B};
+        end else if(clear_reg) begin
+                frame_buffer[clear_count] <= clear_color;
+                if(clear_count < FB_PIXELS-1)begin
+                    clear_count <= clear_count + 1'b1;
+                end else begin
+                    clear_count <= 1'b0;
+                    clear_reg <= 1'b0;
+                    clear_busy <= 1'b0;
+                end
         end
     end
     
+    // =====================================================================
+    // VGA ADDITION: independent, continuous framebuffer scanout at 100 MHz.
+    // Everything above this marker is the original GPU implementation.
+    // One synchronous read port alongside the original GPU write port allows
+    // block-RAM inference. No copy, frame-complete gate, or RGB format change.
+    // Concurrent access to the same address may show the previous pixel;
+    // the following scan will show the newly written value.
+    // Fixed 640x480 mode: keep H_RES=640, V_RES=480 and FB_ADDR_W=19.
+    // =====================================================================
+    wire [18:0] vga_fb_addr;
+    wire        vga_fb_read_en;
+    reg  [7:0]  vga_fb_data;
+
+    always @(posedge vga_clk) begin
+        if (vga_fb_read_en)
+            vga_fb_data <= frame_buffer[vga_fb_addr];
+    end
+
+    vga u_vga (
+        .clk        (vga_clk),
+        .rst        (vga_rst),
+        .fb_addr    (vga_fb_addr),
+        .fb_read_en (vga_fb_read_en),
+        .fb_data    (vga_fb_data),
+        .vga_r      (vga_r),
+        .vga_g      (vga_g),
+        .vga_b      (vga_b),
+        .vga_hs     (vga_hs),
+        .vga_vs     (vga_vs)
+    );
+
 endmodule

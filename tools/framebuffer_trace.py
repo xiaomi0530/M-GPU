@@ -7,6 +7,8 @@ Protocol v1 (ASCII, newline terminated, timestamps in integer nanoseconds):
     E time triangle_id
     D time triangle_count pixel_count
 
+P events with triangle_id=0 are hardware clear writes outside a triangle.
+
 Only complete lines are consumed. Checkpoints bound random-seek work while a
 separate ingestion buffer keeps following the producer during paused playback.
 """
@@ -94,7 +96,8 @@ class Trace:
         elif kind == "P":
             ident, x, y = map(int, parts[2:5])
             color = int(parts[5], 16)
-            if not self.active or ident != self.active.id:
+            # ID 0 records direct clear-engine writes between triangle commands.
+            if (ident == 0 and self.active) or (ident != 0 and (not self.active or ident != self.active.id)):
                 raise ValueError("Pixel does not belong to the active triangle")
             if not (0 <= x < self.width and 0 <= y < self.height and 0 <= color <= 255):
                 raise ValueError("Pixel coordinates or RGB332 value out of range")

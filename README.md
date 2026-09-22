@@ -1,3 +1,7 @@
+> 当前板级入口是 `top.v`，主仿真入口是 `top_tb.v`。Studio 的最新操作说明见 [top 工作流](docs/studio_top_workflow.md)，清屏接口见 [硬件清屏](docs/top_hardware_clear.md)。下方早期开发记录保留作学习参考。
+>
+> 仿真、导出和构建结果统一写入 `out/`，不提交 Git；Vivado 缓存和 runs 也不提交。首次运行请通过 Studio 或构建脚本生成结果。
+
 # M-GPU
 
 完全无GPU基础，边做边学，纯老一辈手工敲代码项目。
@@ -13,7 +17,7 @@
 
 <figure align="center">
 
-<img src="out/triangle_test0.png" width="600">
+<img src="docs/images/triangle_test0.png" width="600">
 
 <figcaption>
 <small>
@@ -31,7 +35,7 @@
 
 <figure align="center">
 
-<img src="out/ver1_1_figure.png" width="600">
+<img src="docs/images/ver1_1_figure.png" width="600">
 
 <figcaption>
 <small>
@@ -48,7 +52,7 @@
 
 <figure align="center">
 
-<img src="out/triangle_test1.png" width="600">
+<img src="docs/images/triangle_test1.png" width="600">
 
 <figcaption>
 <small>
@@ -71,7 +75,7 @@ GPT生成的testbench
 
 - 做一个Vertex Shader
 
-- 做一个VGA模块，上板收敛时序
+- ~~做一个VGA模块，上板收敛时序~~
   
 <br>
 

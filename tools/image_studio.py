@@ -2,8 +2,6 @@
 from __future__ import annotations
 
 import queue
-import shutil
-import subprocess
 import threading
 import time
 from pathlib import Path
@@ -77,9 +75,18 @@ class ImageStudio:
 
         body = tk.Frame(self.window, bg=BG)
         body.pack(fill="both", expand=True, padx=22)
-        side = tk.Frame(body, bg=PANEL, width=round(278*self.owner.ui_scale), padx=16, pady=12)
-        side.pack(side="right", fill="y", padx=(14,0))
-        side.pack_propagate(False)
+        sidebar = tk.Frame(body, bg=PANEL, width=round(290*self.owner.ui_scale))
+        sidebar.pack(side="right",fill="y",padx=(14,0))
+        sidebar.pack_propagate(False)
+        self.side_canvas=tk.Canvas(sidebar,bg=PANEL,highlightthickness=0)
+        scroll=ttk.Scrollbar(sidebar,orient="vertical",command=self.side_canvas.yview)
+        scroll.pack(side="right",fill="y")
+        self.side_canvas.pack(side="left",fill="both",expand=True)
+        self.side_canvas.configure(yscrollcommand=scroll.set)
+        side=tk.Frame(self.side_canvas,bg=PANEL,padx=16,pady=12)
+        self.side_window=self.side_canvas.create_window((0,0),window=side,anchor="nw")
+        side.bind("<Configure>",lambda event:self.side_canvas.configure(scrollregion=self.side_canvas.bbox("all")))
+        self.side_canvas.bind("<Configure>",lambda event:self.side_canvas.itemconfigure(self.side_window,width=event.width))
         stage = tk.Frame(body, bg=PANEL)
         stage.pack(side="left", fill="both", expand=True)
         mode_bar = tk.Frame(stage, bg=PANEL, padx=10, pady=8)
@@ -136,13 +143,25 @@ class ImageStudio:
             self.controls.append(entry)
         ttk.Checkbutton(side, text="显示三角形网格", variable=self.mesh_lines,
                         command=self.redraw).pack(anchor="w", pady=10)
-        self.generate_button = self.button(side, "生成三角 + Testbench", self.generate, True)
+        self.generate_button = self.button(side, "生成三角 + top Testbench", self.generate, True)
         self.generate_button.pack(fill="x", pady=(4,8))
-        self.simulate_button = self.button(side, "运行 GPU 仿真并查看", self.simulate)
+        self.simulate_button = self.button(side, "通过 top.v 仿真并查看", self.simulate)
         self.simulate_button.pack(fill="x")
         self.simulate_button.configure(state="disabled")
+        self.export_button = self.button(side,"导出上板 top.v",self.export_board)
+        self.export_button.pack(fill="x",pady=(8,0))
+        self.export_button.configure(state="disabled")
         self.cancel_button = ttk.Button(side, text="取消当前操作", command=self.cancel.set, state="disabled")
         self.cancel_button.pack(fill="x", pady=8)
+
+        def wheel(event):
+            self.side_canvas.yview_scroll(-1 if event.delta>0 else 1,"units")
+            return "break"
+        def bind_wheel(widget):
+            widget.bind("<MouseWheel>",wheel)
+            for child in widget.winfo_children():bind_wheel(child)
+        bind_wheel(side)
+        self.side_canvas.bind("<MouseWheel>",wheel)
 
         self.metrics = self.label(self.window, "导入图片后，调整位置并点击生成。", TEXT, 11, anchor="w")
         self.metrics.pack(fill="x", padx=24, pady=(14,4))
@@ -176,6 +195,7 @@ class ImageStudio:
         self._last_fields = tuple(variable.get() for variable in self.variables.values()) + (self.background,)
         self.mesh = self.paths = None
         self.simulate_button.configure(state="disabled")
+        self.export_button.configure(state="disabled")
         self.metrics.configure(text="位置或图片已更新 · 需要重新生成三角形。")
         if self.mode.get() == "三角形预览":
             self.mode.set("RGB332")
@@ -294,6 +314,7 @@ class ImageStudio:
             widget.configure(state="disabled" if value else "readonly" if isinstance(widget,ttk.Combobox) else "normal")
         self.simulate_button.configure(state="normal" if not value and self.paths else "disabled")
         self.cancel_button.configure(state="normal" if value else "disabled")
+        self.export_button.configure(state="normal" if not value and self.mesh is not None else "disabled")
 
     def generate(self):
         if self.busy:
@@ -333,59 +354,49 @@ class ImageStudio:
                 self.messages.put(("error",str(exc)))
         threading.Thread(target=work,daemon=True).start()
 
+    def export_board(self):
+        if self.busy or self.mesh is None:
+            return
+        try:
+            from export_image_top import export_top
+            path=export_top(self.mesh,self.project)
+            self.status.configure(text=f"已导出独立上板包：{path.parent}；原工程演示未覆盖。")
+        except Exception as exc:
+            messagebox.showerror("导出上板 top.v",str(exc),parent=self.window)
+
     def simulate(self):
         if self.busy or not self.paths:
             return
-        compiler, runtime = shutil.which("iverilog"), shutil.which("vvp")
-        if not compiler or not runtime:
-            messagebox.showinfo("仿真工具", "未找到 Icarus Verilog。文件已生成，可用 Vivado 运行 out/mgpu_image_tb.v，顶层选 mgpu_image_tb。", parent=self.window)
+        if not self.owner.claim_simulation(self):
+            messagebox.showinfo("仿真进行中","请先停止当前 top.v 仿真。",parent=self.window)
             return
+        from top_simulation import run_top,SimulationCancelled
         self.cancel.clear()
         self.set_busy(True)
-        self.status.configure(text="正在编译并运行 GPU · 主窗口实时追踪像素写入。")
-        self.owner.watch_trace(self.project / "out/framebuffer.trace")
+        self.status.configure(text="正在编译 top.v · 图片通过顶层命令控制器进入 GPU。")
+        output=self.project/"out/studio_image"
+        self.owner.watch_trace(output/"framebuffer.trace")
         self.owner.root.lift()
-        paths = self.paths.copy()
-        expected = self.mesh.prediction.copy()
+        paths=self.paths.copy()
+        expected=self.mesh.prediction.copy()
+        fast=self.owner.sim_fast.get()
         def work():
-            logfile = self.project / "out/image_simulation.log"
             try:
-                sources = sorted((self.project / "MGPU.srcs/sources_1/new").glob("*.v"))
-                binary = self.project / "out/mgpu_image_tb.vvp"
-                commands = [[compiler,"-g2012","-s","mgpu_image_tb","-o",str(binary),
-                             *map(str,sources),str(paths["testbench"])], [runtime,str(binary)]]
-                with logfile.open("w",encoding="utf-8") as log:
-                    for command in commands:
-                        process = subprocess.Popen(command,cwd=self.project,stdout=log,stderr=subprocess.STDOUT,
-                                                   creationflags=getattr(subprocess,"CREATE_NO_WINDOW",0))
-                        started = time.monotonic()
-                        while True:
-                            try:
-                                result = process.wait(timeout=.2)
-                                break
-                            except subprocess.TimeoutExpired:
-                                if self.cancel.is_set() or time.monotonic()-started > 600:
-                                    process.terminate()
-                                    try:
-                                        process.wait(timeout=3)
-                                    except subprocess.TimeoutExpired:
-                                        process.kill()
-                                        process.wait()
-                                    if self.cancel.is_set():
-                                        raise Cancelled()
-                                    raise RuntimeError("仿真超过 10 分钟，已停止。可缩小图片或降低三角形数量。")
-                        if result:
-                            raise RuntimeError(f"仿真失败，查看 {logfile}")
-                actual = np.array([int(line,16) for line in (self.project / "out/framebuffer.hex").read_text().splitlines()],dtype=np.uint8).reshape((480,640))
-                different = int(np.count_nonzero(actual != expected))
+                results=run_top(self.project,output,self.cancel,testbench=paths["testbench"],
+                                module="top_image_tb",scene=paths["scene"],fast=fast,
+                                progress=lambda text:self.messages.put(("progress",text)))
+                actual=np.array([int(line,16) for line in results["framebuffer"].read_text().split()],dtype=np.uint8).reshape((480,640))
+                different=int(np.count_nonzero(actual!=expected))
                 if different:
-                    raise RuntimeError(f"GPU 输出与三角形预览有 {different:,} 个像素不同，请检查 RTL；日志：{logfile}")
-                Image.fromarray(RGB[actual]).save(self.project / "out/framebuffer.png")
+                    raise RuntimeError(f"top.v 输出与三角形预览有 {different:,} 个像素不同；日志：{results['log']}")
+                Image.fromarray(RGB[actual]).save(output/"framebuffer.png")
                 self.messages.put(("simulated",None))
-            except Cancelled:
+            except SimulationCancelled:
                 self.messages.put(("cancelled",None))
             except Exception as exc:
                 self.messages.put(("error",str(exc)))
+            finally:
+                self.owner.release_simulation(self)
         threading.Thread(target=work,daemon=True).start()
 
     def poll(self):
@@ -404,13 +415,14 @@ class ImageStudio:
                     self.mesh,self.paths = value
                     self.mode.set("三角形预览")
                     self.simulate_button.configure(state="normal")
+                    self.export_button.configure(state="normal")
                     mesh = self.mesh
                     self.metrics.configure(text=f"{len(mesh.triangles):,} 个三角形  ·  RGB 误差 {mesh.rmse:.2f}  ·  可见像素一致率 {mesh.exact_percent:.2f}%")
                     suffix = "已达到数量上限，当前为近似结果。" if mesh.budget_limited else ""
-                    self.status.configure(text="已生成 out/image_scene.tri 与 out/mgpu_image_tb.v；可直接运行 GPU 仿真。" + suffix)
+                    self.status.configure(text="已生成 out/image_scene.tri 与 out/top_image_tb.v；以 top.v 为设计顶层运行。" + suffix)
                     self.redraw()
                 elif kind == "simulated":
-                    self.status.configure(text="仿真通过 · GPU 输出与三角形预览逐像素一致。可在主窗口回放，也可查看 out/framebuffer.png。")
+                    self.status.configure(text="仿真通过 · top.v 输出与三角形预览逐像素一致。回放与图片在 out/studio_image/。")
                 elif kind == "cancelled":
                     self.status.configure(text="操作已取消。")
                 else:

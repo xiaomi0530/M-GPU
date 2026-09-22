@@ -101,7 +101,7 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.framebuffer is None or args.gui or args.live or Path(args.framebuffer).suffix.lower() != ".hex":
-        path = Path(args.framebuffer) if args.framebuffer else Path(__file__).resolve().parents[1] / "out/framebuffer.trace"
+        path = Path(args.framebuffer) if args.framebuffer else Path(__file__).resolve().parents[1] / "out/studio_top/framebuffer.trace"
         if path.suffix.lower() == ".hex":
             parser.error("Live playback requires a .trace log; .hex only contains the final frame.")
         try:

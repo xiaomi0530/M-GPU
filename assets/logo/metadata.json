@@ -1,0 +1,14 @@
+{
+  "source": "assets/logo/black_logo.png",
+  "crop": [
+    86,
+    218,
+    1464,
+    767
+  ],
+  "width": 576,
+  "height": 240,
+  "x": 32,
+  "y": 120,
+  "runs": 6399
+}

@@ -89,6 +89,16 @@ class ViewerTests(unittest.TestCase):
             self.assertEqual(picture.getpixel((1, 0)), (0, 0, 0))
         self.assertFalse(self.errors)
 
+    def test_studios_share_one_simulation_slot(self):
+        other=object()
+        self.assertTrue(self.app.claim_simulation(other))
+        self.assertFalse(self.app.claim_simulation(self.app))
+        self.app.release_simulation(self.app)
+        self.assertIs(self.app.simulation_owner,other)
+        self.app.release_simulation(other)
+        self.assertTrue(self.app.claim_simulation(self.app))
+        self.app.release_simulation(self.app)
+
     def test_legacy_hex_command(self):
         target = Path(self.folder.name) / "input.hex"
         target.write_text("e0\n" + "00\n" * (640 * 480 - 1), encoding="ascii")
