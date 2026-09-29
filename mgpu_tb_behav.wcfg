@@ -3,289 +3,397 @@
    <wave_state>
    </wave_state>
    <db_ref_list>
-      <db_ref path="mgpu_tb_behav.wdb" id="1">
+      <db_ref path="top_tb_behav.wdb" id="1">
          <top_modules>
             <top_module name="glbl" />
-            <top_module name="mgpu_tb" />
+            <top_module name="top_tb" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="5,480.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="5,773.001 ns"></ZoomEndTime>
-      <Cursor1Time time="5,542.000 ns"></Cursor1Time>
+      <ZoomStartTime time="49,236,213.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="49,237,397.001 ns"></ZoomEndTime>
+      <Cursor1Time time="49,236,951.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="236"></NameColumnWidth>
+      <NameColumnWidth column_width="230"></NameColumnWidth>
       <ValueColumnWidth column_width="90"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="55" />
-   <wvobject fp_name="/mgpu_tb/u_mgpu/clk" type="logic">
+   <WVObjectSize size="94" />
+   <wvobject fp_name="/top_tb/dut/u_mgpu/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
-      <obj_property name="CustomSignalColor">#FFA500</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/rst" type="logic">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
-      <obj_property name="CustomSignalColor">#FFA500</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/start" type="logic">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/start" type="logic">
       <obj_property name="ElementShortName">start</obj_property>
       <obj_property name="ObjectShortName">start</obj_property>
-      <obj_property name="CustomSignalColor">#FFA500</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/x0" type="array">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/clear" type="logic">
+      <obj_property name="ElementShortName">clear</obj_property>
+      <obj_property name="ObjectShortName">clear</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/x0" type="array">
       <obj_property name="ElementShortName">x0[9:0]</obj_property>
       <obj_property name="ObjectShortName">x0[9:0]</obj_property>
-      <obj_property name="CustomSignalColor">#FFA500</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/y0" type="array">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/y0" type="array">
       <obj_property name="ElementShortName">y0[9:0]</obj_property>
       <obj_property name="ObjectShortName">y0[9:0]</obj_property>
-      <obj_property name="CustomSignalColor">#FFA500</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/x1" type="array">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/x1" type="array">
       <obj_property name="ElementShortName">x1[9:0]</obj_property>
       <obj_property name="ObjectShortName">x1[9:0]</obj_property>
-      <obj_property name="CustomSignalColor">#FFA500</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/y1" type="array">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/y1" type="array">
       <obj_property name="ElementShortName">y1[9:0]</obj_property>
       <obj_property name="ObjectShortName">y1[9:0]</obj_property>
-      <obj_property name="CustomSignalColor">#FFA500</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/x2" type="array">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/x2" type="array">
       <obj_property name="ElementShortName">x2[9:0]</obj_property>
       <obj_property name="ObjectShortName">x2[9:0]</obj_property>
-      <obj_property name="CustomSignalColor">#FFA500</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/y2" type="array">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/y2" type="array">
       <obj_property name="ElementShortName">y2[9:0]</obj_property>
       <obj_property name="ObjectShortName">y2[9:0]</obj_property>
-      <obj_property name="CustomSignalColor">#FFA500</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/clor0" type="array">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/clor0" type="array">
       <obj_property name="ElementShortName">clor0[7:0]</obj_property>
       <obj_property name="ObjectShortName">clor0[7:0]</obj_property>
-      <obj_property name="CustomSignalColor">#FFA500</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/clor1" type="array">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/clor1" type="array">
       <obj_property name="ElementShortName">clor1[7:0]</obj_property>
       <obj_property name="ObjectShortName">clor1[7:0]</obj_property>
-      <obj_property name="CustomSignalColor">#FFA500</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/clor2" type="array">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/clor2" type="array">
       <obj_property name="ElementShortName">clor2[7:0]</obj_property>
       <obj_property name="ObjectShortName">clor2[7:0]</obj_property>
-      <obj_property name="CustomSignalColor">#FFA500</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/clear_color" type="array">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/clear_color" type="array">
       <obj_property name="ElementShortName">clear_color[7:0]</obj_property>
       <obj_property name="ObjectShortName">clear_color[7:0]</obj_property>
-      <obj_property name="CustomSignalColor">#FFA500</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/rast_start" type="logic">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/gpu_busy" type="logic">
+      <obj_property name="ElementShortName">gpu_busy</obj_property>
+      <obj_property name="ObjectShortName">gpu_busy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/gpu_done" type="logic">
+      <obj_property name="ElementShortName">gpu_done</obj_property>
+      <obj_property name="ObjectShortName">gpu_done</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/vga_clk" type="logic">
+      <obj_property name="ElementShortName">vga_clk</obj_property>
+      <obj_property name="ObjectShortName">vga_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/vga_rst" type="logic">
+      <obj_property name="ElementShortName">vga_rst</obj_property>
+      <obj_property name="ObjectShortName">vga_rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/vga_r" type="array">
+      <obj_property name="ElementShortName">vga_r[3:0]</obj_property>
+      <obj_property name="ObjectShortName">vga_r[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/vga_g" type="array">
+      <obj_property name="ElementShortName">vga_g[3:0]</obj_property>
+      <obj_property name="ObjectShortName">vga_g[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/vga_b" type="array">
+      <obj_property name="ElementShortName">vga_b[3:0]</obj_property>
+      <obj_property name="ObjectShortName">vga_b[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/vga_hs" type="logic">
+      <obj_property name="ElementShortName">vga_hs</obj_property>
+      <obj_property name="ObjectShortName">vga_hs</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/vga_vs" type="logic">
+      <obj_property name="ElementShortName">vga_vs</obj_property>
+      <obj_property name="ObjectShortName">vga_vs</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/i" type="array">
+      <obj_property name="ElementShortName">i[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/rast_start" type="logic">
       <obj_property name="ElementShortName">rast_start</obj_property>
       <obj_property name="ObjectShortName">rast_start</obj_property>
-      <obj_property name="CustomSignalColor">#D2691E</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/rast_valid" type="logic">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/rast_valid" type="logic">
       <obj_property name="ElementShortName">rast_valid</obj_property>
       <obj_property name="ObjectShortName">rast_valid</obj_property>
-      <obj_property name="CustomSignalColor">#D2691E</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/rast_done" type="logic">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/rast_done" type="logic">
       <obj_property name="ElementShortName">rast_done</obj_property>
       <obj_property name="ObjectShortName">rast_done</obj_property>
-      <obj_property name="CustomSignalColor">#D2691E</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/rast_busy" type="logic">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/rast_busy" type="logic">
       <obj_property name="ElementShortName">rast_busy</obj_property>
       <obj_property name="ObjectShortName">rast_busy</obj_property>
-      <obj_property name="CustomSignalColor">#D2691E</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/frag_x" type="array">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/rast_finished" type="logic">
+      <obj_property name="ElementShortName">rast_finished</obj_property>
+      <obj_property name="ObjectShortName">rast_finished</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/frag_x" type="array">
       <obj_property name="ElementShortName">frag_x[9:0]</obj_property>
       <obj_property name="ObjectShortName">frag_x[9:0]</obj_property>
-      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/frag_y" type="array">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/frag_y" type="array">
       <obj_property name="ElementShortName">frag_y[9:0]</obj_property>
       <obj_property name="ObjectShortName">frag_y[9:0]</obj_property>
-      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/frag_clor_R" type="array">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/frag_clor_R" type="array">
       <obj_property name="ElementShortName">frag_clor_R[31:0]</obj_property>
       <obj_property name="ObjectShortName">frag_clor_R[31:0]</obj_property>
-      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/frag_clor_G" type="array">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/frag_clor_G" type="array">
       <obj_property name="ElementShortName">frag_clor_G[31:0]</obj_property>
       <obj_property name="ObjectShortName">frag_clor_G[31:0]</obj_property>
-      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/frag_clor_B" type="array">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/frag_clor_B" type="array">
       <obj_property name="ElementShortName">frag_clor_B[31:0]</obj_property>
       <obj_property name="ObjectShortName">frag_clor_B[31:0]</obj_property>
-      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/fifo_rs_empty" type="logic">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/frag_valid" type="logic">
+      <obj_property name="ElementShortName">frag_valid</obj_property>
+      <obj_property name="ObjectShortName">frag_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/fifo_rs_wdata" type="array">
+      <obj_property name="ElementShortName">fifo_rs_wdata[27:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_rs_wdata[27:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/fifo_rs_wen" type="logic">
+      <obj_property name="ElementShortName">fifo_rs_wen</obj_property>
+      <obj_property name="ObjectShortName">fifo_rs_wen</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/fifo_rs_ren" type="logic">
+      <obj_property name="ElementShortName">fifo_rs_ren</obj_property>
+      <obj_property name="ObjectShortName">fifo_rs_ren</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/fifo_rs_rdata" type="array">
+      <obj_property name="ElementShortName">fifo_rs_rdata[27:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_rs_rdata[27:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/fifo_rs_rvalid" type="logic">
+      <obj_property name="ElementShortName">fifo_rs_rvalid</obj_property>
+      <obj_property name="ObjectShortName">fifo_rs_rvalid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/fifo_rs_empty" type="logic">
       <obj_property name="ElementShortName">fifo_rs_empty</obj_property>
       <obj_property name="ObjectShortName">fifo_rs_empty</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/frag_valid" type="logic">
-      <obj_property name="ElementShortName">frag_valid</obj_property>
-      <obj_property name="ObjectShortName">frag_valid</obj_property>
-      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/fifo_rs_full" type="logic">
+      <obj_property name="ElementShortName">fifo_rs_full</obj_property>
+      <obj_property name="ObjectShortName">fifo_rs_full</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/clk" type="logic">
-      <obj_property name="ElementShortName">clk</obj_property>
-      <obj_property name="ObjectShortName">clk</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/rst" type="logic">
-      <obj_property name="ElementShortName">rst</obj_property>
-      <obj_property name="ObjectShortName">rst</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/fifo_empty" type="logic">
-      <obj_property name="ElementShortName">fifo_empty</obj_property>
-      <obj_property name="ObjectShortName">fifo_empty</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/read_fifo_data" type="array">
-      <obj_property name="ElementShortName">read_fifo_data[27:0]</obj_property>
-      <obj_property name="ObjectShortName">read_fifo_data[27:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/read_fifo_en" type="logic">
-      <obj_property name="ElementShortName">read_fifo_en</obj_property>
-      <obj_property name="ObjectShortName">read_fifo_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/read_fifo_valid" type="logic">
-      <obj_property name="ElementShortName">read_fifo_valid</obj_property>
-      <obj_property name="ObjectShortName">read_fifo_valid</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/shad_start" type="logic">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/shad_start" type="logic">
       <obj_property name="ElementShortName">shad_start</obj_property>
       <obj_property name="ObjectShortName">shad_start</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/shad_busy" type="logic">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/shad_done" type="logic">
+      <obj_property name="ElementShortName">shad_done</obj_property>
+      <obj_property name="ObjectShortName">shad_done</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/shad_busy" type="logic">
       <obj_property name="ElementShortName">shad_busy</obj_property>
       <obj_property name="ObjectShortName">shad_busy</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/shad_done" type="logic">
-      <obj_property name="ElementShortName">shad_done</obj_property>
-      <obj_property name="ObjectShortName">shad_done</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/regs_w_en" type="logic">
-      <obj_property name="ElementShortName">regs_w_en</obj_property>
-      <obj_property name="ObjectShortName">regs_w_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/regs_w_addr" type="array">
-      <obj_property name="ElementShortName">regs_w_addr[2:0]</obj_property>
-      <obj_property name="ObjectShortName">regs_w_addr[2:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/regs_w_data" type="array">
-      <obj_property name="ElementShortName">regs_w_data[15:0]</obj_property>
-      <obj_property name="ObjectShortName">regs_w_data[15:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/frag_data" type="array">
-      <obj_property name="ElementShortName">frag_data[27:0]</obj_property>
-      <obj_property name="ObjectShortName">frag_data[27:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/frag_R" type="array">
-      <obj_property name="ElementShortName">frag_R[7:5]</obj_property>
-      <obj_property name="ObjectShortName">frag_R[7:5]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/frag_G" type="array">
-      <obj_property name="ElementShortName">frag_G[4:2]</obj_property>
-      <obj_property name="ObjectShortName">frag_G[4:2]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/frag_B" type="array">
-      <obj_property name="ElementShortName">frag_B[1:0]</obj_property>
-      <obj_property name="ObjectShortName">frag_B[1:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/frag_x" type="array">
-      <obj_property name="ElementShortName">frag_x[9:0]</obj_property>
-      <obj_property name="ObjectShortName">frag_x[9:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/frag_y" type="array">
-      <obj_property name="ElementShortName">frag_y[9:0]</obj_property>
-      <obj_property name="ObjectShortName">frag_y[9:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/shad_state" type="array">
-      <obj_property name="ElementShortName">shad_state[2:0]</obj_property>
-      <obj_property name="ObjectShortName">shad_state[2:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/get_frag_state" type="array">
-      <obj_property name="ElementShortName">get_frag_state[3:0]</obj_property>
-      <obj_property name="ObjectShortName">get_frag_state[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/u_regs/regs" type="array">
-      <obj_property name="ElementShortName">regs[0:7][15:0]</obj_property>
-      <obj_property name="ObjectShortName">regs[0:7][15:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-   </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/regs_r_en" type="logic">
-      <obj_property name="ElementShortName">regs_r_en</obj_property>
-      <obj_property name="ObjectShortName">regs_r_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/regs_r_addr" type="array">
-      <obj_property name="ElementShortName">regs_r_addr[2:0]</obj_property>
-      <obj_property name="ObjectShortName">regs_r_addr[2:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/regs_r_data" type="array">
-      <obj_property name="ElementShortName">regs_r_data[15:0]</obj_property>
-      <obj_property name="ObjectShortName">regs_r_data[15:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/out_pixel_state" type="array">
-      <obj_property name="ElementShortName">out_pixel_state[3:0]</obj_property>
-      <obj_property name="ObjectShortName">out_pixel_state[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/pixel_x" type="array">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/pixel_x" type="array">
       <obj_property name="ElementShortName">pixel_x[9:0]</obj_property>
       <obj_property name="ObjectShortName">pixel_x[9:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/pixel_y" type="array">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/pixel_y" type="array">
       <obj_property name="ElementShortName">pixel_y[9:0]</obj_property>
       <obj_property name="ObjectShortName">pixel_y[9:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/pixel_R" type="array">
-      <obj_property name="ElementShortName">pixel_R[7:5]</obj_property>
-      <obj_property name="ObjectShortName">pixel_R[7:5]</obj_property>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/pixel_R" type="array">
+      <obj_property name="ElementShortName">pixel_R[2:0]</obj_property>
+      <obj_property name="ObjectShortName">pixel_R[2:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/pixel_G" type="array">
-      <obj_property name="ElementShortName">pixel_G[4:2]</obj_property>
-      <obj_property name="ObjectShortName">pixel_G[4:2]</obj_property>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/pixel_G" type="array">
+      <obj_property name="ElementShortName">pixel_G[2:0]</obj_property>
+      <obj_property name="ObjectShortName">pixel_G[2:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/u_shader/pixel_B" type="array">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/pixel_B" type="array">
       <obj_property name="ElementShortName">pixel_B[1:0]</obj_property>
       <obj_property name="ObjectShortName">pixel_B[1:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/mgpu_tb/u_mgpu/shad_done" type="logic">
+   <wvobject fp_name="/top_tb/dut/u_mgpu/clear_count" type="array">
+      <obj_property name="ElementShortName">clear_count[31:0]</obj_property>
+      <obj_property name="ObjectShortName">clear_count[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/clear_reg" type="logic">
+      <obj_property name="ElementShortName">clear_reg</obj_property>
+      <obj_property name="ObjectShortName">clear_reg</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/clear_busy" type="logic">
+      <obj_property name="ElementShortName">clear_busy</obj_property>
+      <obj_property name="ObjectShortName">clear_busy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/vga_fb_addr" type="array">
+      <obj_property name="ElementShortName">vga_fb_addr[18:0]</obj_property>
+      <obj_property name="ObjectShortName">vga_fb_addr[18:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/vga_fb_read_en" type="logic">
+      <obj_property name="ElementShortName">vga_fb_read_en</obj_property>
+      <obj_property name="ObjectShortName">vga_fb_read_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/vga_fb_data" type="array">
+      <obj_property name="ElementShortName">vga_fb_data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">vga_fb_data[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/H_RES" type="array">
+      <obj_property name="ElementShortName">H_RES[31:0]</obj_property>
+      <obj_property name="ObjectShortName">H_RES[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/V_RES" type="array">
+      <obj_property name="ElementShortName">V_RES[31:0]</obj_property>
+      <obj_property name="ObjectShortName">V_RES[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/FB_PIXELS" type="array">
+      <obj_property name="ElementShortName">FB_PIXELS[31:0]</obj_property>
+      <obj_property name="ObjectShortName">FB_PIXELS[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/FB_ADDR_W" type="array">
+      <obj_property name="ElementShortName">FB_ADDR_W[31:0]</obj_property>
+      <obj_property name="ObjectShortName">FB_ADDR_W[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/rst" type="logic">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/fifo_empty" type="logic">
+      <obj_property name="ElementShortName">fifo_empty</obj_property>
+      <obj_property name="ObjectShortName">fifo_empty</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/read_fifo_data" type="array">
+      <obj_property name="ElementShortName">read_fifo_data[27:0]</obj_property>
+      <obj_property name="ObjectShortName">read_fifo_data[27:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/read_fifo_en" type="logic">
+      <obj_property name="ElementShortName">read_fifo_en</obj_property>
+      <obj_property name="ObjectShortName">read_fifo_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/read_fifo_valid" type="logic">
+      <obj_property name="ElementShortName">read_fifo_valid</obj_property>
+      <obj_property name="ObjectShortName">read_fifo_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/shad_start" type="logic">
+      <obj_property name="ElementShortName">shad_start</obj_property>
+      <obj_property name="ObjectShortName">shad_start</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/shad_busy" type="logic">
+      <obj_property name="ElementShortName">shad_busy</obj_property>
+      <obj_property name="ObjectShortName">shad_busy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/shad_done" type="logic">
       <obj_property name="ElementShortName">shad_done</obj_property>
       <obj_property name="ObjectShortName">shad_done</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/pixel_x" type="array">
+      <obj_property name="ElementShortName">pixel_x[9:0]</obj_property>
+      <obj_property name="ObjectShortName">pixel_x[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/pixel_y" type="array">
+      <obj_property name="ElementShortName">pixel_y[9:0]</obj_property>
+      <obj_property name="ObjectShortName">pixel_y[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/pixel_R" type="array">
+      <obj_property name="ElementShortName">pixel_R[7:5]</obj_property>
+      <obj_property name="ObjectShortName">pixel_R[7:5]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/pixel_G" type="array">
+      <obj_property name="ElementShortName">pixel_G[4:2]</obj_property>
+      <obj_property name="ObjectShortName">pixel_G[4:2]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/pixel_B" type="array">
+      <obj_property name="ElementShortName">pixel_B[1:0]</obj_property>
+      <obj_property name="ObjectShortName">pixel_B[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/regs_w_en" type="logic">
+      <obj_property name="ElementShortName">regs_w_en</obj_property>
+      <obj_property name="ObjectShortName">regs_w_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/regs_w_addr" type="array">
+      <obj_property name="ElementShortName">regs_w_addr[2:0]</obj_property>
+      <obj_property name="ObjectShortName">regs_w_addr[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/regs_w_data" type="array">
+      <obj_property name="ElementShortName">regs_w_data[15:0]</obj_property>
+      <obj_property name="ObjectShortName">regs_w_data[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/regs_r_en" type="logic">
+      <obj_property name="ElementShortName">regs_r_en</obj_property>
+      <obj_property name="ObjectShortName">regs_r_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/regs_r_addr" type="array">
+      <obj_property name="ElementShortName">regs_r_addr[2:0]</obj_property>
+      <obj_property name="ObjectShortName">regs_r_addr[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/regs_r_data" type="array">
+      <obj_property name="ElementShortName">regs_r_data[15:0]</obj_property>
+      <obj_property name="ObjectShortName">regs_r_data[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/frag_data" type="array">
+      <obj_property name="ElementShortName">frag_data[27:0]</obj_property>
+      <obj_property name="ObjectShortName">frag_data[27:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/frag_R" type="array">
+      <obj_property name="ElementShortName">frag_R[7:5]</obj_property>
+      <obj_property name="ObjectShortName">frag_R[7:5]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/frag_G" type="array">
+      <obj_property name="ElementShortName">frag_G[4:2]</obj_property>
+      <obj_property name="ObjectShortName">frag_G[4:2]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/frag_B" type="array">
+      <obj_property name="ElementShortName">frag_B[1:0]</obj_property>
+      <obj_property name="ObjectShortName">frag_B[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/frag_x" type="array">
+      <obj_property name="ElementShortName">frag_x[9:0]</obj_property>
+      <obj_property name="ObjectShortName">frag_x[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/frag_y" type="array">
+      <obj_property name="ElementShortName">frag_y[9:0]</obj_property>
+      <obj_property name="ObjectShortName">frag_y[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/shad_state" type="array">
+      <obj_property name="ElementShortName">shad_state[2:0]</obj_property>
+      <obj_property name="ObjectShortName">shad_state[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/get_frag_state" type="array">
+      <obj_property name="ElementShortName">get_frag_state[3:0]</obj_property>
+      <obj_property name="ObjectShortName">get_frag_state[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/out_pixel_state" type="array">
+      <obj_property name="ElementShortName">out_pixel_state[3:0]</obj_property>
+      <obj_property name="ObjectShortName">out_pixel_state[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/IDLE" type="array">
+      <obj_property name="ElementShortName">IDLE[2:0]</obj_property>
+      <obj_property name="ObjectShortName">IDLE[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/GET_FRAG" type="array">
+      <obj_property name="ElementShortName">GET_FRAG[2:0]</obj_property>
+      <obj_property name="ObjectShortName">GET_FRAG[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/SHADE" type="array">
+      <obj_property name="ElementShortName">SHADE[2:0]</obj_property>
+      <obj_property name="ObjectShortName">SHADE[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/OUT_PIXL" type="array">
+      <obj_property name="ElementShortName">OUT_PIXL[2:0]</obj_property>
+      <obj_property name="ObjectShortName">OUT_PIXL[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_tb/dut/u_mgpu/u_shader/DONE" type="array">
+      <obj_property name="ElementShortName">DONE[2:0]</obj_property>
+      <obj_property name="ObjectShortName">DONE[2:0]</obj_property>
    </wvobject>
 </wave_config>

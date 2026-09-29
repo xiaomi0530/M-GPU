@@ -75,7 +75,7 @@ module top_tb;
             @(negedge dut.gpu_clk);
             if(active || fragments!=pixels) $fatal(1,"Recording ended with pending pixels");
             fd=$fopen(frame_path,"w");
-            if(!fd) $fatal(1,"Cannot open framebuffer output");
+            if(!fd) $fatal(1,"Cannot open framebuffer output: %0s; parent directory must exist",frame_path);
             for(i=0;i<307200;i=i+1) $fwrite(fd,"%02x\n",dut.u_mgpu.frame_buffer[i]);
             $fclose(fd);
             $fwrite(trace_fd,"D %0d %0d %0d\n",$time,triangles,pixels+clear_pixels);
@@ -87,7 +87,9 @@ module top_tb;
     endtask
 
     initial begin
-        trace_path="out/framebuffer.trace";frame_path="out/framebuffer.hex";stop_stage="animation";
+        // Vivado runs in its own simulation directory. Use directory-free
+        // defaults; Studio supplies explicit paths after creating its output dir.
+        trace_path="framebuffer.trace";frame_path="framebuffer.hex";stop_stage="animation";
         if($value$plusargs("TRACE=%s",trace_path)) begin end
         if($value$plusargs("FRAMEBUFFER=%s",frame_path)) begin end
         if($value$plusargs("STOP_STAGE=%s",stop_stage)) begin end
@@ -96,7 +98,8 @@ module top_tb;
         if(stop_stage!="logo" && stop_stage!="calibration" && stop_stage!="background" && stop_stage!="animation")
             $fatal(1,"Invalid STOP_STAGE");
         trace_fd=$fopen(trace_path,"w");
-        if(!trace_fd) $fatal(1,"Cannot open trace; create output directory first");
+        if(!trace_fd) $fatal(1,"Cannot open trace: %0s; parent directory must exist",trace_path);
+        $display("Trace output: %0s; framebuffer output: %0s (relative paths use simulator working directory)",trace_path,frame_path);
         $fwrite(trace_fd,"MGPU_TRACE 1 640 480 00 ns\n");
         $fwrite(trace_fd,"# DUT top.v GPU_DIV_LOG2=%0d HOLD_MS=%0d\n",GPU_CLK_DIV_LOG2,STAGE_HOLD_MS);
         $fflush(trace_fd);
@@ -117,7 +120,7 @@ module top_tb;
             finish_recording;
         end
     end
-    initial begin #120000000000;$fatal(1,"Top Studio simulation timeout");end
+    initial begin #(64'd120000000000);$fatal(1,"Top Studio simulation timeout");end
 endmodule
 
 // Sim-only source feeds top's FETCH/LOAD/ISSUE/WAIT_GPU state machine.

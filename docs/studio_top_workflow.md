@@ -41,6 +41,8 @@ Icarus 编译参数：`-g2012 -DSTUDIO_SIMULATION -s top_tb`，编译 source_1/n
 
 运行参数：`+TRACE=路径`、`+FRAMEBUFFER=路径`、`+STOP_STAGE=logo|calibration|background|animation`、`+FRAMES=数量`。`+STUDIO_SCENE=路径` 可给共享 top_tb 指定图片场景。涉及空格时应使用参数数组或给完整参数加引号。输出目录必须存在。
 
+直接在 Vivado 启动 `top_tb`、未指定输出参数时，默认输出到仿真工作目录中的 `framebuffer.trace` 和 `framebuffer.hex`，无需预建 `out` 子目录。通常工作目录为 `MGPU.sim/sim_1/behav/xsim/`，以当前仿真实际目录为准。trace 在启动时创建，hex 在所选场景完成后生成。修改 testbench 后需关闭仿真再重新启动 Behavioral Simulation；只点 Restart 不会重新编译。`run 5000 ns` 只运行 5 微秒，不足以绘制完整画面；完整场景需继续运行或使用上面的快速配置脚本。
+
 旧 mgpu_tb.v 保留为核心级回归测试，不再是 Studio/Vivado 默认入口。tools/build_space_demo.py 再生成演示时会自动重新接入 Studio 仿真支持。
 
 ## 验证

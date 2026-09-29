@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MGPU · 从三维顶点到一个像素</title>
+<style>
+:root{color-scheme:dark;--bg:#0c111a;--panel:#151e2b;--text:#e2eaf6;--muted:#a7b6cc;--line:#2d3a4d;--cyan:#69ddd3;--gold:#ffcc80}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.8 system-ui,"Microsoft YaHei",sans-serif}a{color:var(--cyan)}header,main,footer{max-width:1280px;margin:auto;padding:28px}header{padding-top:60px}h1{font-size:clamp(30px,4vw,56px);line-height:1.25;margin:12px 0}h2{font-size:28px;margin:0 0 18px}h3{font-size:19px;color:var(--cyan)}p{max-width:940px}small,.muted{color:var(--muted)}.eyebrow{letter-spacing:3px;color:var(--cyan);font-size:13px}nav{display:flex;flex-wrap:wrap;gap:9px;margin:25px 0}nav a{padding:6px 12px;background:var(--panel);border-radius:6px;text-decoration:none}section{margin:0 0 44px;scroll-margin-top:24px}.lab{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:24px}.controls label{display:block;margin-bottom:14px}.controls input[type=range]{width:100%;accent-color:var(--cyan)}.controls output{float:right;color:var(--gold);font-variant-numeric:tabular-nums}select,button{background:#202d40;color:var(--text);border:1px solid #455571;padding:9px 12px;border-radius:6px;font:inherit}select{width:100%}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:3px}.checks{display:grid;gap:5px}.checks label{margin:0}input[type=checkbox]{accent-color:var(--cyan);width:17px;height:17px}.canvas-wrap{min-width:0}canvas{display:block;width:100%;height:auto;background:#0a1020;border-radius:8px;border:1px solid var(--line)}#screen{cursor:crosshair;image-rendering:pixelated}.stats{display:flex;gap:20px;flex-wrap:wrap;color:var(--cyan);margin:12px 0;font-variant-numeric:tabular-nums}.formula,pre{background:#101824;border-left:3px solid var(--cyan);padding:16px 20px;white-space:pre-wrap;overflow-wrap:anywhere;font:15px/1.9 Consolas,monospace;color:#d7e6fb}.note{padding:12px 18px;border-left:3px solid var(--gold);background:#251f19}.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}td,th{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}th{color:var(--muted);font-weight:500}.flow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.flow span{background:#1c2b3d;padding:8px 12px;border-radius:6px}.step{color:var(--gold);font-size:14px}details{border-top:1px solid var(--line);padding:12px 0}summary{cursor:pointer;color:var(--cyan)}code{color:var(--gold)}#pixelInfo{min-height:105px}.presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}footer{color:var(--muted);padding-bottom:60px}@media(max-width:850px){.layout,.cols{grid-template-columns:1fr}.controls{display:grid;grid-template-columns:1fr 1fr;gap:12px}.checks{grid-column:1/-1}header,main,footer{padding:20px}.lab{padding:14px}}@media(max-width:460px){.controls{grid-template-columns:1fr}h2{font-size:23px}}
+</style></head>
+<body>
+<header><div class="eyebrow">MGPU / INTERACTIVE GRAPHICS NOTEBOOK</div><h1>从三维顶点<br>到屏幕上的一个像素。</h1><p class="muted">把旋转、投影、裁剪、插值、光照与深度测试连接起来。每个画面都由本页的 JavaScript 软件光栅器实时计算；单文件、离线可用，不依赖 WebGL 或外部库。</p>
+<nav aria-label="章节"><a href="#lab">交互实验</a><a href="#coordinates">01 坐标变换</a><a href="#projection">02 透视投影</a><a href="#clipping">03 裁剪</a><a href="#raster">04 光栅化</a><a href="#attributes">05 属性插值</a><a href="#lighting">06 光照与深度</a><a href="#hardware">07 接入 MGPU</a></nav>
+<div class="note">统一约定：列向量；观察空间 X 向右、Y 向上、摄像机朝 +Z；屏幕 Y 向下；裁剪深度 0 ≤ zc ≤ wc，NDC 深度 0～1。这里是自洽的教学约定，不是直接照搬默认 OpenGL 的 −Z 观察方向和 −1～1 深度范围。</div></header>
+<main>
+<section id="lab" class="lab"><div class="step">LIVE LAB</div><h2>先动手，再追踪每一步</h2>
+<div class="presets"><button data-preset="triangle">① 近大远小</button><button data-preset="clip">② 穿过近裁剪面</button><button data-preset="texture">③ 透视插值对比</button><button data-preset="overlap">④ 遮挡与提交顺序</button><button data-preset="cube">⑤ 旋转立方体光照</button></div>
+<div class="layout"><div class="canvas-wrap"><canvas id="screen" width="640" height="480" aria-label="640乘480光栅化结果，点击选择像素">三维光栅化结果</canvas><div class="stats" id="stats" aria-live="polite"></div><p id="experiment" class="muted"></p><label for="pickX">像素 X </label><input id="pickX" type="number" min="0" max="639" value="320" style="width:80px"> <label for="pickY">Y </label><input id="pickY" type="number" min="0" max="479" value="240" style="width:80px"><button id="inspect">查看像素</button><pre id="pixelInfo" aria-live="polite"></pre><details><summary>查看第一条三角形的顶点变换数值</summary><div class="table-wrap"><table><thead><tr><th>顶点</th><th>观察空间 (x,y,z)</th><th>裁剪空间 (xc,yc,zc,wc)</th><th>除法后 NDC</th><th>屏幕 (x,y)</th></tr></thead><tbody id="vertices"></tbody></table></div><p class="muted">表格追踪原始顶点；近面外的顶点不会直接送去光栅化。跨平面时会生成新的交点。</p></details></div>
+<div class="controls"><label>绕 Y 旋转 <output id="yawVal"></output><input id="yaw" type="range" min="-80" max="80" value="28"></label><label>绕 X 旋转 <output id="pitchVal"></output><input id="pitch" type="range" min="-70" max="70" value="-12"></label><label>沿 Z 平移 <output id="distanceVal"></output><input id="distance" type="range" min="0.5" max="9" step="0.05" value="4"></label><label>垂直视场角 FOV <output id="fovVal"></output><input id="fov" type="range" min="30" max="100" value="60"></label><label>近裁剪面 n <output id="nearVal"></output><input id="near" type="range" min="0.1" max="3" step="0.05" value="0.6"></label><label>光源方向角 <output id="lightVal"></output><input id="light" type="range" min="-180" max="180" value="-30"></label><label>观察输出<select id="display"><option value="color">颜色 / 棋盘纹理</option><option value="depth">深度：近白远黑</option><option value="weights">屏幕重心权重 RGB</option></select></label><div class="checks"><label><input id="correct" type="checkbox" checked> 透视正确 UV 插值</label><label><input id="depth" type="checkbox" checked> 深度测试（LESS）</label><label><input id="lit" type="checkbox"> 漫反射光照</label><label><input id="rgb" type="checkbox"> 最后量化为 RGB332</label><label><input id="reverse" type="checkbox"> 反转三角形提交顺序</label><label><input id="wire" type="checkbox" checked> 显示裁剪后的三角形边界</label></div></div></div>
+<h3>观察空间侧视图：横轴 Z，纵轴 X</h3><canvas id="side" width="960" height="240" aria-label="摄像机、视锥与原始三角形的ZX侧视图">观察空间侧视图</canvas><p class="muted">虚线为原始边，亮色实线为六个裁剪平面处理后的多边形；黄线是近裁剪面。Y 被折叠，因此侧视图不能单独判断上下裁剪。远面固定 f=12，屏幕中的白色十字是所选采样点；线框和十字是教学叠加，不参与深度测试。</p></section>
+
+<section id="coordinates"><div class="step">01 / MODEL → WORLD → VIEW</div><h2>顶点是位置，法线是方向</h2><p>模型坐标描述物体自己的形状。模型矩阵 M 把它放进世界，观察矩阵 V 把世界改写成摄像机的视角。矩阵乘法从右向左执行；绕自身原点旋转后再移动，与先移动再旋转不是一回事。</p><div class="formula">pmodel = [x, y, z, 1]ᵀ
+pview = V · M · pmodel
+本页：V = I，M = T(0,0,d) · Ry(θ) · Rx(φ)
+
+Rx(φ) = [ 1   0       0      0 ]    Ry(θ) = [ cosθ  0  sinθ  0 ]
+        [ 0  cosφ   −sinφ    0 ]            [  0    1   0    0 ]
+        [ 0  sinφ    cosφ    0 ]            [−sinθ  0  cosθ  0 ]
+        [ 0   0       0      1 ]            [  0    0   0    1 ]</div><div class="cols"><div><h3>位置的末尾是 1</h3><p>齐次坐标中的 1 使平移矩阵能够改变位置。相机移到 C 时，观察变换先减去 C，再转换到相机基底。通常 V 是摄像机世界变换的逆。</p></div><div><h3>法线不带平移</h3><p>纯旋转下 N′=RN。一般非均匀缩放下，要用线性变换的逆转置再归一化，不能直接套位置矩阵。本页从旋转后边向量的叉积得到每面法线。</p></div></div></section>
+
+<section id="projection"><div class="step">02 / VIEW → CLIP → NDC → SCREEN</div><h2>近大远小来自一次除法</h2><p>相似三角形给出图像平面位置 ximage = fx·x/z。相同的横向尺寸放到两倍远处，投影尺寸就减半。焦距变大，画面更放大，视场角更小。</p><div class="formula">H=480，W=640，aspect=W/H，s=cot(FOVy/2)
+fx = (W/2)·s/aspect = (H/2)·s，fy=(H/2)·s
+xs = W/2 + fx·xview/zview
+ys = H/2 − fy·yview/zview</div><p>为了用一次矩阵乘法统一投影并保留裁剪信息，构造齐次坐标。令 A=f/(f−n)，B=−fn/(f−n)：</p><div class="formula">P = [ s/aspect  0  0  0 ]
+    [    0     s  0  0 ]
+    [    0     0  A  B ]
+    [    0     0  1  0 ]
+
+[xc,yc,zc,wc]ᵀ = P · [xview,yview,zview,1]ᵀ
+wc = zview
+NDC = (xc/wc, yc/wc, zc/wc)  ← 先裁剪，再做这一步！
+xs = (xndc+1)·W/2，ys = (1−yndc)·H/2
+d = zndc = A+B/zview</div><p>代入 zview=n 得到 d=0；代入 zview=f 得到 d=1。这解释了为什么深度不是简单的“距离除以最远距离”。NDC 边界 +1 对应视口边界 W，而不是最后一个像素中心 W−0.5；覆盖测试采样在 (i+0.5,j+0.5)。</p><div class="note">W 不是第四个空间方向。它让投影可先表示为线性齐次变换，再通过除法恢复三维坐标。正交投影一般令 w=1，因此没有随距离缩小的效果。</div></section>
+
+<section id="clipping"><div class="step">03 / CLIP BEFORE DIVIDE</div><h2>裁剪的是三角形，不是分别夹紧三个顶点</h2><p>裁剪空间中的合法区域由六个线性半空间构成。这时即使原始顶点 w≤0，也不必先执行危险的除法。</p><div class="formula">左：xc+wc ≥ 0     右：wc−xc ≥ 0
+下：yc+wc ≥ 0     上：wc−yc ≥ 0
+近：zc ≥ 0        远：wc−zc ≥ 0</div><p>对每个平面，沿多边形的边走一圈。设平面函数为 F，边端点为 U、V。当两端一内一外时，求交点：</p><div class="formula">t = F(U) / [F(U)−F(V)]
+Qclip = (1−t)·Uclip + t·Vclip
+Qattribute = (1−t)·Uattribute + t·Vattribute</div><p>内→内保留末端；内→外保留交点；外→内保留交点及末端；外→外不输出。依次处理六个平面，最后对凸多边形做扇形三角剖分：(v0,v1,v2)、(v0,v2,v3)…。原始 UV 等 smooth 属性随同一参数 t 插值，之后才为新顶点计算 UV/w。</p><p>点击“穿过近裁剪面”，调整 n：顶点可能被删除，交点会出现，裁剪结果可能变成两个以上三角形。直接丢弃整条跨面的三角形会产生空洞；直接夹紧顶点坐标会改变形状。</p></section>
+
+<section id="raster"><div class="step">04 / TRIANGLE → FRAGMENTS</div><h2>边函数回答：这个像素中心在三角形里吗？</h2><div class="formula">E(A,B,P) = (Bx−Ax)(Py−Ay) − (By−Ay)(Px−Ax)
+S = E(A,B,C)
+λ0 = E(B,C,P)/S
+λ1 = E(C,A,P)/S
+λ2 = E(A,B,P)/S
+λ0+λ1+λ2 = 1</div><p>把顶点顺序规范到 S&gt;0 后，三个边函数非负表示在内部。S=0 是退化三角形，应直接结束，不能继续除以面积。遍历包围盒中每个像素中心 P=(i+0.5,j+0.5)，即可得到片元。</p><p>相邻三角形共享边时，不能让双方同时包含边界。本页采用屏幕 Y 向下、S&gt;0 的 top-left 约定：边界只在 dy&lt;0 或 dy=0 且 dx&gt;0 时包含。硬件通常用定点子像素坐标和精确整数边函数，避免浮点舍入破坏共享边一致性。</p><div class="formula">向右一步：E(x+1,y) = E(x,y) − (By−Ay)
+向下一步：E(x,y+1) = E(x,y) + (Bx−Ax)
+
+任意屏幕线性属性：a(x,y)=a起点+Δax·Δx+Δay·Δy</div><p>这就是你现在 rasterizer 的增量遍历思路：setup 阶段做乘除法，扫描阶段主要做加法。点击画面或输入像素坐标，可看到该样本的 λ、深度与 UV。外部样本不会因为“颜色为黑”而被误认为有效片元。</p></section>
+
+<section id="attributes"><div class="step">05 / PERSPECTIVE-CORRECT INTERPOLATION</div><h2>为什么棋盘格需要插值 u/w，而不是直接插值 u？</h2><p>投影中的除法是非线性的。屏幕上走了一半，不代表三维边上也走了一半。设屏幕重心坐标为 λ，三维属性的有效权重应为：</p><div class="formula">q = λ0/w0 + λ1/w1 + λ2/w2
+βi = (λi/wi) / q
+a = β0·a0 + β1·a1 + β2·a2
+  = [λ0·a0/w0 + λ1·a1/w1 + λ2·a2/w2] / q</div><p>所以 setup 为每个顶点计算 1/w、u/w、v/w；光栅器线性插值这些量；恢复 UV 时共用一次 q 的倒数。点击“透视插值对比”，开关“透视正确 UV 插值”：斜面上的格子大小变化与两个三角形接缝最容易暴露错误。</p><div class="formula">一维例子：w0=1，w1=4，u0=0，u1=1
+屏幕中点 λ0=λ1=0.5：
+普通插值 u = 0.5
+透视正确 u = (0.5·0/1 + 0.5·1/4)/(0.5/1+0.5/4) = 0.2</div><div class="note">不是所有属性都要再次除 q。顶点经过投影的深度 d=zc/wc 在屏幕空间线性插值；每面固定颜色/法线不需要插值；UV、观察空间位置等通常需要透视校正。不要把观察空间 z 和深度 d 混为一谈。</div><p>本页棋盘纹理是 floor(8u) 与 floor(8v) 的奇偶异或，没有外部图片读取。硬件可先用同样的程序化纹理验证 UV，再替换成 BRAM 最近邻采样。教学画面未做纹理抗锯齿，远处细格可能出现锯齿或摩尔纹。</p></section>
+
+<section id="lighting"><div class="step">06 / SHADE → TEST → WRITE</div><h2>方向决定亮度，深度决定谁被看见</h2><div class="cols"><div><h3>每面 Lambert 光照</h3><div class="formula">N = normalize[(B−A) × (C−A)]
+L = 单位向量，表面指向光源
+D = max(0, N·L)
+I = 0.22 + 0.78·D
+Cout = clamp(Cbase·I)</div><p>演示不做背面剔除，立方体各面顶点顺序保证法线向外；光照按原始面朝向计算，背面不会自动翻转法线。拖动光源角度只改变颜色，不改变形状。</p><p>RGB332 开关在光照后量化到 R=8、G=8、B=4 个等级；亮度台阶来自量化。本页用线性数值颜色演示，未建模显示器伽马。</p></div><div><h3>逐片元深度比较</h3><div class="formula">dnew = λ0·d0 + λ1·d1 + λ2·d2
+if (dnew &lt; zbuffer[x,y]):
+    zbuffer[x,y] = dnew
+    framebuffer[x,y] = shadedColor</div><p>本页深度清为 1，并使用 LESS；恰好在远面的 d=1 不会通过。关闭深度测试时，最后提交的片元覆盖前面的片元；开启后，非共面表面的遮挡不依赖提交顺序。相等深度仍由比较规则与先后顺序决定。</p><p>真实 GPU 在满足条件时可以把深度测试提前，减少被遮挡片元的着色工作。透明混合、shader 改写深度或 discard 会带来额外规则；本页只处理不透明片元。</p></div></div></section>
+
+<section id="hardware"><div class="step">07 / MAP THE MATH TO YOUR MGPU</div><h2>先扩展前端，再扩展片元属性</h2><div class="flow"><span>三维命令</span>→<span>顶点变换</span>→<span>六平面裁剪</span>→<span>透视除法 / 视口</span>→<span>现有光栅器</span>→<span>片元 FIFO</span>→<span>shader / 深度写回</span></div><div class="table-wrap"><table><thead><tr><th>模块</th><th>输入 → 输出</th><th>第一版硬件实现</th></tr></thead><tbody><tr><td>vertex_transform</td><td>有符号 XYZ → 齐次 XYZW</td><td>共享 DSP，多周期乘加；矩阵按命令锁存</td></tr><tr><td>clipper</td><td>三角形 → 裁剪多边形 → 三角形</td><td>小顶点缓存 + FSM + 共享除法器</td></tr><tr><td>perspective / viewport</td><td>XYZW → 屏幕 XY、d、1/w</td><td>先计算倒数，再乘；保存子像素精度</td></tr><tr><td>triangle setup</td><td>屏幕顶点 → 边函数 / 属性梯度</td><td>面积零检测、包围盒、梯度除法</td></tr><tr><td>rasterizer</td><td>边函数 / 梯度 → XY、d、u/w、v/w、1/w</td><td>增量加法 + top-left 覆盖 + valid/ready</td></tr><tr><td>shader</td><td>片元属性 → 颜色</td><td>先每面光照，再纹理与逐片元光照</td></tr><tr><td>写回单元</td><td>XY、深度、颜色 → 存储更新</td><td>深度读改写、同地址冒险处理、写入仲裁</td></tr></tbody></table></div>
+<h3>定点实现中的四个边界</h3><ol><li><b>负坐标：</b>裁剪、变换必须保留 signed；不能先截成 10 位无符号数再判断是否越界。</li><li><b>中间位宽：</b>16×16 有符号乘法先保存 32 位，多个乘积相加还要扩位；定好小数位后再舍入、饱和。</li><li><b>反压：</b>每级在 valid=1 且 ready=0 时保留数据。裁剪可能让一个三角形产生多条输出命令。</li><li><b>完成：</b>输入处理结束不等于绘制完成；必须等所有裁剪输出、FIFO、shader、深度请求和颜色写回排空。</li></ol>
+<p>640×480 RGB332 颜色缓冲需要 300 KiB；16 位深度缓冲另需 600 KiB。这里仅计算存储需求，不假设你的 FPGA 片上资源能容纳它们；应检查综合资源，再决定降低深度缓冲分辨率、分块或使用外部存储。</p>
+<h3>适合边做边学的顺序</h3><ol><li>三维单三角形，固定颜色，限制在视锥内：验证旋转与透视。</li><li>加入裁剪：验证一个输入产生零个、一个或多个输出。</li><li>深度缓冲：验证相交三角形、交换提交顺序结果不变。</li><li>每面法线光照：旋转立方体，确认法线与顶点使用同一旋转。</li><li>透视正确 UV 与纹理：对比斜面棋盘格。</li><li>在正确性测试稳定后再做流水化、多片元并行和性能统计。</li></ol><div class="note">本页是浮点数学参考，不是周期精确 RTL 仿真，也不代表硬件吞吐或定点误差。接入 MGPU 时要增加定点参考模型，逐片元比对位置、深度与颜色；页面不会修改你的 Verilog。</div></section>
+<section><h2>规范与延伸阅读</h2><p>本页矩阵按上述 +Z / 0～1 约定自行推导，流水线阶段与插值概念可对照以下 Khronos 官方资料：</p><ul><li><a href="https://wikis.khronos.org/opengl/Vertex_Post-Processing">Vertex Post-Processing：裁剪、透视除法、视口变换</a></li><li><a href="https://wikis.khronos.org/opengl/Interpolation">Interpolation：透视正确、线性与固定属性</a></li><li><a href="https://wikis.khronos.org/opengl/Depth_Test">Depth Test：深度比较与写入</a></li><li><a href="https://registry.khronos.org/OpenGL/specs/gl/glspec43.core.pdf">OpenGL 4.3 Core Specification：固定功能顶点后处理</a></li></ul></section>
+</main><footer>MGPU 交互数学笔记 · 所有计算均在本地浏览器完成 · 无网络依赖</footer>
+<script>
+'use strict';
+const $=id=>document.getElementById(id),W=640,H=480,FAR=12;
+const ctx=$('screen').getContext('2d'),side=$('side').getContext('2d');
+const ids=['yaw','pitch','distance','fov','near','light'];
+let scene='triangle',selected=[320,240],last=null;
+const add=(a,b)=>a.map((x,i)=>x+b[i]),sub=(a,b)=>a.map((x,i)=>x-b[i]);
+const dot=(a,b)=>a.reduce((s,x,i)=>s+x*b[i],0);
+const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const norm=a=>{let l=Math.hypot(...a);return a.map(x=>l?x/l:0)};
+const lerp=(a,b,t)=>a.map((x,i)=>x+(b[i]-x)*t);
+const fmt=a=>a.map(x=>Number.isFinite(x)?x.toFixed(3):'—').join(', ');
+function params(){let p={};ids.forEach(id=>p[id]=+$(id).value);p.s=1/Math.tan(p.fov*Math.PI/360);p.A=FAR/(FAR-p.near);p.B=-FAR*p.near/(FAR-p.near);return p}
+function transform(v,p){let a=p.pitch*Math.PI/180,b=p.yaw*Math.PI/180;let y=v[1]*Math.cos(a)-v[2]*Math.sin(a),z=v[1]*Math.sin(a)+v[2]*Math.cos(a);return [v[0]*Math.cos(b)+z*Math.sin(b),y,-v[0]*Math.sin(b)+z*Math.cos(b)+p.distance]}
+function toClip(v,p){return [v[0]*p.s/(W/H),v[1]*p.s,p.A*v[2]+p.B,v[2]]}
+const planes=[c=>c[0]+c[3],c=>c[3]-c[0],c=>c[1]+c[3],c=>c[3]-c[1],c=>c[2],c=>c[3]-c[2]];
+function clip(poly){for(let f of planes){let out=[];for(let i=0;i<poly.length;i++){let a=poly[i],b=poly[(i+1)%poly.length],fa=f(a.c),fb=f(b.c);if((fa>=0)!=(fb>=0)){let t=fa/(fa-fb);out.push({c:lerp(a.c,b.c,t),v:lerp(a.v,b.v,t),uv:lerp(a.uv,b.uv,t)})}if(fb>=0)out.push(b)}poly=out;if(!poly.length)break}return poly}
+function screen(v){let c=v.c,w=c[3];return {...v,x:(c[0]/w+1)*W/2,y:(1-c[1]/w)*H/2,d:c[2]/w,q:1/w}}
+function geometry(){let tris=[];const uv=[[0,1],[1,1],[.5,0]];function tri(v,col,tex=false,tuv=uv){tris.push({v,col,tex,uv:tuv,id:tris.length+1})}
+if(scene==='texture'){let q=[[-1.5,-1,0],[1.5,-1,0],[1.5,1,0],[-1.5,1,0]],u=[[0,1],[1,1],[1,0],[0,0]];tri([q[0],q[1],q[2]],[.22,.85,.78],true,[u[0],u[1],u[2]]);tri([q[0],q[2],q[3]],[.22,.85,.78],true,[u[0],u[2],u[3]])}
+else if(scene==='cube'){let q=[[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]];for(let f of [[0,3,2,1],[4,5,6,7],[0,4,7,3],[1,2,6,5],[0,1,5,4],[3,7,6,2]]){tri([q[f[0]],q[f[1]],q[f[2]]],[.28,.8,.9]);tri([q[f[0]],q[f[2]],q[f[3]]],[.28,.8,.9])}}
+else if(scene==='overlap'){tri([[-1.4,-1,-.8],[1.4,-1,.8],[0,1.2,0]],[.18,.85,.77]);tri([[-1.3,.7,.8],[1.3,.7,-.8],[0,-1.2,0]],[1,.48,.32])}
+else tri([[-1.2,-.85,0],[1.2,-.85,0],[0,1.25,0]],[.23,.82,.76]);return tris}
+const edge=(a,b,x,y)=>(b.x-a.x)*(y-a.y)-(b.y-a.y)*(x-a.x);
+const topLeft=(a,b)=>(b.y-a.y)<0||((b.y-a.y)===0&&(b.x-a.x)>0);
+function weights(t,x,y){let area=edge(t[0],t[1],t[2].x,t[2].y);return [edge(t[1],t[2],x,y)/area,edge(t[2],t[0],x,y)/area,edge(t[0],t[1],x,y)/area]}
+function attr(t,l,correct){let q=l.reduce((s,a,i)=>s+a*t[i].q,0);return [0,1].map(k=>l.reduce((s,a,i)=>s+a*t[i].uv[k]*(correct?t[i].q:1),0)/(correct?q:1))}
+function render(){let p=params();ids.forEach(id=>$(id+'Val').textContent=p[id].toFixed(['near','distance'].includes(id)?2:0)+(['yaw','pitch','fov','light'].includes(id)?'°':''));let g=geometry(),prepared=[],polys=[];let light=norm([Math.sin(p.light*Math.PI/180),.45,-Math.cos(p.light*Math.PI/180)]);
+for(let tr of g){let v=tr.v.map(a=>transform(a,p)),n=norm(cross(sub(v[1],v[0]),sub(v[2],v[0])));let input=v.map((a,i)=>({v:a,c:toClip(a,p),uv:tr.uv[i]})),poly=clip(input);polys.push({input,poly});for(let i=1;i+1<poly.length;i++){let t=[poly[0],poly[i],poly[i+1]].map(screen);let area=edge(t[0],t[1],t[2].x,t[2].y);if(Math.abs(area)<1e-8)continue;if(area<0)[t[1],t[2]]=[t[2],t[1]];prepared.push({...tr,t,intensity:$('lit').checked?.22+.78*Math.max(0,dot(n,light)):1})}}
+if($('reverse').checked)prepared.reverse();let img=ctx.createImageData(W,H),z=new Float64Array(W*H).fill(1),owner=new Int32Array(W*H).fill(-1),covered=0,writes=0;for(let i=0;i<W*H;i++){img.data[i*4]=10;img.data[i*4+1]=16;img.data[i*4+2]=32;img.data[i*4+3]=255}
+const correct=$('correct').checked,depth=$('depth').checked,quant=$('rgb').checked,display=$('display').value;
+prepared.forEach((tr,index)=>{let t=tr.t,area=edge(t[0],t[1],t[2].x,t[2].y),xmin=Math.max(0,Math.ceil(Math.min(...t.map(a=>a.x))-.5)),xmax=Math.min(W-1,Math.floor(Math.max(...t.map(a=>a.x))-.5)),ymin=Math.max(0,Math.ceil(Math.min(...t.map(a=>a.y))-.5)),ymax=Math.min(H-1,Math.floor(Math.max(...t.map(a=>a.y))-.5));let tl=[topLeft(t[1],t[2]),topLeft(t[2],t[0]),topLeft(t[0],t[1])];for(let y=ymin;y<=ymax;y++)for(let x=xmin;x<=xmax;x++){let e=[edge(t[1],t[2],x+.5,y+.5),edge(t[2],t[0],x+.5,y+.5),edge(t[0],t[1],x+.5,y+.5)];if(e.some((v,i)=>v<0||(v===0&&!tl[i])))continue;covered++;let l=e.map(v=>v/area),d=l.reduce((s,a,i)=>s+a*t[i].d,0),idx=y*W+x;if(depth&&d>=z[idx])continue;let uv=attr(t,l,correct),c=tr.col;if(tr.tex){let odd=(Math.floor(uv[0]*8)+Math.floor(uv[1]*8))&1;c=odd?[.92,.9,.77]:[.08,.29,.4]}c=c.map(v=>v*tr.intensity);if(quant)c=c.map((v,i)=>Math.round(Math.max(0,Math.min(1,v))*(i===2?3:7))/(i===2?3:7));if(display==='depth')c=[1-d,1-d,1-d];if(display==='weights')c=l;for(let k=0;k<3;k++)img.data[4*idx+k]=Math.round(c[k]*255);z[idx]=d;owner[idx]=index;writes++}});
+ctx.putImageData(img,0,0);if($('wire').checked){ctx.strokeStyle='#e5eff999';ctx.lineWidth=1;for(let tr of prepared){ctx.beginPath();tr.t.forEach((v,i)=>i?ctx.lineTo(v.x,v.y):ctx.moveTo(v.x,v.y));ctx.closePath();ctx.stroke()}}ctx.strokeStyle='#ffffff';ctx.beginPath();ctx.moveTo(selected[0]-6,selected[1]+.5);ctx.lineTo(selected[0]+7,selected[1]+.5);ctx.moveTo(selected[0]+.5,selected[1]-6);ctx.lineTo(selected[0]+.5,selected[1]+7);ctx.stroke();
+last={p,prepared,polys,z,owner,covered,writes,image:img};$('stats').textContent=`输入 ${g.length} 个三角形 → 裁剪后 ${prepared.length} 个 · 覆盖 ${covered.toLocaleString()} 片元 · 通过写入 ${writes.toLocaleString()} 次`;
+let first=polys[0].input;$('vertices').innerHTML=first.map((v,i)=>{let safe=v.c[3]>0,s=safe?screen(v):null;return `<tr><td>${'ABC'[i]}</td><td>${fmt(v.v)}</td><td>${fmt(v.c)}</td><td>${safe?fmt(v.c.slice(0,3).map(x=>x/v.c[3])):'w≤0，不做除法'}</td><td>${safe?fmt([s.x,s.y]):'—'}</td></tr>`}).join('');drawSide(polys,p);inspect();}
+function drawSide(polys,p){let c=side,cw=Math.max(280,Math.round($('side').getBoundingClientRect().width));$('side').width=cw;$('side').height=240;c.clearRect(0,0,cw,240);const X=z=>50+z*(cw-90)/13,Y=x=>120-x*25;function line(points,col,dash=[]){c.strokeStyle=col;c.setLineDash(dash);c.beginPath();points.forEach((v,i)=>i?c.lineTo(X(v[2]),Y(v[0])):c.moveTo(X(v[2]),Y(v[0])));c.stroke();c.setLineDash([])}c.font='15px system-ui';c.fillStyle='#a7b6cc';c.fillText('X ↑',15,24);c.fillText('Z →',cw-42,137);line([[0,0,0],[0,0,13]],'#40506a');let slope=(W/H)/p.s;line([[0,0,0],[FAR*slope,0,FAR]],'#40506a');line([[0,0,0],[-FAR*slope,0,FAR]],'#40506a');line([[4,0,p.near],[-4,0,p.near]],'#ffcc80');line([[4,0,FAR],[-4,0,FAR]],'#677895');c.fillStyle='#ffcc80';c.fillText('near',X(p.near)+5,23);c.fillStyle='#a7b6cc';c.fillText('far = 12',X(FAR)-25,23);c.fillText('相机',20,155);for(let {input,poly}of polys){line([...input,input[0]].map(v=>v.v),'#7890af',[4,4]);if(poly.length)line([...poly,poly[0]].map(v=>v.v),'#69ddd3')}for(let z=2;z<=12;z+=2){c.fillStyle='#a7b6cc';c.fillText(String(z),X(z),225)}}
+function inspect(){if(!last)return;let [x,y]=selected,idx=y*W+x,o=last.owner[idx];$('pickX').value=x;$('pickY').value=y;if(o<0){$('pixelInfo').textContent=`像素 (${x}, ${y})，采样中心 (${x+.5}, ${y+.5})\n没有通过的片元；深度缓冲初值 = 1。`;return}let tr=last.prepared[o],l=weights(tr.t,x+.5,y+.5),u=attr(tr.t,l,true),a=attr(tr.t,l,false),q=l.reduce((s,v,i)=>s+v*tr.t[i].q,0),rgb=Array.from(last.image.data.slice(idx*4,idx*4+3));$('pixelInfo').textContent=`像素 (${x}, ${y}) · 原始三角形 #${tr.id}\nλ = (${fmt(l)})，Σλ = ${l.reduce((a,b)=>a+b,0).toFixed(6)}\n深度 d = ${last.z[idx].toFixed(6)}；恢复观察空间 z = ${(1/q).toFixed(4)}\nUV 透视正确 = (${fmt(u)})；UV 普通线性 = (${fmt(a)})\n面亮度 = ${tr.intensity.toFixed(3)}；显示 RGB8 = (${rgb.join(', ')})`;}
+function preset(name){scene=name==='clip'?'triangle':name;let values={yaw:28,pitch:-12,distance:4,fov:60,near:.6,light:-30};if(name==='clip')Object.assign(values,{yaw:55,pitch:0,distance:1.4,near:1.1,fov:85});if(name==='texture')Object.assign(values,{yaw:60,pitch:0,distance:3.8});if(name==='overlap')Object.assign(values,{yaw:0,pitch:0,distance:4});if(name==='cube')Object.assign(values,{yaw:28,pitch:18,distance:4.5});ids.forEach(id=>$(id).value=values[id]);['correct','depth','wire'].forEach(id=>$(id).checked=true);['rgb','reverse'].forEach(id=>$(id).checked=false);$('lit').checked=name==='cube';$('wire').checked=name!=='cube';$('display').value='color';$('experiment').textContent={triangle:'实验：增加 Z 距离，观察投影缩小；减小 FOV，观察投影放大。',clip:'实验：移动近裁剪面，观察交点和输出三角形数量变化；被裁掉的区域不参与除法或写回。',texture:'实验：切换透视正确 UV 插值；错误的屏幕线性插值会让斜面棋盘格变形。',overlap:'实验：反转提交顺序；深度开启时图像应保持一致，关闭时后画的覆盖先画的。',cube:'实验：旋转立方体与改变光源方向；光照改变亮度，深度测试决定哪个面可见。'}[name];render()}
+ids.forEach(id=>$(id).addEventListener('input',render));['correct','depth','lit','rgb','reverse','wire','display'].forEach(id=>$(id).addEventListener('change',render));document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click',()=>preset(b.dataset.preset)));
+$('screen').addEventListener('click',e=>{let r=e.currentTarget.getBoundingClientRect();selected=[Math.min(W-1,Math.max(0,Math.floor((e.clientX-r.left)*W/r.width))),Math.min(H-1,Math.max(0,Math.floor((e.clientY-r.top)*H/r.height)))];render()});$('inspect').addEventListener('click',()=>{let x=Number($('pickX').value),y=Number($('pickY').value);selected=[Math.max(0,Math.min(W-1,Math.floor(Number.isFinite(x)?x:0))),Math.max(0,Math.min(H-1,Math.floor(Number.isFinite(y)?y:0)))];render()});
+window.addEventListener('resize',()=>{if(last)drawSide(last.polys,last.p)});
+window.gpuLab={preset,render,params,clip,toClip,attr,weights,get state(){return last}};preset('triangle');
+</script></body></html>
