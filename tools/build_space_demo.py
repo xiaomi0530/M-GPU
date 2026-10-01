@@ -116,10 +116,9 @@ def main():
     reg [4:0] animation_frame;
     reg [31:0] hold_count;
     reg [12:0] command_address;
-    reg [12:0] drain_count;
     reg saw_busy;
     reg demo_start;
-    wire gpu_busy,gpu_done;
+    wire gpu_busy,gpu_done,gpu_error;
     reg [9:0] gpu_x0,gpu_y0,gpu_x1,gpu_y1,gpu_x2,gpu_y2;
     reg [7:0] gpu_c0,gpu_c1,gpu_c2;
     wire [83:0] command_data;
@@ -136,7 +135,7 @@ def main():
     always @(posedge gpu_clk) begin
         if(rst) begin
             demo_state<=FETCH; scene<=0; animation_frame<=0;
-            command_address<=0; hold_count<=0; drain_count<=0;
+            command_address<=0; hold_count<=0;
             saw_busy<=0; demo_start<=0;
             gpu_x0<=0;gpu_y0<=0;gpu_x1<=0;gpu_y1<=0;gpu_x2<=0;gpu_y2<=0;
             gpu_c0<=0;gpu_c1<=0;gpu_c2<=0;
@@ -150,17 +149,11 @@ def main():
                     demo_state<=ISSUE;
                 end
                 ISSUE: begin
-                    demo_start<=1; saw_busy<=0; drain_count<=0;
+                    demo_start<=1; saw_busy<=0;
                     demo_state<=WAIT_GPU;
                 end
                 WAIT_GPU: begin
-                    if(gpu_busy) begin saw_busy<=1;drain_count<=0;end
-                    else if(saw_busy) drain_count<=drain_count+1'b1;
-                    // User's gpu_done can miss tiny triangles whose last pixel
-                    // retires before rasterization ends. Only in that case use
-                    // the original bounded drain: 8192 > 256*18 + one in flight.
-                    if(saw_busy && (gpu_done || (!gpu_busy && &drain_count)))
-                        demo_state<=ADVANCE;
+                    if(gpu_done) demo_state<=ADVANCE;
                 end
                 ADVANCE: begin
                     if(last_command) begin

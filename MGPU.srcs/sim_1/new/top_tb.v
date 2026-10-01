@@ -23,6 +23,15 @@ module top_tb;
     reg check_video;
 
     always @(posedge dut.gpu_clk) if(!dut.rst) begin
+        if(dut.gpu_done && dut.gpu_error)
+            $fatal(1,"GPU rejected triangle %0d",triangles);
+        if(dut.u_mgpu.rast_start) begin
+            if({dut.u_mgpu.rast_x0,dut.u_mgpu.rast_y0,
+                dut.u_mgpu.rast_x1,dut.u_mgpu.rast_y1,
+                dut.u_mgpu.rast_x2,dut.u_mgpu.rast_y2} !==
+               {dut.gpu_x0,dut.gpu_y0,dut.gpu_x1,dut.gpu_y1,dut.gpu_x2,dut.gpu_y2})
+                $fatal(1,"Vertex transform changed pixel coordinates");
+        end
         if(dut.u_mgpu.clear_reg) begin
             if(active || fragments!=pixels || dut.demo_start || dut.u_mgpu.shad_done)
                 $fatal(1,"Clear overlaps drawing/writeback");
@@ -111,12 +120,7 @@ module top_tb;
         end else
 `endif
         begin
-            case(stop_stage)
-                "logo": wait(dut.logo_active && dut.demo_state==dut.HOLD);
-                "calibration": wait(!dut.logo_active && dut.scene==0 && dut.demo_state==dut.HOLD);
-                "background": wait(!dut.logo_active && dut.scene==1 && dut.demo_state==dut.HOLD);
-                default: wait(completed_frames>=requested_frames);
-            endcase
+            wait(dut.demo_state==dut.HOLD);
             finish_recording;
         end
     end

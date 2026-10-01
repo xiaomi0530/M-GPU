@@ -240,7 +240,6 @@ module rasterizer (
     localparam COLOR_ini_1= 4'd5;
     localparam COLOR_ini_2= 4'd6;
     localparam RAST_I_jud = 4'd7;
-//    localparam SHADE      = 4'd8;
     localparam RAST_I_nex = 4'd9;
     localparam DONE       = 4'd10;
     localparam WAIT       = 4'd11;

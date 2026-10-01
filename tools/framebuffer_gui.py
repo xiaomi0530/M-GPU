@@ -139,10 +139,10 @@ class FramebufferViewer:
 
         simulation = tk.Frame(self.root, bg=BG)
         simulation.pack(fill="x", padx=26, pady=(8,0))
-        self.sim_stage = tk.StringVar(value="Logo 开屏")
+        self.sim_stage = tk.StringVar(value="3D 顶点实验台")
         self.sim_fast = tk.BooleanVar(value=True)
         ttk.Combobox(simulation,textvariable=self.sim_stage,state="readonly",width=15,
-                     values=("Logo 开屏","校准图","太空背景","卫星一圈")).pack(side="left")
+                     values=("3D 顶点实验台",)).pack(side="left")
         self.sim_button=ttk.Button(simulation,text="运行 top.v",command=self.simulate_top)
         self.sim_button.pack(side="left",padx=8)
         self.sim_stop=ttk.Button(simulation,text="停止仿真",command=self.sim_cancel.set,state="disabled")
@@ -283,7 +283,7 @@ class FramebufferViewer:
             messagebox.showinfo("仿真进行中","请先停止当前仿真。",parent=self.root)
             return
         from top_simulation import run_top,SimulationCancelled
-        stage={"Logo 开屏":"logo","校准图":"calibration","太空背景":"background","卫星一圈":"animation"}[self.sim_stage.get()]
+        stage="background"
         fast=self.sim_fast.get()
         output=self.project/"out/studio_top"
         self.sim_cancel.clear()
