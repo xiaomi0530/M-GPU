@@ -11,7 +11,7 @@ class SimulationCancelled(Exception):
 
 
 def run_top(project: Path, output: Path, cancel: threading.Event, *, testbench=None,
-            module='top_tb', stage='logo', frames=1, fast=True, scene=None, progress=None):
+            module='top_tb', stage='logo', frames=1, fast=True, scene=None, progress=None, dump_frames=False):
     project=Path(project).resolve();output=Path(output).resolve()
     compiler,runtime=shutil.which('iverilog'),shutil.which('vvp')
     if not compiler or not runtime:
@@ -27,14 +27,16 @@ def run_top(project: Path, output: Path, cancel: threading.Event, *, testbench=N
     for file in (trace,framebuffer,output/'framebuffer.png'):
         file.unlink(missing_ok=True)
     commands=[[compiler,'-g2012','-DSTUDIO_SIMULATION','-s',module,
-               f'-P{module}.GPU_CLK_DIV_LOG2={1 if fast else 4}',
-               f'-P{module}.STAGE_HOLD_MS={1 if fast else 4000}',
-               f'-P{module}.CUBE_HOLD_MS={1 if fast else 40}',
+               f'-P{module}.GPU_CLK_DIV_LOG2={1 if fast else 2}',
+               f'-P{module}.STAGE_HOLD_MS={1 if fast else 2000}',
+               f'-P{module}.CUBE_HOLD_MS={1 if fast else 200}',
                '-o',str(binary),*map(str,sources),str(testbench)],
               [runtime,str(binary),f'+TRACE={trace.as_posix()}',
                f'+FRAMEBUFFER={framebuffer.as_posix()}',f'+STOP_STAGE={stage}',f'+FRAMES={frames}']]
     if scene is not None:
         commands[1].append(f'+STUDIO_SCENE={Path(scene).resolve().as_posix()}')
+    if dump_frames:
+        commands[1].append('+DUMP_FRAMES')
     with logfile.open('w',encoding='utf-8') as log:
         for number,command in enumerate(commands):
             if cancel.is_set():raise SimulationCancelled()

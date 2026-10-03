@@ -2,23 +2,23 @@
 `ifdef SPACE_SCENE_STUB
 module mgpu(
  input clk,rst,start,clear,
- input signed [31:0] vertex_x0,vertex_y0,vertex_z0,
+ input signed [17:0] vertex_x0,vertex_y0,vertex_z0,
  input [7:0] vertex_color0,
- input signed [31:0] vertex_x1,vertex_y1,vertex_z1,
+ input signed [17:0] vertex_x1,vertex_y1,vertex_z1,
  input [7:0] vertex_color1,
- input signed [31:0] vertex_x2,vertex_y2,vertex_z2,
+ input signed [17:0] vertex_x2,vertex_y2,vertex_z2,
  input [7:0] vertex_color2,
- input signed [31:0] m00,m01,m02,m03,
- input signed [31:0] m10,m11,m12,m13,
- input signed [31:0] m20,m21,m22,m23,
- input signed [31:0] m30,m31,m32,m33,
+ input signed [17:0] m00,m01,m02,m03,
+ input signed [17:0] m10,m11,m12,m13,
+ input signed [17:0] m20,m21,m22,m23,
+ input signed [17:0] m30,m31,m32,m33,
  input [7:0] clear_color,
  output reg gpu_busy,gpu_done,output wire gpu_error,
  input vga_clk,vga_rst,output [3:0] vga_r,vga_g,vga_b,output vga_hs,vga_vs);
  integer remaining=0;
  reg clearing;
- wire [823:0] command;
- reg [823:0] held;
+ wire [473:0] command;
+ reg [473:0] held;
  assign gpu_error=1'b0;
  assign {vga_r,vga_g,vga_b,vga_hs,vga_vs}=0;
  assign command={vertex_x0,vertex_y0,vertex_z0,vertex_x1,vertex_y1,vertex_z1,
@@ -50,13 +50,12 @@ module space_sequence_tb;
   dut(clk,reset_n,1'b0,r,g,b,hs,vs);
  integer count=0,frames=0,dx1,dy1,dx2,dy2;
  reg [31:0] visited=0;
- reg [2:0] old_state=0;
+ reg [3:0] old_state=0;
  always @(posedge dut.gpu_clk) if(!dut.rst) begin
   if(dut.demo_start) begin
    if({dut.gpu_vx0,dut.gpu_vy0,dut.gpu_vz0,dut.gpu_c0,
        dut.gpu_vx1,dut.gpu_vy1,dut.gpu_vz1,dut.gpu_c1,
-       dut.gpu_vx2,dut.gpu_vy2,dut.gpu_vz2,dut.gpu_c2,
-       dut.gpu_x0,dut.gpu_y0,dut.gpu_x1,dut.gpu_y1,dut.gpu_x2,dut.gpu_y2}!==dut.commands[dut.command_address])
+       dut.gpu_vx2,dut.gpu_vy2,dut.gpu_vz2,dut.gpu_c2}!==dut.commands[dut.draw_order[dut.order_address]])
        $fatal(1,"ROM latency/order mismatch");
    if(dut.gpu_x0>=640 || dut.gpu_x1>=640 || dut.gpu_x2>=640 ||
       dut.gpu_y0>=480 || dut.gpu_y1>=480 || dut.gpu_y2>=480) $fatal(1,"Coordinates");
@@ -66,9 +65,14 @@ module space_sequence_tb;
    count=count+1;
   end
   if(dut.demo_state==dut.HOLD && old_state!=dut.HOLD) begin
-    if(count!=dut.COMMAND_COUNT) $fatal(1,"Command count %0d",count);
-    $display("PASS vertex sequence: %0d commands, ROM, bounds, vertex/matrix stability and clear/done handshakes",count);
-    $finish;
+    if(count!=dut.frame_count) $fatal(1,"Command count %0d",count);
+    visited[dut.animation_frame]=1;
+    frames=frames+1;count=0;
+    if(frames==33) begin
+        if(visited!==32'hffffffff || dut.animation_frame!=0) $fatal(1,"Orbit wrap");
+        $display("PASS orbit sequence: 32 views + wrap, ROM, bounds, stable vertex/matrix and clear/done handshakes");
+        $finish;
+    end
   end
   old_state=dut.demo_state;
  end

@@ -3,9 +3,9 @@
 // Icarus: -DSTUDIO_SIMULATION -s top_tb (include every source_1/new/*.v).
 // No forced internal signals, direct framebuffer writes, or alternate clocks.
 module top_tb;
-    parameter GPU_CLK_DIV_LOG2=4;
+    parameter GPU_CLK_DIV_LOG2=2;
     parameter STAGE_HOLD_MS=4000;
-    parameter CUBE_HOLD_MS=40;
+    parameter CUBE_HOLD_MS=200;
     reg clk=0,reset_n=0;
     always #5 clk=~clk;
     wire [3:0] r,g,b;wire hs,vs;
@@ -16,7 +16,7 @@ module top_tb;
     integer scan_reads=0,completed_frames=0,requested_frames=1;
     integer clear_pixels=0;
     reg active=0;
-    reg [2:0] previous_state=0;
+    reg [3:0] previous_state=0;
     reg [8191:0] trace_path,frame_path,stop_stage;
     reg [7:0] sampled;
     reg [11:0] expected_video;
@@ -62,8 +62,16 @@ module top_tb;
                 $fatal(1,"Completion before writeback");
             $fwrite(trace_fd,"E %0d %0d\n",$time,triangles);$fflush(trace_fd);active=0;
         end
-        if(!dut.logo_active && dut.scene==2 && dut.demo_state==dut.HOLD && previous_state!=dut.HOLD)
+        if(!dut.logo_active && dut.scene==2 && dut.demo_state==dut.HOLD && previous_state!=dut.HOLD) begin
             completed_frames=completed_frames+1;
+            if($test$plusargs("DUMP_FRAMES")) begin
+                fd=$fopen($sformatf("%0s.%02d.hex",frame_path,completed_frames-1),"w");
+                if(!fd) $fatal(1,"Cannot open frame snapshot");
+                for(i=0;i<307200;i=i+1) $fwrite(fd,"%02x\n",dut.u_mgpu.frame_buffer[i]);
+                $fclose(fd);
+            end
+            $display("Frame %0d complete",completed_frames);
+        end
         previous_state=dut.demo_state;
     end
 
@@ -120,7 +128,8 @@ module top_tb;
         end else
 `endif
         begin
-            wait(dut.demo_state==dut.HOLD);
+            if(stop_stage=="animation") wait(completed_frames>=requested_frames);
+            else wait(dut.demo_state==dut.HOLD);
             finish_recording;
         end
     end

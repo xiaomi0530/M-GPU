@@ -6,9 +6,7 @@
 // sequence; clearing is performed with triangles through the existing GPU.
 module top #(
     parameter BUTTON_FILTER_BITS = 16,
-    // Default /16 = 6.25 MHz, leaves time for the original combinational
-    // dividers. If changed for hardware, update the XDC generated clock too.
-    parameter GPU_CLK_DIV_LOG2 = 4,
+    parameter GPU_CLK_DIV_LOG2 = 2,
     parameter STAGE_HOLD_MS = 4000,
     parameter CUBE_HOLD_MS = 40,
     // Half edge length in pixels before rotation (recommended 32..128).
@@ -79,13 +77,13 @@ module top #(
 // GENERATED_CONTROLLER
     mgpu u_mgpu (
         .clk(gpu_clk), .rst(rst), .start(demo_start),
-        .vertex_x0({6'd0,gpu_x0,16'd0}), .vertex_y0({6'd0,gpu_y0,16'd0}), .vertex_x1({6'd0,gpu_x1,16'd0}), .vertex_y1({6'd0,gpu_y1,16'd0}), .vertex_x2({6'd0,gpu_x2,16'd0}), .vertex_y2({6'd0,gpu_y2,16'd0}),
+        .vertex_x0({1'd0,gpu_x0,7'd0}), .vertex_y0({1'd0,gpu_y0,7'd0}), .vertex_x1({1'd0,gpu_x1,7'd0}), .vertex_y1({1'd0,gpu_y1,7'd0}), .vertex_x2({1'd0,gpu_x2,7'd0}), .vertex_y2({1'd0,gpu_y2,7'd0}),
         .vertex_color0(gpu_c0), .vertex_color1(gpu_c1), .vertex_color2(gpu_c2),
-        .vertex_z0(32'sd0), .vertex_z1(32'sd0), .vertex_z2(32'sd0),
-        .m00(32'sd393216), .m01(32'sd0), .m02(32'sd0), .m03(32'sd0),
-        .m10(32'sd0), .m11(-32'sd524288), .m12(32'sd0), .m13(32'sd0),
-        .m20(32'sd0), .m21(32'sd0), .m22(32'sd65536), .m23(32'sd0),
-        .m30(-32'sd125632512), .m31(32'sd125566976), .m32(32'sd0), .m33(32'sd125829120),
+        .vertex_z0(18'sd0), .vertex_z1(18'sd0), .vertex_z2(18'sd0),
+        .m00(18'sd6144), .m01(18'sd0), .m02(18'sd0), .m03(18'sd0),
+        .m10(18'sd0), .m11(-18'sd8192), .m12(18'sd0), .m13(18'sd0),
+        .m20(18'sd0), .m21(18'sd0), .m22(18'sd4096), .m23(18'sd0),
+        .m30(-18'sd61344), .m31(18'sd61312), .m32(18'sd0), .m33(18'sd61440),
         .clear_color(8'h00), .gpu_busy(gpu_busy), .gpu_done(gpu_done), .gpu_error(gpu_error),
         .vga_clk(CLK100MHZ), .vga_rst(vga_rst),
         .vga_r(VGA_R), .vga_g(VGA_G), .vga_b(VGA_B), .vga_hs(VGA_HS), .vga_vs(VGA_VS)

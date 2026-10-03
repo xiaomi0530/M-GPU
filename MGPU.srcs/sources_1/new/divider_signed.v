@@ -1,18 +1,18 @@
 `timescale 1ns / 1ps
 
-module divider_q16_16 (
+module divider_signed (
     input  wire               clk,
     input  wire               rst,
 
     input  wire               start,
-    input  wire signed [17:0] a,
-    input  wire signed [17:0] b,
+    input  wire signed [31:0] a,
+    input  wire signed [31:0] b,
 
     output wire               ready,
     output reg                busy,
     output reg                done,
 
-    output reg signed [17:0] result,
+    output reg signed [31:0] result,
     output reg                div_zero,
     output reg                overflow
 );
@@ -26,37 +26,37 @@ module divider_q16_16 (
 
     reg [2:0] state;
 
-    reg signed [17:0] a_reg;
-    reg signed [17:0] b_reg;
+    reg signed [31:0] a_reg;
+    reg signed [31:0] b_reg;
 
     reg negative;
 
-    reg [29:0] dividend;
-    reg [17:0] divisor;
-    reg [18:0] remainder;
-    reg [29:0] quotient;
+    reg [31:0] dividend;
+    reg [31:0] divisor;
+    reg [32:0] remainder;
+    reg [31:0] quotient;
 
     reg [4:0] count;
 
-    wire [17:0] abs_a;
-    wire [17:0] abs_b;
+    wire [31:0] abs_a;
+    wire [31:0] abs_b;
 
-    assign abs_a = a_reg[17]
-                 ? (~a_reg + 18'd1)
+    assign abs_a = a_reg[31]
+                 ? (~a_reg + 32'd1)
                  : a_reg;
 
-    assign abs_b = b_reg[17]
-                 ? (~b_reg + 18'd1)
+    assign abs_b = b_reg[31]
+                 ? (~b_reg + 32'd1)
                  : b_reg;
 
     assign ready = (state == IDLE) && !rst;
 
-    wire [18:0] trial_remainder;
+    wire [32:0] trial_remainder;
     wire        quotient_bit;
-    wire [18:0] next_remainder;
+    wire [32:0] next_remainder;
 
     assign trial_remainder =
-        {remainder[17:0], dividend[29]};
+        {remainder[31:0], dividend[31]};
 
     assign quotient_bit =
         trial_remainder >= {1'b0, divisor};
@@ -70,20 +70,20 @@ module divider_q16_16 (
         if (rst) begin
             state <= IDLE;
 
-            a_reg <= 18'sd0;
-            b_reg <= 18'sd0;
+            a_reg <= 32'sd0;
+            b_reg <= 32'sd0;
             negative <= 1'b0;
 
-            dividend  <= 30'd0;
-            divisor   <= 18'd0;
-            remainder <= 19'd0;
-            quotient  <= 30'd0;
+            dividend  <= 32'd0;
+            divisor   <= 32'd0;
+            remainder <= 33'd0;
+            quotient  <= 32'd0;
             count     <= 5'd0;
 
             busy <= 1'b0;
             done <= 1'b0;
 
-            result   <= 18'sd0;
+            result   <= 32'sd0;
             div_zero <= 1'b0;
             overflow <= 1'b0;
         end else begin
@@ -107,8 +107,8 @@ module divider_q16_16 (
                 end
 
                 CHECK: begin
-                    if (b_reg == 18'sd0) begin
-                        result   <= 18'sd0;
+                    if (b_reg == 32'sd0) begin
+                        result   <= 32'sd0;
                         div_zero <= 1'b1;
 
                         state <= DONE;
@@ -118,13 +118,13 @@ module divider_q16_16 (
                 end
 
                 PREP: begin
-                    negative <= a_reg[17] ^ b_reg[17];
+                    negative <= a_reg[31] ^ b_reg[31];
 
-                    dividend <= {abs_a, 12'b0};
+                    dividend <= abs_a;
                     divisor  <= abs_b;
 
-                    remainder <= 19'd0;
-                    quotient  <= 30'd0;
+                    remainder <= 33'd0;
+                    quotient  <= 32'd0;
                     count     <= 5'd0;
 
                     state <= ITER;
@@ -133,14 +133,14 @@ module divider_q16_16 (
                 ITER: begin
                     remainder <= next_remainder;
 
-                    dividend <= {dividend[28:0], 1'b0};
+                    dividend <= {dividend[30:0], 1'b0};
 
                     quotient <= {
-                        quotient[28:0],
+                        quotient[30:0],
                         quotient_bit
                     };
 
-                    if (count == 5'd29) begin
+                    if (count == 5'd31) begin
                         state <= FINISH;
                     end else begin
                         count <= count + 1'b1;
@@ -148,26 +148,8 @@ module divider_q16_16 (
                 end
 
                 FINISH: begin
-                    if (!negative) begin
-                        if (quotient >
-                            30'h0001_FFFF) begin
-
-                            result   <= 18'sh1_FFFF;
-                            overflow <= 1'b1;
-                        end else begin
-                            result <= quotient[17:0];
-                        end
-                    end else begin
-                        if (quotient >
-                            30'h0002_0000) begin
-
-                            result   <= 18'sh2_0000;
-                            overflow <= 1'b1;
-                        end else begin
-                            result <=
-                                ~quotient[17:0] + 18'd1;
-                        end
-                    end
+                    result <= negative ? (~quotient + 32'd1) : quotient;
+                    overflow <= !negative && quotient[31];
 
                     state <= DONE;
                 end

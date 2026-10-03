@@ -105,7 +105,7 @@ class ImageMeshTests(unittest.TestCase):
                                              *map(str,sources.glob("*.v")),str(paths["testbench"])],
                                             cwd=project,capture_output=True,text=True,timeout=60)
             self.assertEqual(compile_result.returncode,0,compile_result.stderr)
-            simulation = subprocess.run([shutil.which("vvp"),str(binary)],cwd=project,capture_output=True,text=True,timeout=120)
+            simulation = subprocess.run([shutil.which("vvp"),str(binary),"+FRAMEBUFFER=out/framebuffer.hex","+TRACE=out/framebuffer.trace"],cwd=project,capture_output=True,text=True,timeout=120)
             self.assertEqual(simulation.returncode,0,simulation.stdout+simulation.stderr)
             actual = np.array([int(line,16) for line in (project/"out/framebuffer.hex").read_text().splitlines()],dtype=np.uint8).reshape((480,640))
             np.testing.assert_array_equal(actual,mesh.target)

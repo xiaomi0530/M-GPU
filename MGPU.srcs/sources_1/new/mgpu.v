@@ -10,40 +10,40 @@ module mgpu #(
     input  wire        rst,
     input  wire        start,
     input  wire        clear,
-    input  wire signed [31:0]  vertex_x0,
-    input  wire signed [31:0]  vertex_y0,
-    input  wire signed [31:0]  vertex_z0,
+    input  wire signed [17:0]  vertex_x0,
+    input  wire signed [17:0]  vertex_y0,
+    input  wire signed [17:0]  vertex_z0,
     input         wire [7:0]  vertex_color0,
 
-    input  wire signed [31:0]  vertex_x1,
-    input  wire signed [31:0]  vertex_y1,
-    input  wire signed [31:0]  vertex_z1,
+    input  wire signed [17:0]  vertex_x1,
+    input  wire signed [17:0]  vertex_y1,
+    input  wire signed [17:0]  vertex_z1,
     input         wire [7:0]  vertex_color1,
 
-    input  wire signed [31:0]  vertex_x2,
-    input  wire signed [31:0]  vertex_y2,
-    input  wire signed [31:0]  vertex_z2,
+    input  wire signed [17:0]  vertex_x2,
+    input  wire signed [17:0]  vertex_y2,
+    input  wire signed [17:0]  vertex_z2,
     input         wire [7:0]  vertex_color2,
 
-    input signed [31:0] m00,
-    input signed [31:0] m01,
-    input signed [31:0] m02,
-    input signed [31:0] m03,
+    input signed [17:0] m00,
+    input signed [17:0] m01,
+    input signed [17:0] m02,
+    input signed [17:0] m03,
 
-    input signed [31:0] m10,
-    input signed [31:0] m11,
-    input signed [31:0] m12,
-    input signed [31:0] m13,
+    input signed [17:0] m10,
+    input signed [17:0] m11,
+    input signed [17:0] m12,
+    input signed [17:0] m13,
 
-    input signed [31:0] m20,
-    input signed [31:0] m21,
-    input signed [31:0] m22,
-    input signed [31:0] m23,
+    input signed [17:0] m20,
+    input signed [17:0] m21,
+    input signed [17:0] m22,
+    input signed [17:0] m23,
 
-    input signed [31:0] m30,
-    input signed [31:0] m31,
-    input signed [31:0] m32,
-    input signed [31:0] m33,
+    input signed [17:0] m30,
+    input signed [17:0] m31,
+    input signed [17:0] m32,
+    input signed [17:0] m33,
 
     input  wire [7:0] clear_color,
     output wire       gpu_busy,
@@ -127,8 +127,8 @@ module mgpu #(
     localparam GPU_DRAW_WAIT  = 3'd6;
     localparam GPU_DONE       = 3'd7;
 
-    localparam signed [31:0] SCREEN_X_LIMIT = H_RES * 65536;
-    localparam signed [31:0] SCREEN_Y_LIMIT = V_RES * 65536;
+    localparam signed [31:0] SCREEN_X_LIMIT = H_RES * 4096;
+    localparam signed [31:0] SCREEN_Y_LIMIT = V_RES * 4096;
 
     reg [2:0] gpu_state;
     reg [2:0] vs_seen;
@@ -161,7 +161,7 @@ module mgpu #(
         begin
             screen_inside = (x >= 0) && (x < SCREEN_X_LIMIT) &&
                             (y >= 0) && (y < SCREEN_Y_LIMIT) &&
-                            (z >= 0) && (z <= 32'sd65536);
+                            (z >= 0) && (z <= 32'sd4096);
         end
     endfunction
 
@@ -263,12 +263,12 @@ module mgpu #(
                     end
                 end
                 GPU_LOAD:begin
-                    rast_x0 <= screen_x0[25:16];
-                    rast_y0 <= screen_y0[25:16];
-                    rast_x1 <= screen_x1[25:16];
-                    rast_y1 <= screen_y1[25:16];
-                    rast_x2 <= screen_x2[25:16];
-                    rast_y2 <= screen_y2[25:16];
+                    rast_x0 <= screen_x0[21:12];
+                    rast_y0 <= screen_y0[21:12];
+                    rast_x1 <= screen_x1[21:12];
+                    rast_y1 <= screen_y1[21:12];
+                    rast_x2 <= screen_x2[21:12];
+                    rast_y2 <= screen_y2[21:12];
                     rast_color0 <= screen_color0;
                     rast_color1 <= screen_color1;
                     rast_color2 <= screen_color2;
@@ -481,10 +481,9 @@ module mgpu #(
         end else if(clear_accept)begin
             clear_reg <= 1'b1;
             clear_busy <= 1'b1;
-        end else if(shad_done && !clear_reg)begin
-            frame_buffer[pixel_addr(pixel_x,pixel_y)] <= {pixel_R,pixel_G,pixel_B};
-        end else if(clear_reg) begin
-                frame_buffer[clear_count] <= clear_color;
+        end else if(shad_done || clear_reg)begin
+            frame_buffer[clear_reg ? clear_count[FB_ADDR_W-1:0] : pixel_addr(pixel_x,pixel_y)] <= clear_reg ? clear_color : {pixel_R,pixel_G,pixel_B};
+            if(clear_reg)begin
                 if(clear_count < FB_PIXELS-1)begin
                     clear_count <= clear_count + 1'b1;
                 end else begin
@@ -492,6 +491,7 @@ module mgpu #(
                     clear_reg <= 1'b0;
                     clear_busy <= 1'b0;
                 end
+            end
         end
     end
 

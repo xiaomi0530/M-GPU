@@ -103,13 +103,13 @@ write_bitstream -force image_top.bit
 ''',encoding='utf-8')
     metadata=dict(top='top',image_triangles=len(mesh.triangles),commands=len(commands),
                   rom_bits=84*len(commands),rom_bram36_upper_bound=3*math.ceil(len(commands)/1024),
-                  gpu_mhz=6.25,hardware_limit=MAX_BOARD_COMMANDS)
+                  gpu_mhz=25.0,hardware_limit=MAX_BOARD_COMMANDS)
     (output/'manifest.json').write_text(json.dumps(metadata,indent=2),encoding='utf-8')
     (output/'README.txt').write_text('''Image Studio 上板包：目标 Nexys A7-100T，RGB332。
 top.v 是综合顶层，rtl/ 是原 GPU/VGA 的副本，nexys_a7_vga.xdc 是板级约束。
 运行 vivado -mode batch -source build.tcl 生成 image_top.bit；每个新图片仍须通过布局布线时序检查。
 也可在独立 Vivado 工程中加入这些文件并把 top 设为顶层。不要同时加入原工程的另一个 top.v。
 复位后先清屏，再绘制图片，完成后一直显示；CPU_RESETN 可重画。
-此目录不会替换原工程的 3D 顶点实验台。不要手改数字表，修改图片后重新导出。
+此目录不会替换原工程的悬浮水晶演示。不要手改数字表，修改图片后重新导出。
 ''',encoding='utf-8')
     return output/'top.v'

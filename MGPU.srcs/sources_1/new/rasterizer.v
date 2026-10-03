@@ -226,6 +226,99 @@ module rasterizer (
     reg signed [10:0] dx20;
     reg signed [10:0] dy20;
 
+    wire div_start;
+    wire [5:0] div_done;
+    wire signed [31:0] div_result0;
+    wire signed [31:0] div_result1;
+    wire signed [31:0] div_result2;
+    wire signed [31:0] div_result3;
+    wire signed [31:0] div_result4;
+    wire signed [31:0] div_result5;
+
+    divider_signed u0_divider_signed(
+        .clk      (clk),
+        .rst      (rst),
+        .start    (div_start),
+        .a        (dclorR_x_num),
+        .b        ({{10{area[21]}},area}),
+        .ready    (),
+        .busy     (),
+        .done     (div_done[0]),
+        .result   (div_result0),
+        .div_zero (),
+        .overflow ()
+    );
+
+    divider_signed u1_divider_signed(
+        .clk      (clk),
+        .rst      (rst),
+        .start    (div_start),
+        .a        (dclorR_y_num),
+        .b        ({{10{area[21]}},area}),
+        .ready    (),
+        .busy     (),
+        .done     (div_done[1]),
+        .result   (div_result1),
+        .div_zero (),
+        .overflow ()
+    );
+
+    divider_signed u2_divider_signed(
+        .clk      (clk),
+        .rst      (rst),
+        .start    (div_start),
+        .a        (dclorG_x_num),
+        .b        ({{10{area[21]}},area}),
+        .ready    (),
+        .busy     (),
+        .done     (div_done[2]),
+        .result   (div_result2),
+        .div_zero (),
+        .overflow ()
+    );
+
+    divider_signed u3_divider_signed(
+        .clk      (clk),
+        .rst      (rst),
+        .start    (div_start),
+        .a        (dclorG_y_num),
+        .b        ({{10{area[21]}},area}),
+        .ready    (),
+        .busy     (),
+        .done     (div_done[3]),
+        .result   (div_result3),
+        .div_zero (),
+        .overflow ()
+    );
+
+    divider_signed u4_divider_signed(
+        .clk      (clk),
+        .rst      (rst),
+        .start    (div_start),
+        .a        (dclorB_x_num),
+        .b        ({{10{area[21]}},area}),
+        .ready    (),
+        .busy     (),
+        .done     (div_done[4]),
+        .result   (div_result4),
+        .div_zero (),
+        .overflow ()
+    );
+
+    divider_signed u5_divider_signed(
+        .clk      (clk),
+        .rst      (rst),
+        .start    (div_start),
+        .a        (dclorB_y_num),
+        .b        ({{10{area[21]}},area}),
+        .ready    (),
+        .busy     (),
+        .done     (div_done[5]),
+        .result   (div_result5),
+        .div_zero (),
+        .overflow ()
+    );
+
     wire if_inside;
     assign if_inside = is_inside(ef_i0,ef_i1,ef_i2);
 
@@ -243,6 +336,9 @@ module rasterizer (
     localparam RAST_I_nex = 4'd9;
     localparam DONE       = 4'd10;
     localparam WAIT       = 4'd11;
+    localparam DIV_WAIT   = 4'd12;
+
+    assign div_start = (rast_state == RAST_I_ini) && (area != 0);
 
     always@(posedge clk)begin
         if(rst)begin
@@ -363,18 +459,27 @@ module rasterizer (
                     ef_i1 <= ef_v1;
                     ef_i2 <= ef_v2;
 
-                    dclorR_x <= dclorR_x_num / area;    
-                    dclorR_y <= dclorR_y_num / area;
-                    dclorG_x <= dclorG_x_num / area;
-                    dclorG_y <= dclorG_y_num / area;
-                    dclorB_x <= dclorB_x_num / area;
-                    dclorB_y <= dclorB_y_num / area;
-
-                    if(rast_valid)begin
-                        rast_state <= COLOR_ini_1;
+                    if(area == 0)begin
+                        rast_state <= DONE;
                     end else begin
-                        rast_state <= WAIT;
-                        wait_state <= COLOR_ini_1;
+                        rast_state <= DIV_WAIT;
+                    end
+                end
+                DIV_WAIT:begin
+                    if(&div_done)begin
+                        dclorR_x <= div_result0[14:0];
+                        dclorR_y <= div_result1[14:0];
+                        dclorG_x <= div_result2[14:0];
+                        dclorG_y <= div_result3[14:0];
+                        dclorB_x <= div_result4[14:0];
+                        dclorB_y <= div_result5[14:0];
+
+                        if(rast_valid)begin
+                            rast_state <= COLOR_ini_1;
+                        end else begin
+                            rast_state <= WAIT;
+                            wait_state <= COLOR_ini_1;
+                        end
                     end
                 end
                 COLOR_ini_1:begin

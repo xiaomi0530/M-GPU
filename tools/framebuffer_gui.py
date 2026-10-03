@@ -139,10 +139,10 @@ class FramebufferViewer:
 
         simulation = tk.Frame(self.root, bg=BG)
         simulation.pack(fill="x", padx=26, pady=(8,0))
-        self.sim_stage = tk.StringVar(value="3D 顶点实验台")
+        self.sim_stage = tk.StringVar(value="水晶环绕（32 帧）")
         self.sim_fast = tk.BooleanVar(value=True)
         ttk.Combobox(simulation,textvariable=self.sim_stage,state="readonly",width=15,
-                     values=("3D 顶点实验台",)).pack(side="left")
+                     values=("水晶环绕（32 帧）","悬浮水晶（单帧）")).pack(side="left")
         self.sim_button=ttk.Button(simulation,text="运行 top.v",command=self.simulate_top)
         self.sim_button.pack(side="left",padx=8)
         self.sim_stop=ttk.Button(simulation,text="停止仿真",command=self.sim_cancel.set,state="disabled")
@@ -238,7 +238,7 @@ class FramebufferViewer:
             ttk.Button(controls, text=title, command=command).pack(side="left", padx=(6, 0))
         self.speed = tk.StringVar(value="1")
         speed_box = ttk.Combobox(controls, textvariable=self.speed, width=5, state="readonly",
-                                 values=("0.01", "0.05", "0.25", "1", "5", "25", "100"))
+                                 values=("0.01", "0.05", "0.25", "1", "5", "25", "100", "1000"))
         speed_box.pack(side="right")
         self._label(controls, "仿真 ms / 秒  ", MUTED, 9).pack(side="right", padx=(10, 0))
         jump_row = tk.Frame(transport, bg=PANEL)
@@ -283,7 +283,7 @@ class FramebufferViewer:
             messagebox.showinfo("仿真进行中","请先停止当前仿真。",parent=self.root)
             return
         from top_simulation import run_top,SimulationCancelled
-        stage="background"
+        stage="animation" if self.sim_stage.get()=="水晶环绕（32 帧）" else "background"
         fast=self.sim_fast.get()
         output=self.project/"out/studio_top"
         self.sim_cancel.clear()

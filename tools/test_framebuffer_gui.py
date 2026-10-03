@@ -77,6 +77,19 @@ class ViewerTests(unittest.TestCase):
         app.seek(100000)
         self.assertFalse(app.follow)
 
+    def test_realtime_1000_ms_per_second(self):
+        app = self.app
+        app.tail.model.latest_ns = 2000000000
+        app.seek(0)
+        app.speed.set("1000")
+        app.toggle_play()
+        app.root.after_cancel(app._timer)
+        app.last_tick = 100
+        with patch("framebuffer_gui.time.perf_counter", return_value=100.1):
+            app._tick()
+        self.assertEqual(app.time_ns, 100000000)
+        self.assertTrue(app.playing)
+
     def test_export_uses_current_time_and_original_resolution(self):
         app = self.app
         target = Path(self.folder.name) / "export.png"
