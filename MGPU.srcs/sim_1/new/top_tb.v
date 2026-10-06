@@ -3,56 +3,79 @@
 // Icarus: -DSTUDIO_SIMULATION -s top_tb (include every source_1/new/*.v).
 // No forced internal signals, direct framebuffer writes, or alternate clocks.
 module top_tb;
-    parameter GPU_CLK_DIV_LOG2=2;
-    parameter STAGE_HOLD_MS=4000;
-    parameter CUBE_HOLD_MS=200;
+    parameter GPU_CLK_DIV_LOG2=0;
+    parameter STAGE_HOLD_MS=7000;
+    parameter CUBE_HOLD_MS=0;
+    parameter TARGET_FPS=60;
+    parameter START_FRAME=0;
+    parameter START_LOGO_FRAME=0;
+    parameter H_RES=320;
+    parameter V_RES=240;
     reg clk=0,reset_n=0;
     always #5 clk=~clk;
     wire [3:0] r,g,b;wire hs,vs;
-    top #(.GPU_CLK_DIV_LOG2(GPU_CLK_DIV_LOG2),.LOGO_HOLD_MS(STAGE_HOLD_MS),
-          .STAGE_HOLD_MS(STAGE_HOLD_MS),.CUBE_HOLD_MS(CUBE_HOLD_MS))
+    top #(.H_RES(H_RES),.V_RES(V_RES),.GPU_CLK_DIV_LOG2(GPU_CLK_DIV_LOG2),.LOGO_HOLD_MS(STAGE_HOLD_MS),
+          .STAGE_HOLD_MS(STAGE_HOLD_MS),.CUBE_HOLD_MS(CUBE_HOLD_MS),.TARGET_FPS(TARGET_FPS),.START_FRAME(START_FRAME),.START_LOGO_FRAME(START_LOGO_FRAME))
         dut(clk,reset_n,1'b0,r,g,b,hs,vs);
     integer trace_fd,fd,i,triangles=0,pixels=0,fragments=0;
     integer scan_reads=0,completed_frames=0,requested_frames=1;
+    integer logo_completed_frames=0,recorded_frames=0;
     integer clear_pixels=0;
     reg active=0;
+    reg previous_logo=0;
     reg [3:0] previous_state=0;
     reg [8191:0] trace_path,frame_path,stop_stage;
     reg [7:0] sampled;
     reg [11:0] expected_video;
     reg check_video;
+    wire [9:0] trace_x0=dut.studio_mode ? dut.gpu_x0*H_RES/640 : dut.gpu_x0;
+    wire [9:0] trace_y0=dut.studio_mode ? dut.gpu_y0*V_RES/480 : dut.gpu_y0;
+    wire [9:0] trace_x1=dut.studio_mode ? dut.gpu_x1*H_RES/640 : dut.gpu_x1;
+    wire [9:0] trace_y1=dut.studio_mode ? dut.gpu_y1*V_RES/480 : dut.gpu_y1;
+    wire [9:0] trace_x2=dut.studio_mode ? dut.gpu_x2*H_RES/640 : dut.gpu_x2;
+    wire [9:0] trace_y2=dut.studio_mode ? dut.gpu_y2*V_RES/480 : dut.gpu_y2;
+
+    always @(dut.u_mgpu.front_bank) begin
+        if(!dut.vga_rst)begin
+            $fwrite(trace_fd,"S %0d %0d\n",$time,dut.u_mgpu.front_bank);
+            $fflush(trace_fd);
+        end
+    end
 
     always @(posedge dut.gpu_clk) if(!dut.rst) begin
+        if(previous_logo && !dut.logo_active && !dut.studio_mode && stop_stage=="logo" && logo_completed_frames<requested_frames)
+            $fatal(1,"Logo stage ended before requested frame count");
+        previous_logo=dut.logo_active;
         if(dut.gpu_done && dut.gpu_error)
             $fatal(1,"GPU rejected triangle %0d",triangles);
         if(dut.u_mgpu.rast_start) begin
             if({dut.u_mgpu.rast_x0,dut.u_mgpu.rast_y0,
                 dut.u_mgpu.rast_x1,dut.u_mgpu.rast_y1,
                 dut.u_mgpu.rast_x2,dut.u_mgpu.rast_y2} !==
-               {dut.gpu_x0,dut.gpu_y0,dut.gpu_x1,dut.gpu_y1,dut.gpu_x2,dut.gpu_y2})
+               {trace_x0,trace_y0,trace_x1,trace_y1,trace_x2,trace_y2})
                 $fatal(1,"Vertex transform changed pixel coordinates");
         end
         if(dut.u_mgpu.clear_reg) begin
             if(active || fragments!=pixels || dut.demo_start || dut.u_mgpu.shad_done)
                 $fatal(1,"Clear overlaps drawing/writeback");
-            if(dut.u_mgpu.clear_count>=307200) $fatal(1,"Clear address out of bounds");
+            if(dut.u_mgpu.clear_count>=H_RES*V_RES) $fatal(1,"Clear address out of bounds");
             clear_pixels=clear_pixels+1;
-            $fwrite(trace_fd,"P %0d 0 %0d %0d %02x\n",$time,
-                    dut.u_mgpu.clear_count%640,dut.u_mgpu.clear_count/640,dut.u_mgpu.clear_color);
+            $fwrite(trace_fd,"P %0d 0 %0d %0d %0d %02x\n",$time,dut.u_mgpu.back_bank,
+                    dut.u_mgpu.clear_count%H_RES,dut.u_mgpu.clear_count/H_RES,dut.u_mgpu.clear_color);
         end
         if(dut.demo_start) begin
             if(active || fragments!=pixels) $fatal(1,"Overlapping/undrained command");
             triangles=triangles+1;active=1;
             $fwrite(trace_fd,"B %0d %0d %0d %0d %0d %0d %0d %0d\n",$time,triangles,
-                    dut.gpu_x0,dut.gpu_y0,dut.gpu_x1,dut.gpu_y1,dut.gpu_x2,dut.gpu_y2);
+                    trace_x0,trace_y0,trace_x1,trace_y1,trace_x2,trace_y2);
             $fflush(trace_fd);
         end
         if(dut.u_mgpu.fifo_rs_wen && !dut.u_mgpu.fifo_rs_full) fragments=fragments+1;
         if(dut.u_mgpu.shad_done) begin
-            if(!active || dut.u_mgpu.pixel_x>=640 || dut.u_mgpu.pixel_y>=480)
+            if(!active || dut.u_mgpu.pixel_x>=H_RES || dut.u_mgpu.pixel_y>=V_RES)
                 $fatal(1,"Unowned/out-of-bounds pixel");
             pixels=pixels+1;
-            $fwrite(trace_fd,"P %0d %0d %0d %0d %02x\n",$time,triangles,
+            $fwrite(trace_fd,"P %0d %0d %0d %0d %0d %02x\n",$time,triangles,dut.u_mgpu.back_bank,
                     dut.u_mgpu.pixel_x,dut.u_mgpu.pixel_y,
                     {dut.u_mgpu.pixel_R,dut.u_mgpu.pixel_G,dut.u_mgpu.pixel_B});
             if((pixels%256)==0) $fflush(trace_fd);
@@ -62,15 +85,19 @@ module top_tb;
                 $fatal(1,"Completion before writeback");
             $fwrite(trace_fd,"E %0d %0d\n",$time,triangles);$fflush(trace_fd);active=0;
         end
-        if(!dut.logo_active && dut.scene==2 && dut.demo_state==dut.HOLD && previous_state!=dut.HOLD) begin
-            completed_frames=completed_frames+1;
-            if($test$plusargs("DUMP_FRAMES")) begin
-                fd=$fopen($sformatf("%0s.%02d.hex",frame_path,completed_frames-1),"w");
-                if(!fd) $fatal(1,"Cannot open frame snapshot");
-                for(i=0;i<307200;i=i+1) $fwrite(fd,"%02x\n",dut.u_mgpu.frame_buffer[i]);
-                $fclose(fd);
+        if(dut.demo_state==dut.HOLD && previous_state!=dut.HOLD) begin
+            if(dut.logo_active) logo_completed_frames=logo_completed_frames+1;
+            else completed_frames=completed_frames+1;
+            if((stop_stage=="logo" && dut.logo_active) || (stop_stage!="logo" && !dut.logo_active)) begin
+                recorded_frames=recorded_frames+1;
+                if($test$plusargs("DUMP_FRAMES")) begin
+                    fd=$fopen($sformatf("%0s.%02d.hex",frame_path,recorded_frames-1),"w");
+                    if(!fd) $fatal(1,"Cannot open frame snapshot");
+                    for(i=0;i<H_RES*V_RES;i=i+1) $fwrite(fd,"%02x\n",dut.u_mgpu.front_bank ? dut.u_mgpu.frame_buffer1[i] : dut.u_mgpu.frame_buffer0[i]);
+                    $fclose(fd);
+                end
             end
-            $display("Frame %0d complete",completed_frames);
+            $display("Frame complete: logo=%0d phase=%0d model_frames=%0d logo_frames=%0d",dut.logo_active,dut.scene_frame,completed_frames,logo_completed_frames);
         end
         previous_state=dut.demo_state;
     end
@@ -78,7 +105,7 @@ module top_tb;
     // Verify the real scanout alongside writeback, including blanking.
     always @(posedge clk) if(!dut.vga_rst) begin
         if(dut.u_mgpu.vga_fb_read_en) begin
-            sampled=dut.u_mgpu.frame_buffer[dut.u_mgpu.vga_fb_addr];scan_reads=scan_reads+1;
+            sampled=dut.u_mgpu.front_bank ? dut.u_mgpu.frame_buffer1[dut.u_mgpu.vga_fb_addr] : dut.u_mgpu.frame_buffer0[dut.u_mgpu.vga_fb_addr];scan_reads=scan_reads+1;
         end
         check_video=dut.u_mgpu.u_vga.phase==1;
         expected_video=(dut.u_mgpu.u_vga.scan_x<640 && dut.u_mgpu.u_vga.scan_y<480) ?
@@ -93,7 +120,7 @@ module top_tb;
             if(active || fragments!=pixels) $fatal(1,"Recording ended with pending pixels");
             fd=$fopen(frame_path,"w");
             if(!fd) $fatal(1,"Cannot open framebuffer output: %0s; parent directory must exist",frame_path);
-            for(i=0;i<307200;i=i+1) $fwrite(fd,"%02x\n",dut.u_mgpu.frame_buffer[i]);
+            for(i=0;i<H_RES*V_RES;i=i+1) $fwrite(fd,"%02x\n",dut.u_mgpu.front_bank ? dut.u_mgpu.frame_buffer1[i] : dut.u_mgpu.frame_buffer0[i]);
             $fclose(fd);
             $fwrite(trace_fd,"D %0d %0d %0d\n",$time,triangles,pixels+clear_pixels);
             $fflush(trace_fd);$fclose(trace_fd);
@@ -117,7 +144,8 @@ module top_tb;
         trace_fd=$fopen(trace_path,"w");
         if(!trace_fd) $fatal(1,"Cannot open trace: %0s; parent directory must exist",trace_path);
         $display("Trace output: %0s; framebuffer output: %0s (relative paths use simulator working directory)",trace_path,frame_path);
-        $fwrite(trace_fd,"MGPU_TRACE 1 640 480 00 ns\n");
+        $fwrite(trace_fd,"MGPU_TRACE 2 %0d %0d 00 ns\n",H_RES,V_RES);
+        $fwrite(trace_fd,"# DISPLAY 640 480\n");
         $fwrite(trace_fd,"# DUT top.v GPU_DIV_LOG2=%0d HOLD_MS=%0d\n",GPU_CLK_DIV_LOG2,STAGE_HOLD_MS);
         $fflush(trace_fd);
         repeat(8) @(negedge clk);reset_n=1;
@@ -128,7 +156,9 @@ module top_tb;
         end else
 `endif
         begin
+            if(stop_stage=="logo" && STAGE_HOLD_MS<=0) $fatal(1,"Logo stage disabled");
             if(stop_stage=="animation") wait(completed_frames>=requested_frames);
+            else if(stop_stage=="logo") wait(logo_completed_frames>=requested_frames);
             else wait(dut.demo_state==dut.HOLD);
             finish_recording;
         end

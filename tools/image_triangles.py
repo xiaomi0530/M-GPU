@@ -70,7 +70,8 @@ def quantize(rgb: np.ndarray) -> np.ndarray:
     return ((red << 5) | (green << 2) | blue).astype(np.uint8)
 
 
-def compose(image: Image.Image, placement: Placement) -> tuple[np.ndarray, np.ndarray, Image.Image]:
+def compose(image: Image.Image, placement: Placement,
+            resolution: tuple[int, int] = (WIDTH, HEIGHT)) -> tuple[np.ndarray, np.ndarray, Image.Image]:
     p = placement
     if not (1 <= p.width <= 4096 and 1 <= p.height <= 4096 and 0 <= p.background <= 255):
         raise ValueError("图片尺寸应在 1～4096 像素之间，背景应为有效 RGB332 颜色。")
@@ -78,7 +79,9 @@ def compose(image: Image.Image, placement: Placement) -> tuple[np.ndarray, np.nd
     resized = image.convert("RGBA").resize((p.width, p.height), Image.Resampling.LANCZOS)
     layer = Image.new("RGBA", (WIDTH, HEIGHT))
     layer.paste(resized, (p.x, p.y))
-    background = Image.new("RGBA", (WIDTH, HEIGHT), tuple(map(int, RGB[p.background])) + (255,))
+    if resolution != (WIDTH, HEIGHT):
+        layer = layer.resize(resolution, Image.Resampling.LANCZOS)
+    background = Image.new("RGBA", resolution, tuple(map(int, RGB[p.background])) + (255,))
     composite = Image.alpha_composite(background, layer).convert("RGB")
     return quantize(np.asarray(composite)), np.asarray(layer)[:, :, 3].copy(), composite
 
@@ -107,6 +110,8 @@ def raster_triangle(triangle: Triangle) -> tuple[int, int, np.ndarray, np.ndarra
     dx10, dy10, dx20, dy20 = x1-x0, y1-y0, x2-x0, y2-y0
     gx = trunc_div(norm[0]*(dy10-dy20) + norm[1]*dy20 - norm[2]*dy10, area)
     gy = trunc_div(norm[0]*(dx20-dx10) - norm[1]*dx20 + norm[2]*dx10, area)
+    gx=(gx+16384)%32768-16384
+    gy=(gy+16384)%32768-16384
     color = np.clip(norm[0] + (xx-x0)[..., None]*gx + (yy-y0)[..., None]*gy, 0, 4096)
     packed = (color * np.array([7, 7, 3]) + 2048) >> 12
     packed = ((packed[:, :, 0] << 5) | (packed[:, :, 1] << 2) | packed[:, :, 2]).astype(np.uint8)
@@ -119,6 +124,20 @@ def render(triangles: list[Triangle], background: int = 0) -> np.ndarray:
         x, y, pixels, mask = raster_triangle(triangle)
         region = result[y:y+pixels.shape[0], x:x+pixels.shape[1]]
         region[mask] = pixels[mask]
+    return result
+
+
+def render_scaled(triangles: list[Triangle], width: int, height: int) -> np.ndarray:
+    result=np.zeros((height,width),dtype=np.uint8)
+    for triangle in triangles:
+        values=triangle.values
+        coords=tuple(v*(width if i%2==0 else height)//(WIDTH if i%2==0 else HEIGHT)
+                     for i,v in enumerate(values[:6]))
+        x0,y0,x1,y1,x2,y2=coords
+        if (x1-x0)*(y2-y0)==(y1-y0)*(x2-x0):
+            continue
+        x,y,pixels,mask=raster_triangle(Triangle(coords+values[6:]))
+        result[y:y+pixels.shape[0],x:x+pixels.shape[1]][mask]=pixels[mask]
     return result
 
 
@@ -144,12 +163,16 @@ class Tile:
 
 def triangulate(image: Image.Image, placement: Placement, tolerance: float = 8,
                 max_triangles: int = 12000, cancel: threading.Event | None = None,
-                progress: Callable[[int], None] | None = None) -> Mesh:
+                progress: Callable[[int], None] | None = None,
+                resolution: tuple[int, int] = (WIDTH, HEIGHT)) -> Mesh:
     if not np.isfinite(tolerance) or tolerance < 0 or not 2 <= max_triangles <= 160000:
         raise ValueError("误差必须非负，三角形上限应在 2～160000 之间。")
-    target, alpha, _ = compose(image, placement)
+    width, height = resolution
+    if width <= 0 or height <= 0 or width % 2 or height % 2 or WIDTH % width or HEIGHT % height:
+        raise ValueError("渲染尺寸必须为偶数，且能整除 640×480。")
+    target, alpha, _ = compose(image, placement, resolution)
     background = placement.background
-    prefix = rectangle_triangles(0, 0, WIDTH-1, HEIGHT-1, (background,)*4, 0) if background else []
+    prefix = rectangle_triangles(0, 0, width-1, height-1, (background,)*4, 0) if background else []
     prediction = np.full_like(target, background)
     target_rgb = RGB[target].astype(np.int32)
 
@@ -193,7 +216,7 @@ def triangulate(image: Image.Image, placement: Placement, tolerance: float = 8,
     if len(xx):
         # Even aligned bounds permit exact 2x2 leaves, including single-pixel art.
         bounds = (int(xx.min())//2*2, int(yy.min())//2*2,
-                  min(WIDTH, (int(xx.max())//2+1)*2), min(HEIGHT, (int(yy.max())//2+1)*2))
+                  min(width, (int(xx.max())//2+1)*2), min(height, (int(yy.max())//2+1)*2))
         add(fit(bounds))
     if len(prefix) + 2*len(leaves) > max_triangles:
         raise ValueError("三角形上限不足以同时绘制背景与图片，请提高上限。")
@@ -233,6 +256,10 @@ def triangulate(image: Image.Image, placement: Placement, tolerance: float = 8,
         exact = float(np.mean(prediction[visible] == target[visible]) * 100)
     else:
         rmse, exact = 0., 100.
+    if resolution != (WIDTH, HEIGHT):
+        triangles = [Triangle(tuple(v*(WIDTH//width if i%2 == 0 else HEIGHT//height)
+                                    for i,v in enumerate(triangle.values[:6])) + triangle.values[6:])
+                     for triangle in triangles]
     return Mesh(triangles, target, prediction, alpha, placement, rmse, exact, limited, tolerance)
 
 
@@ -256,6 +283,8 @@ def save_bundle(mesh: Mesh, project: Path, source: str = "") -> dict[str, Path]:
     scene += "".join(" ".join(map(str, tri.values[:6])) + " " +
                      " ".join(f"{v:02x}" for v in tri.values[6:]) + "\n" for tri in mesh.triangles)
     metadata = {"design_top": "top", "simulation_top": "top_image_tb", "source": source, "placement": vars(mesh.placement), "triangles": len(mesh.triangles),
+                "render_width": mesh.prediction.shape[1], "render_height": mesh.prediction.shape[0],
+                "command_width": WIDTH, "command_height": HEIGHT,
                 "rmse_rgb888": mesh.rmse, "exact_visible_percent": mesh.exact_percent,
                 "tolerance": mesh.tolerance, "budget_limited": mesh.budget_limited,
                 "alpha": "composited over the selected RGB332 background"}

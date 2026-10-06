@@ -12,6 +12,11 @@ SAMPLE = ("MGPU_TRACE 1 4 3 01 ns\n"
           "B 50 2 0 0 3 0 0 2\n"
           "P 60 2 0 0 03\nP 70 2 0 0 ff\nE 80 2\nD 90 2 4\n")
 
+DOUBLE = ("MGPU_TRACE 2 2 1 00 ns\n# DISPLAY 4 2\n"
+          "B 10 1 0 0 1 0 0 0\nP 20 1 1 0 0 e0\nE 30 1\nS 40 1\n"
+          "P 50 0 0 0 0 00\nB 60 2 0 0 1 0 0 0\nP 70 2 0 1 0 03\nE 80 2\nS 90 0\n"
+          "P 100 0 1 0 0 00\nD 110 2 4\n")
+
 
 def parse(text):
     model = Trace()
@@ -21,6 +26,24 @@ def parse(text):
 
 
 class TraceTests(unittest.TestCase):
+    def test_double_buffer_screen_holds_until_swap_and_seeks_backward(self):
+        model=parse(DOUBLE)
+        self.assertEqual((model.display_width,model.display_height),(4,2))
+        for stamp,expected in [(20,[0,0]),(40,[224,0]),(70,[224,0]),(90,[0,3]),
+                               (110,[0,3]),(39,[0,0]),(89,[224,0]),(0,[0,0])]:
+            self.assertEqual(model.frame_at(stamp),bytes(expected))
+        self.assertEqual(model.frame_at(20,drawing=True),bytes([224,0]))
+        self.assertEqual(model.frame_at(70,drawing=True),bytes([0,3]))
+        self.assertEqual(model.isolated(model.by_id[2],3),bytes([0,3]))
+        self.assertEqual(list(model.swap_counts),[1,3])
+
+    def test_reject_front_writes_and_invalid_swaps(self):
+        for event in ('P 1 0 0 0 0 ff','P 1 0 2 0 0 ff','S 1 0','S 1 2'):
+            with self.subTest(event=event),self.assertRaises(ValueError):
+                parse('MGPU_TRACE 2 2 1 00 ns\n'+event)
+        with self.assertRaises(ValueError):
+            parse('MGPU_TRACE 2 2 1 00 ns\nB 1 1 0 0 1 0 0 0\nS 2 1')
+
     def test_clear_writes_between_triangles_are_reversible(self):
         model = parse('MGPU_TRACE 1 2 1 ff ns\n'
                       'P 1 0 0 0 00\nP 2 0 1 0 00\n'
@@ -123,14 +146,14 @@ class TraceTests(unittest.TestCase):
         self.assertTrue(tail.model.complete)
         expected = bytes(int(line, 16) for line in
                          (project / "out/studio_top/framebuffer.hex").read_text().splitlines())
-        self.assertEqual(tail.model.seek_count(len(tail.model.times)), expected)
+        self.assertEqual(tail.model.frame_at(tail.model.latest_ns), expected)
         # Check bounded, evenly spaced triangle boundaries. Replaying every
         # prefix is quadratic for board demos with tens of thousands of draws.
         triangles=tail.model.triangles
         stride=max(1,len(triangles)//32)
         targets={t.last_pixel for t in triangles[::stride]}
         targets.add(len(tail.model.times))
-        frame=bytearray([tail.model.clear])*len(expected)
+        frame=bytearray([tail.model.clear])*len(tail.model.ingest)
         previous=0
         for count in sorted(targets):
             for i in range(previous,count):

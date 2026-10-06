@@ -139,10 +139,10 @@ class FramebufferViewer:
 
         simulation = tk.Frame(self.root, bg=BG)
         simulation.pack(fill="x", padx=26, pady=(8,0))
-        self.sim_stage = tk.StringVar(value="水晶环绕（32 帧）")
+        self.sim_stage = tk.StringVar(value="奶蛙环绕（128 帧）")
         self.sim_fast = tk.BooleanVar(value=True)
-        ttk.Combobox(simulation,textvariable=self.sim_stage,state="readonly",width=15,
-                     values=("水晶环绕（32 帧）","悬浮水晶（单帧）")).pack(side="left")
+        ttk.Combobox(simulation,textvariable=self.sim_stage,state="readonly",width=24,
+                     values=("奶蛙环绕（128 帧）","奶蛙（单帧）","MIDIYAS GPU 开屏（420 帧）")).pack(side="left")
         self.sim_button=ttk.Button(simulation,text="运行 top.v",command=self.simulate_top)
         self.sim_button.pack(side="left",padx=8)
         self.sim_stop=ttk.Button(simulation,text="停止仿真",command=self.sim_cancel.set,state="disabled")
@@ -169,10 +169,15 @@ class FramebufferViewer:
         viewport.pack(side="left", fill="both", expand=True)
         view_head = tk.Frame(viewport, bg=PANEL, padx=14, pady=8)
         view_head.pack(fill="x")
-        self.resolution = self._label(view_head, "RENDER OUTPUT  /  640 × 480 · RGB332", MUTED, 9)
+        self.resolution = self._label(view_head, "320 × 240 → 640 × 480 · RGB332", MUTED, 9)
         self.resolution.pack(side="left")
         self.mode_label = self._label(view_head, "PAUSED", CYAN, 9)
         self.mode_label.pack(side="right")
+        self.view_mode=tk.StringVar(value="屏幕显示")
+        self.view_box=ttk.Combobox(view_head,textvariable=self.view_mode,state="readonly",width=10,
+                                   values=("屏幕显示","绘制过程"))
+        self.view_box.pack(side="right",padx=10)
+        self.view_box.bind("<<ComboboxSelected>>",lambda event:self.invalidate())
         self.canvas = tk.Canvas(viewport, bg="#03070e", highlightthickness=0)
         self.canvas.pack(fill="both", expand=True, padx=12)
         self.canvas.bind("<Configure>", lambda event: self.invalidate())
@@ -283,7 +288,7 @@ class FramebufferViewer:
             messagebox.showinfo("仿真进行中","请先停止当前仿真。",parent=self.root)
             return
         from top_simulation import run_top,SimulationCancelled
-        stage="animation" if self.sim_stage.get()=="水晶环绕（32 帧）" else "background"
+        stage="logo" if self.sim_stage.get()=="MIDIYAS GPU 开屏（420 帧）" else "animation" if self.sim_stage.get()=="奶蛙环绕（128 帧）" else "background"
         fast=self.sim_fast.get()
         output=self.project/"out/studio_top"
         self.sim_cancel.clear()
@@ -291,7 +296,7 @@ class FramebufferViewer:
         self.watch_trace(output/"framebuffer.trace")
         def work():
             try:
-                paths=run_top(self.project,output,self.sim_cancel,stage=stage,frames=32 if stage=="animation" else 1,
+                paths=run_top(self.project,output,self.sim_cancel,stage=stage,frames=128 if stage=="animation" else 420 if stage=="logo" else 1,
                               fast=fast,progress=lambda text:self.sim_messages.put(("progress",text)))
                 from view_framebuffer import read_hex_framebuffer,rgb332_to_rgb888,save_with_pillow
                 pixels=read_hex_framebuffer(paths["framebuffer"])
@@ -407,6 +412,7 @@ class FramebufferViewer:
         triangles = self.tail.model.triangles
         if not triangles:
             return
+        self.view_mode.set("绘制过程")
         # Navigate completion boundaries, rather than blindly changing selection.
         ends = [t.end_ns if t.end_ns is not None else self.tail.model.latest_ns for t in triangles]
         if delta > 0:
@@ -434,6 +440,7 @@ class FramebufferViewer:
             return
         triangle = self.tail.model.by_id.get(int(selection[0]))
         if triangle:
+            self.view_mode.set("绘制过程")
             self.selected_id = triangle.id
             self.seek(triangle.end_ns if triangle.end_ns is not None else self.tail.model.latest_ns)
 
@@ -449,6 +456,7 @@ class FramebufferViewer:
 
     def _new_recording(self):
         self.time_ns = 0
+        self.view_mode.set("屏幕显示")
         self.playing = False
         self.selected_id = None
         self.tree_page = 0
@@ -486,6 +494,10 @@ class FramebufferViewer:
             if triangle.end_ns is not None:
                 x = 12 + width * triangle.end_ns / end
                 canvas.create_line(x, 26, x, 31, fill=PURPLE)
+        swaps=self.tail.model.swap_times
+        for stamp in swaps[::max(1,(len(swaps)+599)//600)]:
+            x=12+width*stamp/end
+            canvas.create_line(x,7,x,13,fill=CYAN)
         x = 12 + width * self.time_ns / end
         canvas.create_line(12, y, x, y, fill=CYAN, width=5, capstyle="round")
         canvas.create_oval(x - 6, y - 6, x + 6, y + 6, fill=CYAN, outline=TEXT)
@@ -510,28 +522,30 @@ class FramebufferViewer:
                                fill=MUTED, font=("Microsoft YaHei UI", 10))
             return
         count = model.count_at(self.time_ns)
+        drawing=self.view_mode.get()=="绘制过程"
         triangle = self._current_triangle()
         signature = (id(model), count, width, height, self.isolate.get(),
-                     triangle.id if triangle else None, self.outline.get())
+                     triangle.id if triangle else None, self.outline.get(),drawing,model.bank_at(self.time_ns))
         if signature == self.last_signature:
             return
         self.last_signature = signature
         if self.isolate.get() and triangle:
             pixels = model.isolated(triangle, count)
         else:
-            pixels = model.seek_count(count)
+            pixels = model.frame_at(self.time_ns,drawing=drawing)
         self.display_frame = bytes(pixels)
         picture = Image.frombytes("P", (model.width, model.height), self.display_frame)
         picture.putpalette(PALETTE)
-        ratio = min(width / model.width, height / model.height)
-        draw_w, draw_h = max(1, int(model.width * ratio)), max(1, int(model.height * ratio))
+        ratio = min(width / model.display_width, height / model.display_height)
+        draw_w, draw_h = max(1, int(model.display_width * ratio)), max(1, int(model.display_height * ratio))
         picture = picture.resize((draw_w, draw_h), Image.Resampling.NEAREST).convert("RGB")
         self.photo = ImageTk.PhotoImage(picture, master=self.root)
         canvas.delete("all")
         left, top = (width - draw_w) // 2, (height - draw_h) // 2
         self.image_box = (left, top, draw_w, draw_h)
         canvas.create_image(left, top, image=self.photo, anchor="nw")
-        if self.outline.get() and triangle:
+        if self.outline.get() and triangle and (self.isolate.get() or model.version==1 or
+                (drawing and triangle.bank==model.bank_at(self.time_ns,drawing=True))):
             vertices = triangle.vertices
             points = [(left + (vertices[i] + .5) * draw_w / model.width,
                        top + (vertices[i + 1] + .5) * draw_h / model.height) for i in (0, 2, 4)]
@@ -565,6 +579,7 @@ class FramebufferViewer:
             try:
                 picture = Image.frombytes("P", (model.width, model.height), self.display_frame)
                 picture.putpalette(PALETTE)
+                picture=picture.resize((model.display_width,model.display_height),Image.Resampling.NEAREST)
                 picture.convert("RGB").save(name)
             except OSError as exc:
                 messagebox.showerror("导出失败", str(exc), parent=self.root)
@@ -584,7 +599,12 @@ class FramebufferViewer:
         self.play_button.configure(text="Ⅱ  暂停" if self.playing or self.follow else "▶  播放")
         self.live_button.configure(text="●  正在追踪" if self.follow else "●  实时追踪")
         if model.ready:
-            self.resolution.configure(text=f"RENDER OUTPUT  /  {model.width} × {model.height} · RGB332")
+            dimensions=f"{model.width} × {model.height}"
+            if (model.display_width,model.display_height)!=(model.width,model.height):
+                dimensions+=f" → {model.display_width} × {model.display_height}"
+            bank=model.bank_at(self.time_ns,self.view_mode.get()=="绘制过程")
+            suffix=f" · 缓冲 {'AB'[bank]}" if model.version==2 else " · 单缓冲日志"
+            self.resolution.configure(text=f"{dimensions} · RGB332{suffix}")
         self.update_triangle_table()
         triangle = self._current_triangle()
         if triangle:
@@ -599,7 +619,7 @@ class FramebufferViewer:
         elif not self.tail.exists:
             footer = "等待文件创建 · 可先打开本窗口，再运行仿真；也可用“打开日志”选择 Vivado 输出目录。"
         elif model.complete:
-            footer = "录制完成 · 青色为当前进度，紫色刻度为三角形完成时刻；1 ms/秒表示每秒播放 1 ms 仿真时间。"
+            footer = "录制完成 · 青色刻度为缓冲交换，紫色刻度为三角形完成；屏幕显示保持完整帧，绘制过程可逐三角形回放。" if model.version==2 else "录制完成 · 紫色刻度为三角形完成时刻；1 ms/秒表示每秒播放 1 ms 仿真时间。"
         else:
             footer = "日志持续读取中 · 暂停或拖动不会丢失新数据；点击“实时追踪”返回最新位置。"
         self.footer.configure(text=footer)

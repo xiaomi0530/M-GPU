@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Open MGPU Framebuffer Studio or export a static 640x480 RGB332 framebuffer.
+Open MGPU Framebuffer Studio or export a native RGB332 framebuffer.
 
 Expected input format:
-    One hex byte per line, total 640*480 lines.
+    One hex byte per line, 320*240 or legacy 640*480 lines.
 
 Example:
     python tools/view_framebuffer.py              # desktop replay GUI
@@ -41,7 +41,20 @@ def rgb332_to_rgb888(value: int) -> tuple[int, int, int]:
     return red, green, blue
 
 
-def read_hex_framebuffer(path: Path) -> list[int]:
+def framebuffer_size(count: int, width: int | None = None, height: int | None = None) -> tuple[int,int]:
+    if width is None and height is None:
+        for w,h in ((320,240),(640,480)):
+            if count==w*h:
+                return w,h
+        raise ValueError(f"Expected 76800 or 307200 pixels, got {count}; specify width and height for other sizes")
+    if width is None or height is None or not (1<=width<=4096 and 1<=height<=4096):
+        raise ValueError("Specify both width and height in 1..4096")
+    if count!=width*height:
+        raise ValueError(f"Expected {width*height} pixels, got {count}")
+    return width,height
+
+
+def read_hex_framebuffer(path: Path, width: int | None = None, height: int | None = None) -> list[int]:
     pixels: list[int] = []
 
     with path.open("r", encoding="ascii") as file:
@@ -60,32 +73,44 @@ def read_hex_framebuffer(path: Path) -> list[int]:
 
             pixels.append(value)
 
-    if len(pixels) != PIXELS:
-        raise ValueError(f"Expected {PIXELS} pixels, got {len(pixels)}")
-
+    framebuffer_size(len(pixels),width,height)
     return pixels
 
 
-def save_with_pillow(rgb_pixels: list[tuple[int, int, int]], output_png: Path) -> bool:
+def output_size(count, width=None, height=None, scale=None):
+    width,height=framebuffer_size(count,width,height)
+    if scale is None:
+        scale=2 if (width,height)==(320,240) else 1
+    if not isinstance(scale,int) or not 1<=scale<=8:
+        raise ValueError("Scale must be an integer in 1..8")
+    return width,height,scale
+
+
+def save_with_pillow(rgb_pixels: list[tuple[int, int, int]], output_png: Path, width=None, height=None, scale=None) -> bool:
     try:
         from PIL import Image
     except ImportError:
         return False
 
-    image = Image.new("RGB", (WIDTH, HEIGHT))
+    width,height,scale=output_size(len(rgb_pixels),width,height,scale)
+    image = Image.new("RGB", (width, height))
     image.putdata(rgb_pixels)
+    if scale!=1:
+        image=image.resize((width*scale,height*scale),Image.Resampling.NEAREST)
     image.save(output_png)
     return True
 
 
-def save_as_ppm(rgb_pixels: list[tuple[int, int, int]], output_ppm: Path) -> None:
+def save_as_ppm(rgb_pixels: list[tuple[int, int, int]], output_ppm: Path, width=None, height=None, scale=None) -> None:
     # PPM P6 is a tiny binary image format:
     #   header: P6 <width> <height> 255
     #   payload: raw RGB bytes
+    width,height,scale=output_size(len(rgb_pixels),width,height,scale)
     with output_ppm.open("wb") as file:
-        file.write(f"P6\n{WIDTH} {HEIGHT}\n255\n".encode("ascii"))
-        for red, green, blue in rgb_pixels:
-            file.write(bytes((red, green, blue)))
+        file.write(f"P6\n{width*scale} {height*scale}\n255\n".encode("ascii"))
+        for y in range(height):
+            row=b"".join(bytes(value)*scale for value in rgb_pixels[y*width:(y+1)*width])
+            file.write(row*scale)
 
 
 def main() -> None:
@@ -98,6 +123,9 @@ def main() -> None:
     )
     parser.add_argument("--live", action="store_true", help="Follow newest trace events")
     parser.add_argument("--gui", action="store_true", help="Open the trace GUI explicitly")
+    parser.add_argument("--width", type=int)
+    parser.add_argument("--height", type=int)
+    parser.add_argument("--scale", type=int, help="Integer image scale; 320x240 defaults to 2, use 1 for native pixels")
     args = parser.parse_args()
 
     if args.framebuffer is None or args.gui or args.live or Path(args.framebuffer).suffix.lower() != ".hex":
@@ -115,16 +143,16 @@ def main() -> None:
     output_dir = Path("out")
     output_dir.mkdir(exist_ok=True)
 
-    raw_pixels = read_hex_framebuffer(framebuffer_path)
+    raw_pixels = read_hex_framebuffer(framebuffer_path,args.width,args.height)
     rgb_pixels = [rgb332_to_rgb888(value) for value in raw_pixels]
 
     output_png = output_dir / "framebuffer.png"
     output_ppm = output_dir / "framebuffer.ppm"
 
-    if save_with_pillow(rgb_pixels, output_png):
+    if save_with_pillow(rgb_pixels, output_png,args.width,args.height,args.scale):
         print(f"Wrote {output_png}")
     else:
-        save_as_ppm(rgb_pixels, output_ppm)
+        save_as_ppm(rgb_pixels, output_ppm,args.width,args.height,args.scale)
         print("Pillow is not installed, so PNG output was skipped.")
         print(f"Wrote {output_ppm}")
         print("Install Pillow with: python -m pip install pillow")

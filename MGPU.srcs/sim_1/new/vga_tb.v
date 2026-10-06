@@ -3,6 +3,7 @@
 // Independent timing/address model: two complete frames, all 256 colors,
 // one-cycle synchronous RAM latency, blanking, pixel hold and mid-frame reset.
 module vga_tb;
+    parameter FB_WIDTH=640,FB_HEIGHT=480;
     reg clk = 0;
     always #5 clk = !clk;
     reg rst = 1;
@@ -11,7 +12,9 @@ module vga_tb;
     reg [7:0] data;
     wire [3:0] r, g, b;
     wire hs, vs;
-    vga dut(clk, rst, addr, read_en, data, r, g, b, hs, vs);
+    wire vblank_start;
+    vga #(.FB_WIDTH(FB_WIDTH),.FB_HEIGHT(FB_HEIGHT))
+        dut(clk, rst, addr, read_en, data, r, g, b, hs, vs, vblank_start);
 
     integer phase = 0, x = 0, y = 0, frames = 0;
     integer reads = 0, hs_pixels = 0, vs_pixels = 0;
@@ -21,6 +24,8 @@ module vga_tb;
     reg [13:0] held = {12'b0, 2'b11};
     reg [13:0] expected;
     reg [255:0] seen = 0;
+    reg fb_visible;
+    integer expected_addr;
     function [7:0] pattern;
         input integer address;
         input bank;
@@ -38,13 +43,17 @@ module vga_tb;
             if ({r,g,b,hs,vs} !== held || read_en !== 0)
                 $fatal(1, "Reset output mismatch");
         end else begin
-            if (read_en !== (phase == 0 && x < 640 && y < 480))
+            fb_visible=x<640 && y<480;
+            expected_addr=fb_visible ? (y/(480/FB_HEIGHT))*FB_WIDTH+x/(640/FB_WIDTH) : 0;
+            if(vblank_start !== (phase == 0 && x == 0 && y == 480))
+                $fatal(1,"Vertical blank pulse mismatch");
+            if (read_en !== (phase == 0 && fb_visible))
                 $fatal(1, "Read enable mismatch at %0d,%0d phase %0d",x,y,phase);
-            if (addr !== ((x < 640 && y < 480) ? y*640+x : 0))
+            if (addr !== expected_addr)
                 $fatal(1, "Address mismatch at %0d,%0d",x,y);
             if (read_en) begin
                 data <= pattern(addr, epoch);
-                expected_data = pattern(y*640+x, epoch);
+                expected_data = pattern(expected_addr, epoch);
                 seen[expected_data] = 1;
                 reads = reads + 1;
             end
@@ -52,7 +61,7 @@ module vga_tb;
             if (phase == 1) begin
                 expected[1] = !(x >= 656 && x < 752);
                 expected[0] = !(y >= 490 && y < 492);
-                if (x < 640 && y < 480) begin
+                if (fb_visible) begin
                     // Arithmetic reference for 3->4 and 2->4 bit expansion.
                     expected[13:10] = (expected_data[7:5] * 15 + 3) / 7;
                     expected[9:6]   = (expected_data[4:2] * 15 + 3) / 7;
@@ -94,7 +103,7 @@ module vga_tb;
         wait (frames == 2);
         @(negedge clk);
         if (seen !== {256{1'b1}}) $fatal(1,"Not all RGB332 colors tested");
-        $display("PASS VGA: two frames, 307200 reads/frame, all colors, live data, reset, sync and hold (%0d clocks)",checks);
+        $display("PASS VGA: two frames, 307200 reads/frame from %0dx%0d buffer, all colors, live data, reset, sync and hold (%0d clocks)",FB_WIDTH,FB_HEIGHT,checks);
         $finish;
     end
     initial begin

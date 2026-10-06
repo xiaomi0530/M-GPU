@@ -10,6 +10,8 @@ module mgpu #(
     input  wire        rst,
     input  wire        start,
     input  wire        clear,
+    input  wire        present,
+    output reg         present_done,
     input  wire signed [17:0]  vertex_x0,
     input  wire signed [17:0]  vertex_y0,
     input  wire signed [17:0]  vertex_z0,
@@ -58,12 +60,14 @@ module mgpu #(
     output wire       vga_hs,
     output wire       vga_vs
 );
-    reg [7:0] frame_buffer [0:FB_PIXELS-1];
+    (* ram_style = "block" *) reg [7:0] frame_buffer0 [0:FB_PIXELS-1];
+    (* ram_style = "block" *) reg [7:0] frame_buffer1 [0:FB_PIXELS-1];
 
     integer i;
     initial begin
         for(i=0;i<=FB_PIXELS-1;i=i+1)begin
-            frame_buffer[i] <= clear_color;
+            frame_buffer0[i] <= 8'h00;
+            frame_buffer1[i] <= 8'h00;
         end
     end
 
@@ -71,9 +75,10 @@ module mgpu #(
         input [9:0] x;
         input [9:0] y;
         begin
-            pixel_addr = (y<<9)+(y<<7) + x;
+            pixel_addr = y*H_RES + x;
         end
     endfunction
+
     function [7:0] Q312_to_RGB332;
         input signed [31:0] R;
         input signed [31:0] G;
@@ -170,8 +175,8 @@ module mgpu #(
     assign screen_valid = screen_inside(screen_x0,screen_y0,screen_z0) &&
                           screen_inside(screen_x1,screen_y1,screen_z1) &&
                           screen_inside(screen_x2,screen_y2,screen_z2);
-    assign clear_accept = clear && !rst && (gpu_state == GPU_IDLE) && !clear_busy && !clear_reg;
-    assign gpu_busy = (gpu_state != GPU_IDLE) || clear_busy || clear_reg;
+    assign clear_accept = clear && !rst && (gpu_state == GPU_IDLE) && !clear_busy && !clear_reg && !swap_pending;
+    assign gpu_busy = (gpu_state != GPU_IDLE) || clear_busy || clear_reg || swap_pending;
     assign gpu_done = gpu_done_reg;
     assign gpu_error = draw_error;
 
@@ -232,7 +237,7 @@ module mgpu #(
             gpu_done_reg <= 1'b0;
             case(gpu_state)
                 GPU_IDLE:begin
-                    if(start && !clear && !clear_busy && !clear_reg)begin
+                    if(start && !clear && !clear_busy && !clear_reg && !swap_pending)begin
                         vs_seen <= 3'b000;
                         rast_finished <= 1'b0;
                         pending_pixels <= 10'd0;
@@ -306,7 +311,7 @@ module mgpu #(
         end
     end
 
-    vertex_shader u_vertex_shader0(
+    vertex_shader #(.H_RES(H_RES),.V_RES(V_RES)) u_vertex_shader0(
         .clk          (clk          ),
         .rst          (rst          ),
         .vs_start     (vs_start0     ),
@@ -338,7 +343,7 @@ module mgpu #(
         .vs_done      (vs_done0      ),
         .vs_error     (vs_error0     )
     );
-    vertex_shader u_vertex_shader1(
+    vertex_shader #(.H_RES(H_RES),.V_RES(V_RES)) u_vertex_shader1(
         .clk          (clk          ),
         .rst          (rst          ),
         .vs_start     (vs_start1     ),
@@ -370,7 +375,7 @@ module mgpu #(
         .vs_done      (vs_done1      ),
         .vs_error     (vs_error1     )
     );
-    vertex_shader u_vertex_shader2(
+    vertex_shader #(.H_RES(H_RES),.V_RES(V_RES)) u_vertex_shader2(
         .clk          (clk          ),
         .rst          (rst          ),
         .vs_start     (vs_start2     ),
@@ -481,8 +486,14 @@ module mgpu #(
         end else if(clear_accept)begin
             clear_reg <= 1'b1;
             clear_busy <= 1'b1;
-        end else if(shad_done || clear_reg)begin
-            frame_buffer[clear_reg ? clear_count[FB_ADDR_W-1:0] : pixel_addr(pixel_x,pixel_y)] <= clear_reg ? clear_color : {pixel_R,pixel_G,pixel_B};
+        end else if(!swap_pending && (shad_done || clear_reg))begin
+            if(back_bank)begin
+                frame_buffer1[clear_reg ? clear_count[FB_ADDR_W-1:0] : pixel_addr(pixel_x,pixel_y)]
+                    <= clear_reg ? clear_color : {pixel_R,pixel_G,pixel_B};
+            end else begin
+                frame_buffer0[clear_reg ? clear_count[FB_ADDR_W-1:0] : pixel_addr(pixel_x,pixel_y)]
+                    <= clear_reg ? clear_color : {pixel_R,pixel_G,pixel_B};
+            end
             if(clear_reg)begin
                 if(clear_count < FB_PIXELS-1)begin
                     clear_count <= clear_count + 1'b1;
@@ -495,26 +506,80 @@ module mgpu #(
         end
     end
 
-    wire [18:0] vga_fb_addr;
-    wire        vga_fb_read_en;
-    reg  [7:0]  vga_fb_data;
+    reg front_bank;
+    reg back_bank;
+    reg swap_req;
+    reg swap_pending;
 
-    always @(posedge vga_clk) begin
-        if (vga_fb_read_en)
-            vga_fb_data <= frame_buffer[vga_fb_addr];
+    wire vblank_start;
+
+    (* ASYNC_REG = "TRUE" *) reg [1:0] req_sync;
+    (* ASYNC_REG = "TRUE" *) reg [1:0] ack_sync;
+
+    always @(posedge clk) begin
+        if(rst)begin
+            back_bank <= 1'b1;
+            swap_req <= 1'b0;
+            swap_pending <= 1'b0;
+            ack_sync <= 2'b00;
+            present_done <= 1'b0;
+        end else begin
+            ack_sync <= {ack_sync[0],front_bank};
+            present_done <= 1'b0;
+
+            if(present && !gpu_busy && !swap_pending)begin
+                swap_req <= ~swap_req;
+                swap_pending <= 1'b1;
+            end else if(swap_pending && ack_sync[1] == swap_req)begin
+                back_bank <= ~back_bank;
+                swap_pending <= 1'b0;
+                present_done <= 1'b1;
+            end
+        end
     end
 
-    vga u_vga (
-        .clk        (vga_clk),
-        .rst        (vga_rst),
-        .fb_addr    (vga_fb_addr),
-        .fb_read_en (vga_fb_read_en),
-        .fb_data    (vga_fb_data),
-        .vga_r      (vga_r),
-        .vga_g      (vga_g),
-        .vga_b      (vga_b),
-        .vga_hs     (vga_hs),
-        .vga_vs     (vga_vs)
+    wire [18:0] vga_fb_addr;
+    wire        vga_fb_read_en;
+    wire [7:0]  vga_fb_data;
+    reg  [7:0]  vga_fb_data0;
+    reg  [7:0]  vga_fb_data1;
+
+    assign vga_fb_data = front_bank ? vga_fb_data1 : vga_fb_data0;
+
+    always @(posedge vga_clk) begin
+        if(vga_fb_read_en)begin
+            if(front_bank)begin
+                vga_fb_data1 <= frame_buffer1[vga_fb_addr];
+            end else begin
+                vga_fb_data0 <= frame_buffer0[vga_fb_addr];
+            end
+        end
+    end
+
+    always @(posedge vga_clk) begin
+        if(vga_rst)begin
+            front_bank <= 1'b0;
+            req_sync <= 2'b00;
+        end else begin
+            req_sync <= {req_sync[0],swap_req};
+            if(vblank_start && req_sync[1] != front_bank)begin
+                front_bank <= req_sync[1];
+            end
+        end
+    end
+
+    vga #(.FB_WIDTH(H_RES),.FB_HEIGHT(V_RES)) u_vga (
+        .clk            (vga_clk),
+        .rst            (vga_rst),
+        .fb_addr        (vga_fb_addr),
+        .fb_read_en     (vga_fb_read_en),
+        .fb_data        (vga_fb_data),
+        .vga_r          (vga_r),
+        .vga_g          (vga_g),
+        .vga_b          (vga_b),
+        .vga_hs         (vga_hs),
+        .vga_vs         (vga_vs),
+        .vblank_start   (vblank_start)
     );
 
 endmodule

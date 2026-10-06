@@ -20,6 +20,49 @@ RECORDING = ("MGPU_TRACE 1 4 3 00 ns\n"
 
 
 class ViewerTests(unittest.TestCase):
+    def test_double_buffer_display_drawing_seek_and_scaled_export(self):
+        from test_framebuffer_trace import DOUBLE
+        self.path.write_text(DOUBLE,encoding='ascii')
+        app=self.app
+        app.watch_trace(self.path)
+        while app.tail.poll():pass
+        app.seek(20);app.render()
+        self.assertEqual(app.display_frame,bytes([0,0]))
+        app.view_mode.set('绘制过程');app.render()
+        self.assertEqual(app.display_frame,bytes([224,0]))
+        app.view_mode.set('屏幕显示');app.seek(40);app.render()
+        self.assertEqual(app.display_frame,bytes([224,0]))
+        app.seek(70);app.render()
+        self.assertEqual(app.display_frame,bytes([224,0]))
+        app.seek(90);app.render()
+        self.assertEqual(app.display_frame,bytes([0,3]))
+        target=Path(self.folder.name)/'display.png'
+        with patch('framebuffer_gui.filedialog.asksaveasfilename',return_value=str(target)):
+            app.export()
+        with Image.open(target) as picture:
+            self.assertEqual(picture.size,(4,2))
+            self.assertEqual(picture.getpixel((2,1)),(0,0,255))
+        app.seek(0);app.step_triangle(1);app.render()
+        self.assertEqual(app.view_mode.get(),'绘制过程')
+        self.assertEqual(app.display_frame,bytes([224,0]))
+        self.assertFalse(self.errors)
+
+    def test_native_hex_auto_scale_and_native_option(self):
+        target=Path(self.folder.name)/'native.hex'
+        target.write_text('e0\n'+'00\n'*(320*240-1),encoding='ascii')
+        script=Path(__file__).with_name('view_framebuffer.py')
+        for scale,size in ((None,(640,480)),(1,(320,240))):
+            command=[sys.executable,str(script),str(target)]
+            if scale:command+=['--scale',str(scale)]
+            process=subprocess.run(command,cwd=self.folder.name,capture_output=True,text=True)
+            self.assertEqual(process.returncode,0,process.stderr)
+            with Image.open(Path(self.folder.name)/'out/framebuffer.png') as picture:
+                self.assertEqual(picture.size,size)
+                self.assertEqual(picture.getpixel((0,0)),(255,0,0))
+                if scale is None:
+                    self.assertEqual(picture.getpixel((1,1)),(255,0,0))
+                    self.assertEqual(picture.getpixel((2,0)),(0,0,0))
+
     def setUp(self):
         self.folder = tempfile.TemporaryDirectory()
         self.addCleanup(self.folder.cleanup)

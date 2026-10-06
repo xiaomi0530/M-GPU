@@ -13,13 +13,16 @@ from PIL import Image, ImageDraw, ImageTk
 
 from framebuffer_gui import BG, PANEL, SURFACE, TEXT, MUTED, CYAN, LINE
 from image_triangles import (Cancelled, Placement, PRESETS, RGB, compose, load_image,
-                             quantize, save_bundle, triangulate)
+                             quantize, save_bundle, triangulate, render_scaled)
 
 
 class ImageStudio:
     def __init__(self, owner, project: Path):
         self.owner = owner
         self.project = Path(project)
+        from top_simulation import design_resolution
+        try:self.render_size=design_resolution(self.project)
+        except FileNotFoundError:self.render_size=(320,240)
         self.window = tk.Toplevel(owner.root)
         self.window.title("MGPU · Image Studio")
         scale = owner.ui_scale
@@ -32,6 +35,7 @@ class ImageStudio:
         self.picture = None
         self.source = None
         self.mesh = None
+        self.gpu_prediction = None
         self.paths = None
         self.busy = False
         self.closed = False
@@ -91,7 +95,7 @@ class ImageStudio:
         stage.pack(side="left", fill="both", expand=True)
         mode_bar = tk.Frame(stage, bg=PANEL, padx=10, pady=8)
         mode_bar.pack(fill="x")
-        self.label(mode_bar, "640 × 480", TEXT, 10).pack(side="left")
+        self.label(mode_bar, "640 × 480 布局 · 320 × 240 渲染", TEXT, 10).pack(side="left")
         for title in ("原图合成", "RGB332", "三角形预览"):
             widget = ttk.Radiobutton(mode_bar, text=title, value=title,
                                      variable=self.mode, command=self.redraw)
@@ -193,7 +197,7 @@ class ImageStudio:
 
     def changed(self):
         self._last_fields = tuple(variable.get() for variable in self.variables.values()) + (self.background,)
-        self.mesh = self.paths = None
+        self.mesh = self.paths = self.gpu_prediction = None
         self.simulate_button.configure(state="disabled")
         self.export_button.configure(state="disabled")
         self.metrics.configure(text="位置或图片已更新 · 需要重新生成三角形。")
@@ -285,10 +289,13 @@ class ImageStudio:
         try:
             p = self.placement()
             if self.mesh and self.mode.get() == "三角形预览":
-                picture = Image.fromarray(RGB[self.mesh.prediction])
+                prediction=self.gpu_prediction if self.gpu_prediction is not None else self.mesh.prediction
+                picture = Image.fromarray(RGB[prediction]).resize((640,480),Image.Resampling.NEAREST)
             else:
-                target, _, original = compose(self.picture, p)
+                target, _, original = compose(self.picture, p,
+                    (640,480) if self.mode.get() == "原图合成" else self.render_size)
                 picture = original if self.mode.get() == "原图合成" else Image.fromarray(RGB[target])
+                picture = picture.resize((640,480),Image.Resampling.NEAREST)
             if self.mesh and self.mesh_lines.get():
                 pen = ImageDraw.Draw(picture)
                 for tri in self.mesh.triangles:
@@ -335,6 +342,7 @@ class ImageStudio:
         self.set_busy(True)
         self.status.configure(text="正在自适应划分：平坦区域合并，细节与透明边缘细分…")
         picture = self.picture.copy()
+        resolution=self.render_size
         def work():
             try:
                 last = [0.]
@@ -343,11 +351,14 @@ class ImageStudio:
                     if now-last[0] > .2:
                         self.messages.put(("progress",f"正在细分 · {count:,} 个三角形"))
                         last[0] = now
-                mesh = triangulate(picture,placement,tolerance,maximum,self.cancel,progress)
+                width,height=resolution
+                mesh = triangulate(picture,placement,tolerance,maximum,self.cancel,progress,
+                                   resolution=(width,height))
                 if self.cancel.is_set():
                     raise Cancelled()
                 paths = save_bundle(mesh,self.project,str(self.source))
-                self.messages.put(("mesh",(mesh,paths)))
+                prediction=render_scaled(mesh.triangles,width,height)
+                self.messages.put(("mesh",(mesh,paths,prediction)))
             except Cancelled:
                 self.messages.put(("cancelled",None))
             except Exception as exc:
@@ -377,19 +388,22 @@ class ImageStudio:
         output=self.project/"out/studio_image"
         self.owner.watch_trace(output/"framebuffer.trace")
         self.owner.root.lift()
-        paths=self.paths.copy()
-        expected=self.mesh.prediction.copy()
+        mesh=self.mesh
+        triangles=list(self.mesh.triangles)
         fast=self.owner.sim_fast.get()
         def work():
             try:
+                paths=save_bundle(mesh,self.project,str(self.source))
                 results=run_top(self.project,output,self.cancel,testbench=paths["testbench"],
                                 module="top_image_tb",scene=paths["scene"],fast=fast,
                                 progress=lambda text:self.messages.put(("progress",text)))
-                actual=np.array([int(line,16) for line in results["framebuffer"].read_text().split()],dtype=np.uint8).reshape((480,640))
+                width,height=results['width'],results['height']
+                expected=render_scaled(triangles,width,height)
+                actual=np.array([int(line,16) for line in results["framebuffer"].read_text().split()],dtype=np.uint8).reshape((height,width))
                 different=int(np.count_nonzero(actual!=expected))
                 if different:
                     raise RuntimeError(f"top.v 输出与三角形预览有 {different:,} 个像素不同；日志：{results['log']}")
-                Image.fromarray(RGB[actual]).save(output/"framebuffer.png")
+                Image.fromarray(RGB[actual]).resize((640,480),Image.Resampling.NEAREST).save(output/"framebuffer.png")
                 self.messages.put(("simulated",None))
             except SimulationCancelled:
                 self.messages.put(("cancelled",None))
@@ -412,14 +426,14 @@ class ImageStudio:
             else:
                 self.set_busy(False)
                 if kind == "mesh":
-                    self.mesh,self.paths = value
+                    self.mesh,self.paths,self.gpu_prediction = value
                     self.mode.set("三角形预览")
                     self.simulate_button.configure(state="normal")
                     self.export_button.configure(state="normal")
                     mesh = self.mesh
                     self.metrics.configure(text=f"{len(mesh.triangles):,} 个三角形  ·  RGB 误差 {mesh.rmse:.2f}  ·  可见像素一致率 {mesh.exact_percent:.2f}%")
                     suffix = "已达到数量上限，当前为近似结果。" if mesh.budget_limited else ""
-                    self.status.configure(text="已生成 out/image_scene.tri 与 out/top_image_tb.v；以 top.v 为设计顶层运行。" + suffix)
+                    self.status.configure(text="已按 GPU 分辨率划分三角形并生成场景与 testbench；预览放大至完整屏幕。" + suffix)
                     self.redraw()
                 elif kind == "simulated":
                     self.status.configure(text="仿真通过 · top.v 输出与三角形预览逐像素一致。回放与图片在 out/studio_image/。")

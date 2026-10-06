@@ -88,7 +88,7 @@ read_verilog [glob [file join $root rtl *.v]]
 read_verilog [file join $root top.v]
 read_xdc [file join $root nexys_a7_vga.xdc]
 synth_design -top top -part xc7a100tcsg324-1
-opt_design
+opt_design -propconst -sweep -remap -bufg_opt -shift_register_opt
 place_design
 phys_opt_design
 route_design
@@ -103,7 +103,7 @@ write_bitstream -force image_top.bit
 ''',encoding='utf-8')
     metadata=dict(top='top',image_triangles=len(mesh.triangles),commands=len(commands),
                   rom_bits=84*len(commands),rom_bram36_upper_bound=3*math.ceil(len(commands)/1024),
-                  gpu_mhz=25.0,hardware_limit=MAX_BOARD_COMMANDS)
+                  gpu_mhz=40.0,hardware_limit=MAX_BOARD_COMMANDS)
     (output/'manifest.json').write_text(json.dumps(metadata,indent=2),encoding='utf-8')
     (output/'README.txt').write_text('''Image Studio 上板包：目标 Nexys A7-100T，RGB332。
 top.v 是综合顶层，rtl/ 是原 GPU/VGA 的副本，nexys_a7_vga.xdc 是板级约束。

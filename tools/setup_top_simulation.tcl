@@ -14,10 +14,10 @@ set_property top top_tb $sim
 set defs [get_property verilog_define $sim]
 if {[lsearch -exact $defs STUDIO_SIMULATION]<0} {lappend defs STUDIO_SIMULATION}
 set_property verilog_define $defs $sim
-set_property generic {GPU_CLK_DIV_LOG2=1 STAGE_HOLD_MS=1 CUBE_HOLD_MS=1} $sim
+set_property generic {GPU_CLK_DIV_LOG2=1 STAGE_HOLD_MS=0 TARGET_FPS=0 H_RES=320 V_RES=240} $sim
 set output [file join $root out studio_top]
 file mkdir $output
-set_property -name xsim.simulate.xsim.more_options -value [list -testplusarg "TRACE=$output/framebuffer.trace" -testplusarg "FRAMEBUFFER=$output/framebuffer.hex" -testplusarg STOP_STAGE=background] -objects $sim
+set_property -name xsim.simulate.xsim.more_options -value [list -testplusarg "TRACE=$output/framebuffer.trace" -testplusarg "FRAMEBUFFER=$output/framebuffer.hex" -testplusarg STOP_STAGE=animation] -objects $sim
 set_property xsim.simulate.runtime all $sim
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1

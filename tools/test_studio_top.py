@@ -47,15 +47,16 @@ class TopStudioTests(unittest.TestCase):
     @unittest.skipUnless(shutil.which('iverilog') and shutil.which('vvp'),'Icarus unavailable')
     def test_simulation_accepts_more_than_board_rom_capacity(self):
         scene=self.project/'large scene.tri'
-        scene.write_text('8193\n'+('10 10 11 10 10 11 e0 e0 e0\n'*8193))
+        scene.write_text('8193\n'+('10 10 12 10 10 12 e0 e0 e0\n'*8193))
         paths=run_top(self.project,self.project/'output with spaces',threading.Event(),scene=scene)
         tail=TraceTail(paths['trace'])
         while tail.poll():pass
         self.assertIsNone(tail.error)
         self.assertTrue(tail.model.complete)
         self.assertEqual(len(tail.model.triangles),8193)
-        self.assertEqual(tail.model.ingest[6410],224)
-        self.assertEqual(tail.model.ingest[0],0)
+        self.assertEqual((tail.model.width,tail.model.height),(320,240))
+        self.assertEqual(tail.model.frame_at(tail.model.latest_ns)[1605],224)
+        self.assertEqual(tail.model.frame_at(tail.model.latest_ns)[0],0)
 
     @unittest.skipUnless(shutil.which('iverilog') and shutil.which('vvp'),'Icarus unavailable')
     def test_empty_scene_and_invalid_geometry(self):

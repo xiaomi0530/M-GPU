@@ -1,0 +1,97 @@
+newmtl color_0
+Kd 0.857143 0.714286 0.333333
+Ka 0 0 0
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl color_1
+Kd 1.000000 0.857143 0.333333
+Ka 0 0 0
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl color_2
+Kd 0.428571 0.428571 0.333333
+Ka 0 0 0
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl color_3
+Kd 0.428571 0.428571 0.333333
+Ka 0 0 0
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl color_4
+Kd 1.000000 0.857143 0.666667
+Ka 0 0 0
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl color_5
+Kd 0.428571 0.428571 0.333333
+Ka 0 0 0
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl color_6
+Kd 0.428571 0.428571 0.333333
+Ka 0 0 0
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl color_7
+Kd 0.428571 0.428571 0.333333
+Ka 0 0 0
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl color_8
+Kd 0.428571 0.428571 0.333333
+Ka 0 0 0
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl color_9
+Kd 0.428571 0.428571 0.333333
+Ka 0 0 0
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl color_10
+Kd 0.428571 0.714286 0.333333
+Ka 0 0 0
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl color_11
+Kd 0.000000 0.142857 0.000000
+Ka 0 0 0
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl color_12
+Kd 0.857143 1.000000 1.000000
+Ka 0 0 0
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl color_13
+Kd 0.285714 0.285714 0.333333
+Ka 0 0 0
+Ks 0 0 0
+d 1
+illum 1

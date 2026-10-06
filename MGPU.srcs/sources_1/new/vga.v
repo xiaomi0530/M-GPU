@@ -4,7 +4,10 @@
 // Run from the board's 100 MHz clock; GPU writes can use a slower clock.
 // This module uses clock enables, not a separate 25 MHz clock.
 // The framebuffer interface requires a one-clock synchronous read.
-module vga (
+module vga #(
+    parameter FB_WIDTH = 640,
+    parameter FB_HEIGHT = 480
+)(
     input  wire        clk,
     input  wire        rst,
     output wire [18:0] fb_addr,
@@ -14,7 +17,8 @@ module vga (
     output reg  [3:0]  vga_g,
     output reg  [3:0]  vga_b,
     output reg         vga_hs,
-    output reg         vga_vs
+    output reg         vga_vs,
+    output wire        vblank_start
 );
     localparam H_ACTIVE = 640;
     localparam H_FRONT  = 16;
@@ -33,12 +37,13 @@ module vga (
     reg [9:0] scan_x;
     reg [9:0] scan_y;
     wire active = (scan_x < H_ACTIVE) && (scan_y < V_ACTIVE);
-    wire [18:0] row_y = {9'b0, scan_y};
 
     // Keep the address in range even during blanking.
-    assign fb_addr = active ? ((row_y << 9) + (row_y << 7)
-                              + {9'b0, scan_x}) : 19'd0;
+    assign fb_addr = active ? ((scan_y/(V_ACTIVE/FB_HEIGHT))*FB_WIDTH
+                              + scan_x/(H_ACTIVE/FB_WIDTH)) : 19'd0;
     assign fb_read_en = !rst && active && (phase == 2'd0);
+
+    assign vblank_start = !rst && (scan_x == 10'b0) && (scan_y == V_ACTIVE) && (phase == 2'd0);
 
     always @(posedge clk) begin
         if (rst) begin

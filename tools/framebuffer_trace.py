@@ -9,6 +9,13 @@ Protocol v1 (ASCII, newline terminated, timestamps in integer nanoseconds):
 
 P events with triangle_id=0 are hardware clear writes outside a triangle.
 
+Protocol v2 uses two buffers initialized to clear, front bank 0:
+    MGPU_TRACE 2 width height clear_rgb332 ns
+    # DISPLAY output_width output_height
+    P time triangle_id bank x y rgb332
+    S time new_front_bank
+B, E and D retain their v1 format. Pixel counts count writes, not swaps.
+
 Only complete lines are consumed. Checkpoints bound random-seek work while a
 separate ingestion buffer keeps following the producer during paused playback.
 """
@@ -28,6 +35,7 @@ class Triangle:
     first_pixel: int
     end_ns: int | None = None
     last_pixel: int | None = None
+    bank: int | None = None
 
 
 class Trace:
@@ -37,6 +45,12 @@ class Trace:
 
     def __init__(self) -> None:
         self.width = self.height = self.clear = 0
+        self.version = 1
+        self.display_width = self.display_height = 0
+        self.front_bank = 0
+        self.swap_times = array("Q")
+        self.swap_counts = array("I")
+        self.swap_banks = bytearray()
         self.ready = False
         self.complete = False
         self.latest_ns = 0
@@ -57,16 +71,26 @@ class Trace:
 
     def parse_line(self, line: str) -> None:
         parts = line.split()
+        if self.ready and parts[:2] == ["#", "DISPLAY"]:
+            if len(parts)!=4:
+                raise ValueError("Malformed display dimensions")
+            width,height=map(int,parts[2:])
+            if not (1<=width<=4096 and 1<=height<=4096):
+                raise ValueError("Invalid display dimensions")
+            self.display_width,self.display_height=width,height
+            return
         if not parts or parts[0].startswith("#"):
             return
         if not self.ready:
-            if len(parts) != 6 or parts[:2] != ["MGPU_TRACE", "1"] or parts[5] != "ns":
-                raise ValueError("Expected MGPU_TRACE 1 width height clear ns header")
+            if len(parts) != 6 or parts[0] != "MGPU_TRACE" or parts[1] not in ("1","2") or parts[5] != "ns":
+                raise ValueError("Expected MGPU_TRACE 1 or 2 width height clear ns header")
             width, height, clear = int(parts[2]), int(parts[3]), int(parts[4], 16)
             if not (1 <= width <= 4096 and 1 <= height <= 4096 and 0 <= clear <= 255):
                 raise ValueError("Invalid framebuffer dimensions or clear color")
             self.width, self.height, self.clear = width, height, clear
-            self.ingest = bytearray([clear]) * (width * height)
+            self.version=int(parts[1])
+            self.display_width,self.display_height=width,height
+            self.ingest = bytearray([clear]) * (width * height * self.version)
             self.frame = self.ingest.copy()
             self.checkpoints = {0: bytes(self.ingest)}
             self.ready = True
@@ -75,6 +99,8 @@ class Trace:
             raise ValueError("Unexpected event after D (end of recording)")
         kind = parts[0]
         lengths = {"B": 9, "P": 6, "E": 3, "D": 4}
+        if self.version==2:
+            lengths.update(P=7,S=3)
         if kind not in lengths or len(parts) != lengths[kind]:
             raise ValueError("Malformed trace event")
         stamp = int(parts[1])
@@ -94,14 +120,22 @@ class Trace:
             self.by_id[ident] = triangle
             self.starts.append(stamp)
         elif kind == "P":
-            ident, x, y = map(int, parts[2:5])
-            color = int(parts[5], 16)
+            ident=int(parts[2])
+            bank=int(parts[3]) if self.version==2 else 0
+            x,y=map(int,parts[-3:-1])
+            color = int(parts[-1], 16)
             # ID 0 records direct clear-engine writes between triangle commands.
             if (ident == 0 and self.active) or (ident != 0 and (not self.active or ident != self.active.id)):
                 raise ValueError("Pixel does not belong to the active triangle")
             if not (0 <= x < self.width and 0 <= y < self.height and 0 <= color <= 255):
                 raise ValueError("Pixel coordinates or RGB332 value out of range")
-            address = y * self.width + x
+            if not 0<=bank<self.version or (self.version==2 and bank==self.front_bank):
+                raise ValueError("Pixel write targets the front or invalid bank")
+            if self.active:
+                if self.active.bank is not None and self.active.bank!=bank:
+                    raise ValueError("Triangle writes multiple banks")
+                self.active.bank=bank
+            address = bank*self.width*self.height + y * self.width + x
             self.previous.append(self.ingest[address])
             self.ingest[address] = color
             self.times.append(stamp)
@@ -122,6 +156,14 @@ class Trace:
             self.active.end_ns = stamp
             self.active.last_pixel = len(self.times)
             self.active = None
+        elif kind == "S":
+            bank=int(parts[2])
+            if self.active or bank not in (0,1) or bank==self.front_bank:
+                raise ValueError("Invalid buffer swap")
+            self.front_bank=bank
+            self.swap_times.append(stamp)
+            self.swap_counts.append(len(self.times))
+            self.swap_banks.append(bank)
         else:
             if self.active or int(parts[2]) != len(self.triangles) or int(parts[3]) != len(self.times):
                 raise ValueError("Recording totals do not match its events")
@@ -134,6 +176,19 @@ class Trace:
     def triangle_at(self, time_ns: int) -> Triangle | None:
         index = bisect_right(self.starts, time_ns) - 1
         return self.triangles[index] if index >= 0 else None
+
+    def bank_at(self, time_ns: int, drawing: bool = False) -> int:
+        if self.version==1:
+            return 0
+        index=bisect_right(self.swap_times,time_ns)-1
+        front=self.swap_banks[index] if index>=0 else 0
+        return 1-front if drawing else front
+
+    def frame_at(self, time_ns: int, drawing: bool = False) -> bytearray:
+        self.seek_count(self.count_at(time_ns))
+        size=self.width*self.height
+        start=self.bank_at(time_ns,drawing)*size
+        return self.frame[start:start+size]
 
     def seek_count(self, count: int) -> bytearray:
         count = max(0, min(count, len(self.times)))
@@ -155,7 +210,7 @@ class Trace:
         frame = bytearray([self.clear]) * (self.width * self.height)
         stop = min(count, triangle.last_pixel if triangle.last_pixel is not None else len(self.times))
         for index in range(triangle.first_pixel, stop):
-            frame[self.addresses[index]] = self.colors[index]
+            frame[self.addresses[index] % len(frame)] = self.colors[index]
         return frame
 
 

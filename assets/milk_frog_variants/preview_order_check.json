@@ -1,0 +1,92 @@
+[
+  {
+    "variant": "A",
+    "frame": 0,
+    "order_ok": true,
+    "triangles": 304
+  },
+  {
+    "variant": "A",
+    "frame": 16,
+    "order_ok": true,
+    "triangles": 264
+  },
+  {
+    "variant": "A",
+    "frame": 32,
+    "order_ok": true,
+    "triangles": 224
+  },
+  {
+    "variant": "B",
+    "frame": 0,
+    "order_ok": true,
+    "triangles": 284
+  },
+  {
+    "variant": "B",
+    "frame": 16,
+    "order_ok": true,
+    "triangles": 254
+  },
+  {
+    "variant": "B",
+    "frame": 32,
+    "order_ok": true,
+    "triangles": 209
+  },
+  {
+    "variant": "C",
+    "frame": 0,
+    "order_ok": true,
+    "triangles": 309
+  },
+  {
+    "variant": "C",
+    "frame": 16,
+    "order_ok": true,
+    "triangles": 267
+  },
+  {
+    "variant": "C",
+    "frame": 32,
+    "order_ok": true,
+    "triangles": 206
+  },
+  {
+    "variant": "D",
+    "frame": 0,
+    "order_ok": true,
+    "triangles": 308
+  },
+  {
+    "variant": "D",
+    "frame": 16,
+    "order_ok": true,
+    "triangles": 285
+  },
+  {
+    "variant": "D",
+    "frame": 32,
+    "order_ok": true,
+    "triangles": 225
+  },
+  {
+    "variant": "E",
+    "frame": 0,
+    "order_ok": true,
+    "triangles": 288
+  },
+  {
+    "variant": "E",
+    "frame": 16,
+    "order_ok": true,
+    "triangles": 270
+  },
+  {
+    "variant": "E",
+    "frame": 32,
+    "order_ok": true,
+    "triangles": 213
+  }
+]

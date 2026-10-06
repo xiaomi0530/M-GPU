@@ -22,7 +22,7 @@ def rgb(r, g, b):
     return (round(max(0,min(255,r))*7/255)<<5) | (round(max(0,min(255,g))*7/255)<<2) | round(max(0,min(255,b))*3/255)
 
 
-def scene():
+def crystal_scene():
     faces=[]
     center=np.array([0.,0.,5.4])
 
@@ -76,34 +76,85 @@ def scene():
     return sorted(faces,key=lambda f:sum(v[2] for v in f[0]),reverse=True)
 
 
+def scene():
+    faces=[]
+    for face in json.loads((ROOT/'assets/milk_frog/mesh.json').read_text()):
+        vertices=[tuple(round((c+(5.4 if j==2 else 0))*Q) for j,c in enumerate(v)) for v in face['vertices']]
+        faces.append((vertices,[project(v) for v in vertices],[rgb(*c) for c in face['colors']]))
+    return faces
+
+
 def generate():
     target=ROOT/'MGPU.srcs/sources_1/new/top.v'
     source=target.read_text(encoding='utf-8')
     prefix=source[:source.index('    localparam FETCH')] if '    // The generated ROM contains' not in source else source[:source.index('    // The generated ROM contains')]
     prefix='\n'.join(line.split('//')[0].rstrip() for line in prefix.splitlines())+'\n'
-    from orbit_scene import matrix,project as orbit_project,order
+    from orbit_scene import matrix,project as orbit_project,order,FRAME_COUNT
+    import midiyas_logo
     triangles=scene()
-    assert len(triangles)<=256
-    orders=[order(frame) for frame in range(32)]
-    matrices=[matrix(frame) for frame in range(32)]
-    prefix=prefix.replace('parameter CUBE_HOLD_MS = 40','parameter CUBE_HOLD_MS = 200')
-    body='''    localparam FETCH=0,LOAD=1,ISSUE=2,WAIT_GPU=3,ADVANCE=4,HOLD=5,CLEAR_ISSUE=6,CLEAR_WAIT=7,INDEX=8;
+    model_count=len(triangles)
+    orders=[order(frame) for frame in range(FRAME_COUNT)]
+    matrices=[matrix(frame) for frame in range(FRAME_COUNT)]
+    logo_triangles=midiyas_logo.scene()
+    logo_count=len(logo_triangles)-model_count
+    triangles+=logo_triangles[:logo_count]
+    groups=[midiyas_logo.GROUP_COUNT-1]*model_count+list(midiyas_logo.groups())[:logo_count]
+    assert len(groups)==len(triangles) and all(0<=group<midiyas_logo.GROUP_COUNT for group in groups)
+    orders+=[[model_count+i if i<logo_count else i-logo_count for i in midiyas_logo.order(frame)] for frame in range(midiyas_logo.FRAME_COUNT)]
+    matrices+=[midiyas_logo.matrix(frame,group) for frame in range(midiyas_logo.FRAME_COUNT) for group in range(midiyas_logo.GROUP_COUNT)]
+    matrix_indices=list(range(FRAME_COUNT));unique_matrices=matrices[:FRAME_COUNT]
+    matrix_lookup={tuple(values):index for index,values in enumerate(unique_matrices)}
+    for values in matrices[FRAME_COUNT:]:
+        key=tuple(values)
+        if key not in matrix_lookup:
+            matrix_lookup[key]=len(unique_matrices);unique_matrices.append(values)
+        matrix_indices.append(matrix_lookup[key])
+    matrices=unique_matrices
+    frame_offsets=[];order_count=0
+    for ordering in orders:
+        frame_offsets.append(order_count);order_count+=len(ordering)
+    assert len(triangles)<=2048
+    index_bits=len(triangles).bit_length()
+    group_bits=max(1,(midiyas_logo.GROUP_COUNT-1).bit_length())
+    matrix_bits=max(1,(len(matrices)-1).bit_length())
+    order_bits=max(1,(order_count-1).bit_length())
+    prefix=prefix.replace('parameter CUBE_HOLD_MS = 200','parameter CUBE_HOLD_MS = 0')
+    prefix=prefix.replace('parameter LOGO_HOLD_MS = 5000','parameter LOGO_HOLD_MS = 7000')
+    if 'parameter TARGET_FPS' not in prefix:
+        prefix=prefix.replace('parameter CUBE_HOLD_MS = 0,','parameter CUBE_HOLD_MS = 0,\n    parameter TARGET_FPS = 60,')
+    if 'parameter START_FRAME' not in prefix:
+        prefix=prefix.replace('parameter TARGET_FPS = 60,','parameter TARGET_FPS = 60,\n    parameter START_FRAME = 0,')
+    if 'parameter START_LOGO_FRAME' not in prefix:
+        prefix=prefix.replace('parameter START_FRAME = 0,','parameter START_FRAME = 0,\n    parameter START_LOGO_FRAME = 0,')
+    body='''    localparam FETCH=0,LOAD=1,ISSUE=2,WAIT_GPU=3,ADVANCE=4,HOLD=5,CLEAR_ISSUE=6,CLEAR_WAIT=7,INDEX=8,PRESENT=9,SWAP_WAIT=10;
     localparam COMMAND_COUNT=COUNT_VALUE;
-    localparam HOLD_TICKS=(100000000/(1 << GPU_CLK_DIV_LOG2)/1000)*CUBE_HOLD_MS;
+    localparam FRAME_COUNT=PHASE_VALUE;
+    localparam LOGO_FRAME_COUNT=LOGO_PHASE_VALUE;
+    localparam LOGO_GROUP_COUNT=GROUP_VALUE;
+    localparam ROM_FRAME_COUNT=FRAME_COUNT+LOGO_FRAME_COUNT;
+    localparam MATRIX_SLOT_COUNT=FRAME_COUNT+LOGO_FRAME_COUNT*LOGO_GROUP_COUNT;
+    localparam MATRIX_COUNT=MATRICES_VALUE;
+    localparam ORDER_COUNT=ORDERS_VALUE;
+    localparam INTRO_NEXT_FRAME=25;
+    localparam FRAME_TICKS=(TARGET_FPS>0) ? GPU_HZ/TARGET_FPS : 1;
+    localparam LOGO_TICKS=(GPU_HZ/1000)*LOGO_HOLD_MS;
     reg [3:0] demo_state;
-    reg [31:0] hold_count;
+    reg [31:0] frame_elapsed;
+    reg [31:0] boot_elapsed;
     reg paused;
     reg [17:0] command_address;
-    reg demo_start,demo_clear,saw_busy;
-    wire gpu_busy,gpu_done,gpu_error;
+    reg demo_start,demo_clear,demo_present,saw_busy;
+    wire gpu_busy,gpu_done,gpu_error,present_done;
     reg [9:0] gpu_x0,gpu_y0,gpu_x1,gpu_y1,gpu_x2,gpu_y2;
     reg [7:0] gpu_c0,gpu_c1,gpu_c2;
     reg signed [17:0] gpu_vx0,gpu_vy0,gpu_vz0;
     reg signed [17:0] gpu_vx1,gpu_vy1,gpu_vz1;
     reg signed [17:0] gpu_vx2,gpu_vy2,gpu_vz2;
-    wire logo_active=1'b0;
-    wire [1:0] scene=2'd2;
-    reg [4:0] animation_frame;
+    reg logo_active;
+    wire [1:0] scene=logo_active ? 2'd0 : 2'd2;
+    reg [$clog2(FRAME_COUNT)-1:0] animation_frame;
+    reg [$clog2(LOGO_FRAME_COUNT)-1:0] logo_frame;
+    wire [$clog2(ROM_FRAME_COUNT)-1:0] scene_frame=logo_active ? FRAME_COUNT+logo_frame : animation_frame;
     wire [17:0] studio_index=command_address;
     wire studio_finished=(demo_state==HOLD);
 `ifdef STUDIO_SIMULATION
@@ -117,47 +168,56 @@ def generate():
     wire [83:0] studio_data=0;
 `endif
     (* rom_style="block" *) reg [185:0] commands [0:COMMAND_COUNT-1];
+    reg [GROUP_HIGH:0] command_group [0:COMMAND_COUNT-1];
     reg [185:0] command_data;
-    (* rom_style="block" *) reg [7:0] draw_order [0:32*COMMAND_COUNT-1];
-    reg [7:0] frame_counts [0:31];
-    (* rom_style="block" *) reg [287:0] matrices [0:31];
+    (* rom_style="block" *) reg [INDEX_HIGH:0] draw_order [0:ORDER_COUNT-1];
+    reg [INDEX_HIGH:0] frame_counts [0:ROM_FRAME_COUNT-1];
+    reg [$clog2(ORDER_COUNT)-1:0] frame_offsets [0:ROM_FRAME_COUNT-1];
+    (* rom_style="block" *) reg [287:0] matrices [0:MATRIX_COUNT-1];
+    reg [$clog2(MATRIX_COUNT)-1:0] matrix_indices [0:MATRIX_SLOT_COUNT-1];
     reg [287:0] matrix_data;
-    reg [7:0] order_data;
-    wire [12:0] order_address=animation_frame*COMMAND_COUNT+command_address;
-    wire [7:0] frame_count=frame_counts[animation_frame];
+    reg [INDEX_HIGH:0] order_data;
+    wire [$clog2(ORDER_COUNT)-1:0] order_address=frame_offsets[scene_frame]+command_address;
+    wire [$clog2(MATRIX_SLOT_COUNT)-1:0] matrix_slot=logo_active ? FRAME_COUNT+logo_frame*LOGO_GROUP_COUNT+command_group[order_data] : animation_frame;
+    wire [$clog2(MATRIX_COUNT)-1:0] matrix_address=matrix_indices[matrix_slot];
+    wire [INDEX_HIGH:0] frame_count=frame_counts[scene_frame];
 `ifndef SYNTHESIS
-    reg [59:0] reference_pixels [0:32*COMMAND_COUNT-1];
+    reg [59:0] reference_pixels [0:ORDER_COUNT-1];
     reg [59:0] reference_data;
     always @(posedge gpu_clk) reference_data<=reference_pixels[order_address];
 `endif
     always @(posedge gpu_clk) begin
         order_data<=draw_order[order_address];
         if(order_data<COMMAND_COUNT) command_data<=commands[order_data];
-        matrix_data<=matrices[animation_frame];
+        matrix_data<=matrices[matrix_address];
     end
     always @(posedge gpu_clk) begin
         if(rst) begin
             demo_state<=CLEAR_ISSUE;command_address<=0;
-            animation_frame<=0;hold_count<=0;paused<=0;
-            demo_start<=0;demo_clear<=0;saw_busy<=0;
+            animation_frame<=START_FRAME;frame_elapsed<=0;paused<=0;
+            logo_active<=LOGO_HOLD_MS>0;logo_frame<=START_LOGO_FRAME;boot_elapsed<=0;
+            demo_start<=0;demo_clear<=0;demo_present<=0;saw_busy<=0;
             gpu_x0<=0;gpu_y0<=0;gpu_x1<=0;gpu_y1<=0;gpu_x2<=0;gpu_y2<=0;
             gpu_c0<=0;gpu_c1<=0;gpu_c2<=0;
             gpu_vx0<=0;gpu_vy0<=0;gpu_vz0<=0;
             gpu_vx1<=0;gpu_vy1<=0;gpu_vz1<=0;
             gpu_vx2<=0;gpu_vy2<=0;gpu_vz2<=0;
         end else begin
-            demo_start<=0;demo_clear<=0;
+            demo_start<=0;demo_clear<=0;demo_present<=0;
             if(button_press) paused<=!paused;
+            if(studio_mode) logo_active<=0;
+            if(logo_active && !paused && boot_elapsed<LOGO_TICKS) boot_elapsed<=boot_elapsed+1'b1;
+            if(frame_elapsed<FRAME_TICKS) frame_elapsed<=frame_elapsed+1'b1;
             case(demo_state)
                 CLEAR_ISSUE: begin
-                    demo_clear<=1;saw_busy<=0;hold_count<=0;demo_state<=CLEAR_WAIT;
+                    demo_clear<=1;saw_busy<=0;frame_elapsed<=1;demo_state<=CLEAR_WAIT;
                 end
                 CLEAR_WAIT: begin
                     if(gpu_busy) saw_busy<=1;
                     if(saw_busy && !gpu_busy) demo_state<=INDEX;
                 end
                 INDEX: demo_state<=FETCH;
-                FETCH: demo_state<=(studio_mode && studio_count==0) ? HOLD : LOAD;
+                FETCH: demo_state<=((studio_mode ? studio_count : frame_count)==0) ? PRESENT : LOAD;
                 LOAD: begin
                     if(studio_mode) begin
                         {gpu_x0,gpu_y0,gpu_x1,gpu_y1,gpu_x2,gpu_y2,gpu_c0,gpu_c1,gpu_c2}<=studio_data;
@@ -168,7 +228,9 @@ def generate():
                         {gpu_vx0,gpu_vy0,gpu_vz0,gpu_c0,gpu_vx1,gpu_vy1,gpu_vz1,gpu_c1,
                          gpu_vx2,gpu_vy2,gpu_vz2,gpu_c2}<=command_data;
 `ifndef SYNTHESIS
-                        {gpu_x0,gpu_y0,gpu_x1,gpu_y1,gpu_x2,gpu_y2}<=reference_data;
+                        gpu_x0<=reference_data[59:50]*H_RES/640;gpu_y0<=reference_data[49:40]*V_RES/480;
+                        gpu_x1<=reference_data[39:30]*H_RES/640;gpu_y1<=reference_data[29:20]*V_RES/480;
+                        gpu_x2<=reference_data[19:10]*H_RES/640;gpu_y2<=reference_data[9:0]*V_RES/480;
 `endif
                     end
                     demo_state<=ISSUE;
@@ -180,23 +242,34 @@ def generate():
                     if(gpu_done) demo_state<=gpu_error ? HOLD : ADVANCE;
                 end
                 ADVANCE: begin
-                    if(command_address+1 >= (studio_mode ? studio_count : frame_count)) demo_state<=HOLD;
+                    if(command_address+1 >= (studio_mode ? studio_count : frame_count)) demo_state<=PRESENT;
                     else begin command_address<=command_address+1'b1;demo_state<=INDEX;end
+                end
+                PRESENT: begin
+                    demo_present<=1;demo_state<=SWAP_WAIT;
+                end
+                SWAP_WAIT: begin
+                    if(present_done) demo_state<=HOLD;
                 end
                 HOLD: begin
                     if(!studio_mode && !gpu_error && !paused && !button_press) begin
-                        if(hold_count>=HOLD_TICKS) begin
-                            animation_frame<=animation_frame+1'b1;
-                            command_address<=0;demo_state<=CLEAR_ISSUE;hold_count<=0;
-                        end else hold_count<=hold_count+1'b1;
+                        if(frame_elapsed>=FRAME_TICKS-1) begin
+                            if(logo_active) begin
+                                if(boot_elapsed>=LOGO_TICKS && logo_frame==LOGO_FRAME_COUNT-1) begin
+                                    logo_active<=0;animation_frame<=INTRO_NEXT_FRAME;
+                                end else if(logo_frame<LOGO_FRAME_COUNT-1) logo_frame<=logo_frame+1'b1;
+                            end else animation_frame<=animation_frame+1'b1;
+                            command_address<=0;demo_state<=CLEAR_ISSUE;
+                        end
                     end
                 end
                 default: demo_state<=CLEAR_ISSUE;
             endcase
         end
     end
-    mgpu u_mgpu (
+    mgpu #(.H_RES(H_RES),.V_RES(V_RES)) u_mgpu (
         .clk(gpu_clk), .rst(rst), .start(demo_start), .clear(demo_clear),
+        .present(demo_present), .present_done(present_done),
         .vertex_x0(gpu_vx0), .vertex_y0(gpu_vy0), .vertex_z0(gpu_vz0), .vertex_color0(gpu_c0),
         .vertex_x1(gpu_vx1), .vertex_y1(gpu_vy1), .vertex_z1(gpu_vz1), .vertex_color1(gpu_c1),
         .vertex_x2(gpu_vx2), .vertex_y2(gpu_vy2), .vertex_z2(gpu_vz2), .vertex_color2(gpu_c2),
@@ -209,28 +282,33 @@ def generate():
         .vga_r(VGA_R), .vga_g(VGA_G), .vga_b(VGA_B), .vga_hs(VGA_HS), .vga_vs(VGA_VS)
     );
     initial begin
-'''.replace('COUNT_VALUE',str(len(triangles)))
+'''.replace('COUNT_VALUE',str(len(triangles))).replace('LOGO_PHASE_VALUE',str(midiyas_logo.FRAME_COUNT)).replace('PHASE_VALUE',str(FRAME_COUNT)).replace('GROUP_VALUE',str(midiyas_logo.GROUP_COUNT)).replace('MATRICES_VALUE',str(len(matrices))).replace('ORDERS_VALUE',str(order_count)).replace('INDEX_HIGH',str(index_bits-1)).replace('GROUP_HIGH',str(group_bits-1))
     for index,(vertices,pixels,colors) in enumerate(triangles):
         word=0
         for vertex,color in zip(vertices,colors):
             for coordinate in vertex:word=(word<<18)|(coordinate&0x3ffff)
             word=(word<<8)|color
         body+=f"        commands[{index}]=186'h{word:047x};\n"
-    for frame,ordering in enumerate(orders):
+        body+=f"        command_group[{index}]={group_bits}'d{groups[index]};\n"
+    for address,values in enumerate(matrices):
         word=0
-        for value in matrices[frame]:word=(word<<18)|(value&0x3ffff)
-        body+=f"        matrices[{frame}]=288'h{word:072x};\n"
-        body+=f"        frame_counts[{frame}]=8'd{len(ordering)};\n"
-        for index in range(len(triangles)):
-            ident=ordering[index] if index<len(ordering) else 0
-            body+=f"        draw_order[{frame*len(triangles)+index}]=8'd{ident};\n"
+        for value in values:word=(word<<18)|(value&0x3ffff)
+        body+=f"        matrices[{address}]=288'h{word:072x};\n"
+    for address,index in enumerate(matrix_indices):
+        body+=f"        matrix_indices[{address}]={matrix_bits}'d{index};\n"
+    for frame,ordering in enumerate(orders):
+        body+=f"        frame_counts[{frame}]={index_bits}'d{len(ordering)};\n"
+        body+=f"        frame_offsets[{frame}]={order_bits}'d{frame_offsets[frame]};\n"
+        for index,ident in enumerate(ordering):
+            body+=f"        draw_order[{frame_offsets[frame]+index}]={index_bits}'d{ident};\n"
     body+='    end\n`ifndef SYNTHESIS\n    initial begin\n'
     for frame,ordering in enumerate(orders):
         for index,ident in enumerate(ordering):
             word=0
+            slot=frame if frame<FRAME_COUNT else FRAME_COUNT+(frame-FRAME_COUNT)*midiyas_logo.GROUP_COUNT+groups[ident]
             for vertex in triangles[ident][0]:
-                for value in orbit_project(vertex,matrices[frame])[0]:word=(word<<10)|value
-            body+=f"        reference_pixels[{frame*len(triangles)+index}]=60'h{word:015x};\n"
+                for value in orbit_project(vertex,matrices[matrix_indices[slot]])[0]:word=(word<<10)|value
+            body+=f"        reference_pixels[{frame_offsets[frame]+index}]=60'h{word:015x};\n"
     body+='    end\n`endif\n'
 
     target.write_text(prefix+body+'endmodule\n',encoding='utf-8')

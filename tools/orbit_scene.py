@@ -2,8 +2,10 @@ import math
 from build_vertex_lab import scene,Q
 import numpy as np
 
+FRAME_COUNT=128
+
 def matrix(frame):
-    angle=frame*2*math.pi/32;s,c=math.sin(angle),math.cos(angle);a=11/9;b=-20/9;r=5.4
+    angle=frame*2*math.pi/FRAME_COUNT;s,c=math.sin(angle),math.cos(angle);a=11/9;b=-20/9;r=5.4
     return [round(v*Q) for v in [1.5*c,0,-a*s,-s,0,2,0,0,1.5*s,0,a*c,c,-1.5*s*r,0,a*r*(1-c)+b,r*(1-c)]]
 def project(v,m):
     clip=[(sum(v[j]*m[j*4+i] for j in range(3))+m[12+i]*Q)>>12 for i in range(4)]
@@ -15,7 +17,10 @@ def project(v,m):
 
 def order(frame):
     m=matrix(frame);mesh=scene();maps={};keys={};out={};ind={}
+    angle=frame*2*math.pi/FRAME_COUNT;camera=np.array([5.4*math.sin(angle),0,5.4*(1-math.cos(angle))])*Q
     for i,(verts,_,colors) in enumerate(mesh):
+        points=np.array(verts)
+        if np.dot(np.cross(points[1]-points[0],points[2]-points[0]),camera-points.mean(0))<=0:continue
         projections=[project(v,m) for v in verts];p=np.array([r[0] for r in projections]);z=np.array([r[1] for r in projections]);x0,y0=p.min(0);x1,y1=p.max(0)
         dx1,dy1=p[1]-p[0];dx2,dy2=p[2]-p[0];area=int(dx1*dy2-dy1*dx2);
         if area==0:continue
@@ -30,7 +35,9 @@ def order(frame):
             sa=np.s_[y0-a[1]:y1-a[1]+1,x0-a[0]:x1-a[0]+1];sb=np.s_[y0-b[1]:y1-b[1]+1,x0-b[0]:x1-b[0]+1]
             mask=a[5][sa]&b[5][sb];delta=(a[4][sa]-b[4][sb])[mask]
             pos=np.any(delta>1e-5);neg=np.any(delta< -1e-5)
-            if pos and neg:raise ValueError(('Intersecting depth order',frame,i,j))
+            if pos and neg:
+                if len(set(mesh[i][2]+mesh[j][2]))==1:continue
+                raise ValueError(('Intersecting depth order',frame,i,j))
             if pos or neg:
                 far,near=(j,i) if pos else (i,j);out[far].add(near);ind[near]+=1
     ordered=[]

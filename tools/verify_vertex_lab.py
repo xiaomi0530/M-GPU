@@ -4,10 +4,13 @@ from PIL import Image
 from build_vertex_lab import ROOT, scene
 
 
-def render(triangles):
-    expected=np.zeros((480,640),dtype=np.uint8)
+def render(triangles,width=640,height=480):
+    expected=np.zeros((height,width),dtype=np.uint8)
     for vertices,pixels,color in triangles:
         points=np.array(pixels)
+        a,b,c=points
+        if (b[0]-a[0])*(c[1]-a[1])==(b[1]-a[1])*(c[0]-a[0]):
+            continue
         x0,y0=points.min(axis=0);x1,y1=points.max(axis=0)
         y,x=np.mgrid[y0:y1+1,x0:x1+1]
         edges=[]
@@ -38,24 +41,35 @@ def to_image(actual):
     return Image.fromarray(image)
 
 
-def verify(output=None,frames=1,orbit=False):
-    from orbit_scene import matrix,project,order
+def verify(output=None,frames=1,orbit=False,start=0,logo=False):
+    from orbit_scene import matrix,project,order,FRAME_COUNT
+    from view_framebuffer import framebuffer_size
     output=Path(output or ROOT/'out/vertex_lab')
     mesh=scene();images=[]
+    if logo:
+        from midiyas_logo import scene as logo_scene,matrix,project,order,groups,FRAME_COUNT
+        mesh=logo_scene();group_ids=groups()
     for frame in range(frames):
-        angle=frame%32;m=matrix(angle)
-        triangles=[(mesh[i][0],[project(v,m)[0] for v in mesh[i][0]],mesh[i][2]) for i in order(angle)]
+        angle=min(frame+start,FRAME_COUNT-1) if logo else (frame+start)%FRAME_COUNT
         filename=f'framebuffer.hex.{frame:02d}.hex' if orbit else 'framebuffer.hex'
-        actual=np.array([int(v,16) for v in (output/filename).read_text().split()],dtype=np.uint8).reshape(480,640)
-        expected=render(triangles)
+        actual=np.array([int(v,16) for v in (output/filename).read_text().split()],dtype=np.uint8)
+        width,height=framebuffer_size(actual.size)
+        actual=actual.reshape(height,width)
+        triangles=[]
+        for i in order(angle):
+            m=matrix(angle,group_ids[i]) if logo else matrix(angle)
+            triangles.append((mesh[i][0],[(p[0]*width//640,p[1]*height//480)
+                for p in (project(v,m)[0] for v in mesh[i][0])],mesh[i][2]))
+        expected=render(triangles,width,height)
         mismatch=np.count_nonzero(actual!=expected)
         assert mismatch==0,f'Frame {frame}: {mismatch} framebuffer pixels differ'
-        images.append(to_image(actual))
-        print(f'PASS frame {frame}: {len(triangles)} triangles, all 307200 pixels match')
+        images.append(to_image(actual).resize((640,480),Image.Resampling.NEAREST))
+        print(f'PASS frame {frame}: {len(triangles)} triangles, all {width*height} pixels match')
     images[-1].save(output/'framebuffer.png')
     if orbit:
-        images[0].save(output/'orbit.gif',save_all=True,append_images=images[1:32],duration=200,loop=0,disposal=2)
-        if frames>32:assert np.array_equal(np.asarray(images[0]),np.asarray(images[32]))
+        duration=[round((i+1)*1.6672)*10-round(i*1.6672)*10 for i in range(len(images))]
+        images[0].save(output/'orbit.gif',save_all=True,append_images=images[1:FRAME_COUNT],duration=duration[:FRAME_COUNT],loop=0,disposal=2)
+        if frames>FRAME_COUNT and not logo:assert np.array_equal(np.asarray(images[0]),np.asarray(images[FRAME_COUNT]))
 
 
 if __name__=='__main__':
@@ -64,5 +78,7 @@ if __name__=='__main__':
     parser.add_argument('--output',type=Path)
     parser.add_argument('--frames',type=int,default=1)
     parser.add_argument('--orbit',action='store_true')
+    parser.add_argument('--start',type=int,default=0)
+    parser.add_argument('--logo',action='store_true')
     args=parser.parse_args()
-    verify(args.output,args.frames,args.orbit)
+    verify(args.output,args.frames,args.orbit,args.start,args.logo)

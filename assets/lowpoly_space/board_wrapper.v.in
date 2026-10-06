@@ -6,7 +6,7 @@
 // sequence; clearing is performed with triangles through the existing GPU.
 module top #(
     parameter BUTTON_FILTER_BITS = 16,
-    parameter GPU_CLK_DIV_LOG2 = 2,
+    parameter GPU_CLK_DIV_LOG2 = 0,
     parameter STAGE_HOLD_MS = 4000,
     parameter CUBE_HOLD_MS = 40,
     // Half edge length in pixels before rotation (recommended 32..128).
@@ -32,22 +32,22 @@ module top #(
 
     // Free-running divider, routed through a dedicated global clock buffer.
     // Never gate or restart this clock with a button.
-    reg [GPU_CLK_DIV_LOG2-1:0] gpu_divider = 0;
-    always @(posedge CLK100MHZ)
-        gpu_divider <= gpu_divider + 1'b1;
+    localparam GPU_HZ=(GPU_CLK_DIV_LOG2==0) ? 40000000 : 100000000/(1 << GPU_CLK_DIV_LOG2);
     wire gpu_clk;
-`ifdef __ICARUS__
-    // Icarus does not provide Xilinx primitives; BUFG is logically a wire.
-    assign gpu_clk = gpu_divider[GPU_CLK_DIV_LOG2-1];
-`else
-    BUFG u_gpu_clk_buf (.I(gpu_divider[GPU_CLK_DIV_LOG2-1]), .O(gpu_clk));
-`endif
+    wire gpu_clk_locked;
+    gpu_clock #(.GPU_CLK_DIV_LOG2(GPU_CLK_DIV_LOG2)) u_gpu_clock (
+        .clk(CLK100MHZ), .rst(!CPU_RESETN),
+        .gpu_clk(gpu_clk), .locked(gpu_clk_locked)
+    );
 
     (* ASYNC_REG = "TRUE", SHREG_EXTRACT = "NO" *) reg [3:0] gpu_reset_pipe = 4'b1111;
-    always @(posedge gpu_clk) begin
-        gpu_reset_pipe <= {gpu_reset_pipe[2:0], !CPU_RESETN};
+    wire gpu_reset_request = !CPU_RESETN || !gpu_clk_locked;
+    always @(posedge gpu_clk or posedge gpu_reset_request) begin
+        if(gpu_reset_request) gpu_reset_pipe <= 4'b1111;
+        else gpu_reset_pipe <= {gpu_reset_pipe[2:0], 1'b0};
     end
-    wire rst = gpu_reset_pipe[3];
+    reg rst = 1'b1;
+    always @(posedge gpu_clk) rst <= gpu_reset_pipe[3];
 
     (* ASYNC_REG = "TRUE" *) reg [1:0] button_sync;
     reg [BUTTON_FILTER_BITS-1:0] button_count;

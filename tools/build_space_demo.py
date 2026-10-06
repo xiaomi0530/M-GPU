@@ -107,7 +107,6 @@ def main():
                           '    // Legacy parameter retained for compatibility; new art uses fixed coordinates.')
     body='''    // The generated ROM contains triangle commands, never framebuffer pixels.
     // The GPU still rasterizes and shades every triangle through its normal input.
-    localparam GPU_HZ=100000000/(1 << GPU_CLK_DIV_LOG2);
     localparam STAGE_TICKS=(GPU_HZ/1000)*STAGE_HOLD_MS;
     localparam FRAME_TICKS=(GPU_HZ/1000)*CUBE_HOLD_MS;
     localparam FETCH=0, LOAD=1, ISSUE=2, WAIT_GPU=3, ADVANCE=4, HOLD=5;

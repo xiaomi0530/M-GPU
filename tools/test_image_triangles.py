@@ -10,7 +10,7 @@ import numpy as np
 from PIL import Image
 
 from image_triangles import (Cancelled, Placement, RGB, compose, load_image,
-                             quantize, render, save_bundle, triangulate)
+                             quantize, render, render_scaled, save_bundle, triangulate)
 from framebuffer_trace import TraceTail
 
 PROJECT = Path(__file__).resolve().parents[1]
@@ -65,6 +65,16 @@ class ImageMeshTests(unittest.TestCase):
         self.assertEqual(len(colored.triangles),2)
         np.testing.assert_array_equal(render(colored.triangles),colored.prediction)
 
+    def test_native_resolution_preserves_alpha_and_small_triangles(self):
+        mesh = triangulate(specimen(),Placement(17,23,48,32,0x49),0,160000,resolution=(320,240))
+        self.assertEqual(mesh.prediction.shape,(240,320))
+        self.assertEqual(mesh.exact_percent,100.)
+        np.testing.assert_array_equal(mesh.prediction,mesh.target)
+        np.testing.assert_array_equal(render_scaled(mesh.triangles,320,240),mesh.target)
+        for triangle in mesh.triangles:
+            x0,y0,x1,y1,x2,y2 = (v//2 for v in triangle.values[:6])
+            self.assertNotEqual((x1-x0)*(y2-y0)-(y1-y0)*(x2-x0),0)
+
     def test_budget_and_cancellation(self):
         picture = specimen().convert("RGB")
         mesh = triangulate(picture,Placement(0,0,48,32),0,20)
@@ -97,7 +107,7 @@ class ImageMeshTests(unittest.TestCase):
             for path in (PROJECT/"MGPU.srcs/sources_1/new").glob("*.v"):
                 shutil.copy2(path,sources/path.name)
             shutil.copy2(PROJECT/"MGPU.srcs/sim_1/new/top_tb.v",testbench/"top_tb.v")
-            mesh = triangulate(specimen(),Placement(16,20,48,32),0,160000)
+            mesh = triangulate(specimen(),Placement(16,20,48,32,0x49),0,160000,resolution=(320,240))
             paths = save_bundle(mesh,project,"RGBA test fixture")
             self.assertTrue(paths["scene"].exists())
             binary = project/"out/check.vvp"
@@ -107,7 +117,7 @@ class ImageMeshTests(unittest.TestCase):
             self.assertEqual(compile_result.returncode,0,compile_result.stderr)
             simulation = subprocess.run([shutil.which("vvp"),str(binary),"+FRAMEBUFFER=out/framebuffer.hex","+TRACE=out/framebuffer.trace"],cwd=project,capture_output=True,text=True,timeout=120)
             self.assertEqual(simulation.returncode,0,simulation.stdout+simulation.stderr)
-            actual = np.array([int(line,16) for line in (project/"out/framebuffer.hex").read_text().splitlines()],dtype=np.uint8).reshape((480,640))
+            actual = np.array([int(line,16) for line in (project/"out/framebuffer.hex").read_text().splitlines()],dtype=np.uint8).reshape((240,320))
             np.testing.assert_array_equal(actual,mesh.target)
             np.testing.assert_array_equal(actual,mesh.prediction)
             tail = TraceTail(project/"out/framebuffer.trace")
@@ -116,7 +126,7 @@ class ImageMeshTests(unittest.TestCase):
             self.assertIsNone(tail.error)
             self.assertTrue(tail.model.complete)
             self.assertEqual(len(tail.model.triangles),len(mesh.triangles))
-            self.assertEqual(bytes(tail.model.ingest),mesh.prediction.tobytes())
+            self.assertEqual(tail.model.frame_at(tail.model.latest_ns),mesh.prediction.tobytes())
 
 
 if __name__ == "__main__":
