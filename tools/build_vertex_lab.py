@@ -76,7 +76,7 @@ def crystal_scene():
     return sorted(faces,key=lambda f:sum(v[2] for v in f[0]),reverse=True)
 
 
-def scene():
+def milk_frog_scene():
     faces=[]
     for face in json.loads((ROOT/'assets/milk_frog/mesh.json').read_text()):
         vertices=[tuple(round((c+(5.4 if j==2 else 0))*Q) for j,c in enumerate(v)) for v in face['vertices']]
@@ -84,37 +84,48 @@ def scene():
     return faces
 
 
+def scene():
+    from mechanical_core import scene as mechanical_scene
+    return mechanical_scene()
+
+
 def generate():
     target=ROOT/'MGPU.srcs/sources_1/new/top.v'
     source=target.read_text(encoding='utf-8')
     prefix=source[:source.index('    localparam FETCH')] if '    // The generated ROM contains' not in source else source[:source.index('    // The generated ROM contains')]
     prefix='\n'.join(line.split('//')[0].rstrip() for line in prefix.splitlines())+'\n'
+    import orbit_scene
     from orbit_scene import matrix,project as orbit_project,order,FRAME_COUNT
     import midiyas_logo
-    triangles=scene()
+    triangles=list(orbit_scene.scene())
     model_count=len(triangles)
     orders=[order(frame) for frame in range(FRAME_COUNT)]
-    matrices=[matrix(frame) for frame in range(FRAME_COUNT)]
+    key_count=FRAME_COUNT//orbit_scene.KEY_STRIDE
+    matrices=[orbit_scene.key_matrix(key,group) for key in range(key_count) for group in range(orbit_scene.GROUP_COUNT)]
     logo_triangles=midiyas_logo.scene()
     logo_count=len(logo_triangles)-model_count
     triangles+=logo_triangles[:logo_count]
-    groups=[midiyas_logo.GROUP_COUNT-1]*model_count+list(midiyas_logo.groups())[:logo_count]
+    groups=[16+group for group in orbit_scene.groups()]+list(midiyas_logo.groups())[:logo_count]
     assert len(groups)==len(triangles) and all(0<=group<midiyas_logo.GROUP_COUNT for group in groups)
     orders+=[[model_count+i if i<logo_count else i-logo_count for i in midiyas_logo.order(frame)] for frame in range(midiyas_logo.FRAME_COUNT)]
     matrices+=[midiyas_logo.matrix(frame,group) for frame in range(midiyas_logo.FRAME_COUNT) for group in range(midiyas_logo.GROUP_COUNT)]
-    matrix_indices=list(range(FRAME_COUNT));unique_matrices=matrices[:FRAME_COUNT]
-    matrix_lookup={tuple(values):index for index,values in enumerate(unique_matrices)}
-    for values in matrices[FRAME_COUNT:]:
+    matrix_indices=[];unique_matrices=[];matrix_lookup={}
+    for values in matrices:
         key=tuple(values)
         if key not in matrix_lookup:
             matrix_lookup[key]=len(unique_matrices);unique_matrices.append(values)
         matrix_indices.append(matrix_lookup[key])
     matrices=unique_matrices
-    frame_offsets=[];order_count=0
+    frame_offsets=[];order_count=0;unique_orders=[];order_lookup={}
     for ordering in orders:
-        frame_offsets.append(order_count);order_count+=len(ordering)
+        key=tuple(ordering)
+        if key not in order_lookup:
+            order_lookup[key]=order_count;unique_orders.append((order_count,ordering));order_count+=len(ordering)
+        frame_offsets.append(order_lookup[key])
     assert len(triangles)<=2048
-    index_bits=len(triangles).bit_length()
+    assert FRAME_COUNT%orbit_scene.KEY_STRIDE==0 and orbit_scene.KEY_STRIDE==8
+    index_bits=max(1,(len(triangles)-1).bit_length())
+    count_bits=max(1,max(map(len,orders)).bit_length())
     group_bits=max(1,(midiyas_logo.GROUP_COUNT-1).bit_length())
     matrix_bits=max(1,(len(matrices)-1).bit_length())
     order_bits=max(1,(order_count-1).bit_length())
@@ -126,16 +137,20 @@ def generate():
         prefix=prefix.replace('parameter TARGET_FPS = 60,','parameter TARGET_FPS = 60,\n    parameter START_FRAME = 0,')
     if 'parameter START_LOGO_FRAME' not in prefix:
         prefix=prefix.replace('parameter START_FRAME = 0,','parameter START_FRAME = 0,\n    parameter START_LOGO_FRAME = 0,')
-    body='''    localparam FETCH=0,LOAD=1,ISSUE=2,WAIT_GPU=3,ADVANCE=4,HOLD=5,CLEAR_ISSUE=6,CLEAR_WAIT=7,INDEX=8,PRESENT=9,SWAP_WAIT=10;
+    body='''    localparam FETCH=0,LOAD=1,ISSUE=2,WAIT_GPU=3,ADVANCE=4,HOLD=5,CLEAR_ISSUE=6,CLEAR_WAIT=7,INDEX=8,PRESENT=9,SWAP_WAIT=10,FETCH_B=11;
     localparam COMMAND_COUNT=COUNT_VALUE;
     localparam FRAME_COUNT=PHASE_VALUE;
     localparam LOGO_FRAME_COUNT=LOGO_PHASE_VALUE;
     localparam LOGO_GROUP_COUNT=GROUP_VALUE;
+    localparam MODEL_GROUP_COUNT=MODEL_GROUP_VALUE;
+    localparam MODEL_KEY_COUNT=MODEL_KEY_VALUE;
+    localparam MODEL_SLOT_COUNT=MODEL_KEY_COUNT*MODEL_GROUP_COUNT;
     localparam ROM_FRAME_COUNT=FRAME_COUNT+LOGO_FRAME_COUNT;
-    localparam MATRIX_SLOT_COUNT=FRAME_COUNT+LOGO_FRAME_COUNT*LOGO_GROUP_COUNT;
+    localparam MATRIX_SLOT_COUNT=MODEL_SLOT_COUNT+LOGO_FRAME_COUNT*LOGO_GROUP_COUNT;
     localparam MATRIX_COUNT=MATRICES_VALUE;
     localparam ORDER_COUNT=ORDERS_VALUE;
-    localparam INTRO_NEXT_FRAME=25;
+    localparam INTRO_NEXT_FRAME=INTRO_NEXT_VALUE;
+    localparam ORDER_STRIDE=ORDER_STRIDE_VALUE;
     localparam FRAME_TICKS=(TARGET_FPS>0) ? GPU_HZ/TARGET_FPS : 1;
     localparam LOGO_TICKS=(GPU_HZ/1000)*LOGO_HOLD_MS;
     reg [3:0] demo_state;
@@ -171,25 +186,44 @@ def generate():
     reg [GROUP_HIGH:0] command_group [0:COMMAND_COUNT-1];
     reg [185:0] command_data;
     (* rom_style="block" *) reg [INDEX_HIGH:0] draw_order [0:ORDER_COUNT-1];
-    reg [INDEX_HIGH:0] frame_counts [0:ROM_FRAME_COUNT-1];
+    reg [COUNT_HIGH:0] frame_counts [0:ROM_FRAME_COUNT-1];
     reg [$clog2(ORDER_COUNT)-1:0] frame_offsets [0:ROM_FRAME_COUNT-1];
     (* rom_style="block" *) reg [287:0] matrices [0:MATRIX_COUNT-1];
     reg [$clog2(MATRIX_COUNT)-1:0] matrix_indices [0:MATRIX_SLOT_COUNT-1];
-    reg [287:0] matrix_data;
+    reg [287:0] matrix_data,matrix_raw,matrix_first;
     reg [INDEX_HIGH:0] order_data;
     wire [$clog2(ORDER_COUNT)-1:0] order_address=frame_offsets[scene_frame]+command_address;
-    wire [$clog2(MATRIX_SLOT_COUNT)-1:0] matrix_slot=logo_active ? FRAME_COUNT+logo_frame*LOGO_GROUP_COUNT+command_group[order_data] : animation_frame;
+    wire [$clog2(MODEL_KEY_COUNT)-1:0] matrix_key=animation_frame>>3;
+    wire [$clog2(MODEL_KEY_COUNT)-1:0] matrix_next_key=(matrix_key==MODEL_KEY_COUNT-1) ? 0 : matrix_key+1'b1;
+    wire [$clog2(MATRIX_SLOT_COUNT)-1:0] matrix_slot=logo_active ? MODEL_SLOT_COUNT+logo_frame*LOGO_GROUP_COUNT+command_group[order_data] :
+        ((demo_state==FETCH_B) ? matrix_next_key : matrix_key)*MODEL_GROUP_COUNT+command_group[order_data]-16;
     wire [$clog2(MATRIX_COUNT)-1:0] matrix_address=matrix_indices[matrix_slot];
-    wire [INDEX_HIGH:0] frame_count=frame_counts[scene_frame];
+    wire [COUNT_HIGH:0] frame_count=frame_counts[scene_frame];
 `ifndef SYNTHESIS
-    reg [59:0] reference_pixels [0:ORDER_COUNT-1];
+    reg [59:0] reference_pixels [0:ROM_FRAME_COUNT*ORDER_STRIDE-1];
     reg [59:0] reference_data;
-    always @(posedge gpu_clk) reference_data<=reference_pixels[order_address];
+    always @(posedge gpu_clk) reference_data<=reference_pixels[scene_frame*ORDER_STRIDE+command_address];
 `endif
+    function [287:0] interpolate_matrix;
+        input [287:0] first,second;
+        input [2:0] fraction;
+        reg signed [18:0] a,b,difference;
+        reg signed [22:0] product,value;
+        integer i;
+        begin
+            for(i=0;i<16;i=i+1) begin
+                a=$signed(first[i*18+:18]);b=$signed(second[i*18+:18]);difference=b-a;
+                product=difference*$signed({1'b0,fraction});value=a+(product>>>3);
+                interpolate_matrix[i*18+:18]=value[17:0];
+            end
+        end
+    endfunction
     always @(posedge gpu_clk) begin
         order_data<=draw_order[order_address];
         if(order_data<COMMAND_COUNT) command_data<=commands[order_data];
-        matrix_data<=matrices[matrix_address];
+        matrix_raw<=matrices[matrix_address];
+        if(demo_state==FETCH_B) matrix_first<=matrix_raw;
+        if(demo_state==LOAD) matrix_data<=interpolate_matrix(matrix_first,matrix_raw,logo_active ? 3'd0 : animation_frame[2:0]);
     end
     always @(posedge gpu_clk) begin
         if(rst) begin
@@ -217,7 +251,8 @@ def generate():
                     if(saw_busy && !gpu_busy) demo_state<=INDEX;
                 end
                 INDEX: demo_state<=FETCH;
-                FETCH: demo_state<=((studio_mode ? studio_count : frame_count)==0) ? PRESENT : LOAD;
+                FETCH: demo_state<=((studio_mode ? studio_count : frame_count)==0) ? PRESENT : FETCH_B;
+                FETCH_B: demo_state<=LOAD;
                 LOAD: begin
                     if(studio_mode) begin
                         {gpu_x0,gpu_y0,gpu_x1,gpu_y1,gpu_x2,gpu_y2,gpu_c0,gpu_c1,gpu_c2}<=studio_data;
@@ -258,7 +293,7 @@ def generate():
                                 if(boot_elapsed>=LOGO_TICKS && logo_frame==LOGO_FRAME_COUNT-1) begin
                                     logo_active<=0;animation_frame<=INTRO_NEXT_FRAME;
                                 end else if(logo_frame<LOGO_FRAME_COUNT-1) logo_frame<=logo_frame+1'b1;
-                            end else animation_frame<=animation_frame+1'b1;
+                            end else animation_frame<=(animation_frame==FRAME_COUNT-1) ? 0 : animation_frame+1'b1;
                             command_address<=0;demo_state<=CLEAR_ISSUE;
                         end
                     end
@@ -282,7 +317,7 @@ def generate():
         .vga_r(VGA_R), .vga_g(VGA_G), .vga_b(VGA_B), .vga_hs(VGA_HS), .vga_vs(VGA_VS)
     );
     initial begin
-'''.replace('COUNT_VALUE',str(len(triangles))).replace('LOGO_PHASE_VALUE',str(midiyas_logo.FRAME_COUNT)).replace('PHASE_VALUE',str(FRAME_COUNT)).replace('GROUP_VALUE',str(midiyas_logo.GROUP_COUNT)).replace('MATRICES_VALUE',str(len(matrices))).replace('ORDERS_VALUE',str(order_count)).replace('INDEX_HIGH',str(index_bits-1)).replace('GROUP_HIGH',str(group_bits-1))
+'''.replace('COUNT_VALUE',str(len(triangles))).replace('LOGO_PHASE_VALUE',str(midiyas_logo.FRAME_COUNT)).replace('PHASE_VALUE',str(FRAME_COUNT)).replace('MODEL_GROUP_VALUE',str(orbit_scene.GROUP_COUNT)).replace('GROUP_VALUE',str(midiyas_logo.GROUP_COUNT)).replace('MODEL_KEY_VALUE',str(key_count)).replace('INTRO_NEXT_VALUE',str(midiyas_logo.INTRO_NEXT_FRAME)).replace('ORDER_STRIDE_VALUE',str(1<<count_bits)).replace('MATRICES_VALUE',str(len(matrices))).replace('ORDERS_VALUE',str(order_count)).replace('INDEX_HIGH',str(index_bits-1)).replace('COUNT_HIGH',str(count_bits-1)).replace('GROUP_HIGH',str(group_bits-1))
     for index,(vertices,pixels,colors) in enumerate(triangles):
         word=0
         for vertex,color in zip(vertices,colors):
@@ -297,18 +332,20 @@ def generate():
     for address,index in enumerate(matrix_indices):
         body+=f"        matrix_indices[{address}]={matrix_bits}'d{index};\n"
     for frame,ordering in enumerate(orders):
-        body+=f"        frame_counts[{frame}]={index_bits}'d{len(ordering)};\n"
+        body+=f"        frame_counts[{frame}]={count_bits}'d{len(ordering)};\n"
         body+=f"        frame_offsets[{frame}]={order_bits}'d{frame_offsets[frame]};\n"
+    for offset,ordering in unique_orders:
         for index,ident in enumerate(ordering):
-            body+=f"        draw_order[{frame_offsets[frame]+index}]={index_bits}'d{ident};\n"
+            body+=f"        draw_order[{offset+index}]={index_bits}'d{ident};\n"
     body+='    end\n`ifndef SYNTHESIS\n    initial begin\n'
+    order_stride=1<<count_bits
     for frame,ordering in enumerate(orders):
         for index,ident in enumerate(ordering):
             word=0
-            slot=frame if frame<FRAME_COUNT else FRAME_COUNT+(frame-FRAME_COUNT)*midiyas_logo.GROUP_COUNT+groups[ident]
+            transform=matrix(frame,groups[ident]-16) if frame<FRAME_COUNT else midiyas_logo.matrix(frame-FRAME_COUNT,groups[ident])
             for vertex in triangles[ident][0]:
-                for value in orbit_project(vertex,matrices[matrix_indices[slot]])[0]:word=(word<<10)|value
-            body+=f"        reference_pixels[{frame_offsets[frame]+index}]=60'h{word:015x};\n"
+                for value in orbit_project(vertex,transform)[0]:word=(word<<10)|value
+            body+=f"        reference_pixels[{frame*order_stride+index}]=60'h{word:015x};\n"
     body+='    end\n`endif\n'
 
     target.write_text(prefix+body+'endmodule\n',encoding='utf-8')

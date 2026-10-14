@@ -55,7 +55,9 @@ module space_sequence_tb;
  top #(.H_RES(640),.V_RES(480),.GPU_CLK_DIV_LOG2(1),.LOGO_HOLD_MS(0),.STAGE_HOLD_MS(0),.CUBE_HOLD_MS(0),.TARGET_FPS(TARGET_FPS))
   dut(clk,reset_n,1'b0,r,g,b,hs,vs);
  integer count=0,frames=0,dx1,dy1,dx2,dy2;
- reg [127:0] visited=0;
+ bit visited[];
+ integer checked,slot_a,slot_b,matrix_item,value_a,value_b,value_lerp,model_group,fraction;
+ reg [287:0] expected_matrix;
  reg [3:0] old_state=0;
  integer cycle=0,last_clear=-1,hold_cycle=0,expected_cycle=0;
  always @(posedge dut.gpu_clk) if(!dut.rst) begin
@@ -69,7 +71,18 @@ module space_sequence_tb;
    last_clear=cycle;
   end
   if(dut.demo_start) begin
-   if(dut.matrix_data!==dut.matrices[dut.animation_frame]) $fatal(1,"Matrix ROM mismatch");
+   model_group=dut.command_group[dut.draw_order[dut.order_address]]-16;
+   slot_a=(dut.animation_frame/8)*dut.MODEL_GROUP_COUNT+model_group;
+   slot_b=((dut.animation_frame/8+1)%dut.MODEL_KEY_COUNT)*dut.MODEL_GROUP_COUNT+model_group;
+   fraction=dut.animation_frame%8;
+   for(matrix_item=0;matrix_item<16;matrix_item=matrix_item+1)begin
+    value_a=$signed(dut.matrices[dut.matrix_indices[slot_a]][matrix_item*18+:18]);
+    value_b=$signed(dut.matrices[dut.matrix_indices[slot_b]][matrix_item*18+:18]);
+    value_lerp=(value_b-value_a)*fraction;
+    value_lerp=value_a+(value_lerp>>>3);
+    expected_matrix[matrix_item*18+:18]=value_lerp;
+   end
+   if(dut.matrix_data!==expected_matrix) $fatal(1,"Interpolated matrix mismatch");
    if({dut.gpu_vx0,dut.gpu_vy0,dut.gpu_vz0,dut.gpu_c0,
        dut.gpu_vx1,dut.gpu_vy1,dut.gpu_vz1,dut.gpu_c1,
        dut.gpu_vx2,dut.gpu_vy2,dut.gpu_vz2,dut.gpu_c2}!==dut.commands[dut.draw_order[dut.order_address]])
@@ -86,14 +99,16 @@ module space_sequence_tb;
     if(count!=dut.frame_count) $fatal(1,"Command count %0d",count);
     visited[dut.animation_frame]=1;
     frames=frames+1;count=0;
-    if(frames==129) begin
-        if(visited!==128'hffffffffffffffffffffffffffffffff || dut.animation_frame!=0) $fatal(1,"Orbit wrap");
-        $display("PASS orbit sequence: 128 views + wrap, ROM, bounds, stable vertex/matrix and clear/done handshakes");
+    if(frames==dut.FRAME_COUNT+1) begin
+        for(checked=0;checked<dut.FRAME_COUNT;checked=checked+1)
+         if(!visited[checked]) $fatal(1,"Skipped model phase %0d",checked);
+        if(dut.animation_frame!=0) $fatal(1,"Orbit wrap");
+        $display("PASS orbit sequence: %0d views + wrap, interpolated ROM, bounds, stable vertex/matrix and clear/done handshakes",dut.FRAME_COUNT);
         $finish;
     end
   end
   old_state=dut.demo_state;
  end
- initial begin #80;reset_n=1;#100000000;$fatal(1,"Timeout");end
+ initial begin visited=new[dut.FRAME_COUNT];#80;reset_n=1;#100000000;$fatal(1,"Timeout");end
 endmodule
 `endif

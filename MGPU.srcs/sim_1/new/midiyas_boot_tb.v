@@ -14,8 +14,10 @@ module midiyas_boot_tb;
  integer cycle=0,commands=0,logo_frames=0,model_frames=0,transitions=0;
  integer first_clear=-1,last_clear=-1,dx1,dy1,dx2,dy2;
  integer saved_boot,saved_logo,saved_clear,run=0;
- reg [127:0] visited=0;
- reg [419:0] logo_visited=0;
+ bit visited[];
+ bit logo_visited[];
+ integer checked,slot_a,slot_b,matrix_item,value_a,value_b,value_lerp,model_group,fraction;
+ reg [287:0] expected_matrix;
  reg [8:0] old_logo_frame=0;
  reg [3:0] old_state=0;
  reg old_valid=0,old_logo=0,old_busy=0,old_paused=0;
@@ -24,7 +26,7 @@ module midiyas_boot_tb;
  always @(posedge dut.gpu_clk) begin
   if(dut.rst) begin
    cycle=0;commands=0;logo_frames=0;model_frames=0;transitions=0;
-   first_clear=-1;last_clear=-1;visited=0;logo_visited=0;old_logo_frame=0;
+   first_clear=-1;last_clear=-1;visited=new[dut.FRAME_COUNT];logo_visited=new[dut.LOGO_FRAME_COUNT];old_logo_frame=0;
    old_state=0;old_valid=0;old_logo=0;old_busy=0;old_paused=0;old_boot=0;
    first_model_pending=0;
   end else begin
@@ -33,8 +35,10 @@ module midiyas_boot_tb;
    if(old_valid && old_logo && !dut.logo_active) begin
     if(old_state!=dut.HOLD || old_busy || old_paused) $fatal(1,"Unsafe logo transition");
     if(old_boot<dut.LOGO_TICKS) $fatal(1,"Logo duration too short");
-    if(logo_frames<dut.LOGO_FRAME_COUNT || commands!=0 || old_logo_frame!=dut.LOGO_FRAME_COUNT-1 ||
-       logo_visited!=={420{1'b1}}) $fatal(1,"Incomplete logo animation");
+    if(logo_frames<dut.LOGO_FRAME_COUNT || commands!=0 || old_logo_frame!=dut.LOGO_FRAME_COUNT-1)
+       $fatal(1,"Incomplete logo animation");
+    for(checked=0;checked<dut.LOGO_FRAME_COUNT;checked=checked+1)
+     if(!logo_visited[checked]) $fatal(1,"Skipped logo phase %0d",checked);
     if(dut.animation_frame!=dut.INTRO_NEXT_FRAME || dut.command_address!=0) $fatal(1,"Character start frame");
     transitions=transitions+1;
     if(transitions!=1) $fatal(1,"Repeated intro transition");
@@ -62,7 +66,23 @@ module midiyas_boot_tb;
    if(dut.demo_start) begin
     if(dut.gpu_busy) $fatal(1,"Start while busy");
     if(dut.frame_count==0) $fatal(1,"Triangle submitted in empty frame");
-    if(dut.matrix_data!==dut.matrices[dut.matrix_address]) $fatal(1,"Matrix ROM mismatch");
+    model_group=dut.command_group[dut.draw_order[dut.order_address]];
+    if(dut.logo_active)begin
+     slot_a=dut.MODEL_SLOT_COUNT+dut.logo_frame*dut.LOGO_GROUP_COUNT+model_group;
+     slot_b=slot_a;
+    end else begin
+     slot_a=(dut.animation_frame/8)*dut.MODEL_GROUP_COUNT+model_group-16;
+     slot_b=((dut.animation_frame/8+1)%dut.MODEL_KEY_COUNT)*dut.MODEL_GROUP_COUNT+model_group-16;
+    end
+    fraction=dut.logo_active ? 0 : dut.animation_frame%8;
+    for(matrix_item=0;matrix_item<16;matrix_item=matrix_item+1)begin
+     value_a=$signed(dut.matrices[dut.matrix_indices[slot_a]][matrix_item*18+:18]);
+     value_b=$signed(dut.matrices[dut.matrix_indices[slot_b]][matrix_item*18+:18]);
+     value_lerp=(value_b-value_a)*fraction;
+     value_lerp=value_a+(value_lerp>>>3);
+     expected_matrix[matrix_item*18+:18]=value_lerp;
+    end
+    if(dut.matrix_data!==expected_matrix) $fatal(1,"Interpolated matrix mismatch frame %0d group %0d",dut.scene_frame,model_group);
     if({dut.gpu_vx0,dut.gpu_vy0,dut.gpu_vz0,dut.gpu_c0,
         dut.gpu_vx1,dut.gpu_vy1,dut.gpu_vz1,dut.gpu_c1,
         dut.gpu_vx2,dut.gpu_vy2,dut.gpu_vz2,dut.gpu_c2}!==dut.commands[dut.draw_order[dut.order_address]])
@@ -83,7 +103,7 @@ module midiyas_boot_tb;
      logo_frames=logo_frames+1;
     end
     else begin
-     if(transitions!=1 || dut.animation_frame!=((dut.INTRO_NEXT_FRAME+model_frames)%128)) $fatal(1,"Character frame sequence");
+     if(transitions!=1 || dut.animation_frame!=((dut.INTRO_NEXT_FRAME+model_frames)%dut.FRAME_COUNT)) $fatal(1,"Character frame sequence");
      visited[dut.animation_frame]=1;
      model_frames=model_frames+1;
     end
@@ -114,9 +134,10 @@ module midiyas_boot_tb;
    $fatal(1,"Paused intro advanced");
   press_button;
   wait(!dut.paused);
-  wait(model_frames==129);
-  if(visited!==128'hffffffffffffffffffffffffffffffff || dut.animation_frame!=dut.INTRO_NEXT_FRAME)
-   $fatal(1,"Character orbit wrap");
+  wait(model_frames==dut.FRAME_COUNT+1);
+  for(checked=0;checked<dut.FRAME_COUNT;checked=checked+1)
+   if(!visited[checked]) $fatal(1,"Skipped model phase %0d",checked);
+  if(dut.animation_frame!=dut.INTRO_NEXT_FRAME) $fatal(1,"Character orbit wrap");
   @(negedge clk);run=1;reset_n=0;
   repeat(12) @(negedge clk);
   reset_n=1;
@@ -125,9 +146,9 @@ module midiyas_boot_tb;
   if(!dut.logo_active || transitions!=0) $fatal(1,"Intro missing after reset");
   wait(model_frames==1);
   if(transitions!=1 || dut.animation_frame!=dut.INTRO_NEXT_FRAME) $fatal(1,"Reset transition");
-  $display("PASS MIDIYAS boot: all 420 intro phases, pause/resume, complete-frame transition into orbit 25, 128 views + wrap, reset and ROM/handshake checks");
+  $display("PASS MIDIYAS boot: all %0d intro phases, pause/resume, complete-frame transition into orbit %0d, %0d views + wrap, reset and interpolated ROM/handshake checks",dut.LOGO_FRAME_COUNT,dut.INTRO_NEXT_FRAME,dut.FRAME_COUNT);
   $finish;
  end
- initial begin #200000000;$fatal(1,"Timeout");end
+ initial begin #400000000;$fatal(1,"Timeout");end
 endmodule
 `endif

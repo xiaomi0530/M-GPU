@@ -139,10 +139,10 @@ class FramebufferViewer:
 
         simulation = tk.Frame(self.root, bg=BG)
         simulation.pack(fill="x", padx=26, pady=(8,0))
-        self.sim_stage = tk.StringVar(value="奶蛙环绕（128 帧）")
+        self.sim_stage = tk.StringVar(value="机械晶核（512 帧）")
         self.sim_fast = tk.BooleanVar(value=True)
         ttk.Combobox(simulation,textvariable=self.sim_stage,state="readonly",width=24,
-                     values=("奶蛙环绕（128 帧）","奶蛙（单帧）","MIDIYAS GPU 开屏（420 帧）")).pack(side="left")
+                     values=("机械晶核（512 帧）","机械晶核（单帧）","MIDIYAS GPU 开屏（420 帧）")).pack(side="left")
         self.sim_button=ttk.Button(simulation,text="运行 top.v",command=self.simulate_top)
         self.sim_button.pack(side="left",padx=8)
         self.sim_stop=ttk.Button(simulation,text="停止仿真",command=self.sim_cancel.set,state="disabled")
@@ -288,7 +288,7 @@ class FramebufferViewer:
             messagebox.showinfo("仿真进行中","请先停止当前仿真。",parent=self.root)
             return
         from top_simulation import run_top,SimulationCancelled
-        stage="logo" if self.sim_stage.get()=="MIDIYAS GPU 开屏（420 帧）" else "animation" if self.sim_stage.get()=="奶蛙环绕（128 帧）" else "background"
+        stage="logo" if self.sim_stage.get()=="MIDIYAS GPU 开屏（420 帧）" else "animation" if self.sim_stage.get()=="机械晶核（512 帧）" else "background"
         fast=self.sim_fast.get()
         output=self.project/"out/studio_top"
         self.sim_cancel.clear()
@@ -296,7 +296,7 @@ class FramebufferViewer:
         self.watch_trace(output/"framebuffer.trace")
         def work():
             try:
-                paths=run_top(self.project,output,self.sim_cancel,stage=stage,frames=128 if stage=="animation" else 420 if stage=="logo" else 1,
+                paths=run_top(self.project,output,self.sim_cancel,stage=stage,frames=512 if stage=="animation" else 420 if stage=="logo" else 1,
                               fast=fast,progress=lambda text:self.sim_messages.put(("progress",text)))
                 from view_framebuffer import read_hex_framebuffer,rgb332_to_rgb888,save_with_pillow
                 pixels=read_hex_framebuffer(paths["framebuffer"])

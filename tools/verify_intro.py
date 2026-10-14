@@ -97,19 +97,21 @@ def verify(output=None,complete_from=0,complete_to=None,text_groups=None,gpu_hz=
     missing_groups=[dict(phase=p['phase'],missing=sorted(set(text_groups)-set(p['text_groups'])))
         for p in complete_frames if set(text_groups)-set(p['text_groups'])]
     centers=[p['text_center'] for p in complete_frames if 'text_center' in p]
-    from orbit_scene import scene as model_scene,matrix as model_matrix,order as model_order,FRAME_COUNT as model_frames
+    from orbit_scene import scene as model_scene,matrix as model_matrix,order as model_order,groups as model_groups,FRAME_COUNT as model_frames,GROUP_COUNT as model_group_count
     from verify_vertex_lab import render
-    model_mesh=model_scene();model_group=group_count-1;model_offset=midiyas_logo.MODEL_OFFSET
+    model_mesh=model_scene();model_group=midiyas_logo.MODEL_GROUP;model_offset=midiyas_logo.MODEL_OFFSET;model_ids=model_groups()
     final_orbit=(midiyas_logo.INTRO_NEXT_FRAME-1)%model_frames
     assert len(mesh)-model_offset==len(model_mesh),('Transition model size',len(mesh),model_offset,len(model_mesh))
     assert all(mesh[model_offset+i][0]==face[0] and mesh[model_offset+i][2]==face[2]
         for i,face in enumerate(model_mesh)),('Transition model changed',model_offset)
-    final_matrix=midiyas_logo.matrix(frames-1,model_group)
-    assert final_matrix==model_matrix(final_orbit),('Transition matrix discontinuity',frames-1,final_orbit)
+    assert all(group_ids[model_offset+i]==model_group+model_ids[i] for i in range(len(model_mesh))),('Transition group mapping',model_group)
+    final_matrices=[midiyas_logo.matrix(frames-1,model_group+group) for group in range(model_group_count)]
+    assert all(final_matrices[group]==model_matrix(final_orbit,group) for group in range(model_group_count)),('Transition matrix discontinuity',frames-1,final_orbit)
     final_order=midiyas_logo.order(frames-1)
-    assert all(group_ids[i]==model_group for i in final_order),('Logo remains at transition',final_order)
-    final_triangles=[(mesh[i][0],[(x//2,y//2) for x,y in (project(v,final_matrix) for v in mesh[i][0])],mesh[i][2]) for i in final_order]
-    model_triangles=[(model_mesh[i][0],[(x//2,y//2) for x,y in (project(v,final_matrix) for v in model_mesh[i][0])],model_mesh[i][2]) for i in model_order(final_orbit)]
+    assert all(group_ids[i]>=model_group for i in final_order),('Logo remains at transition',final_order)
+    assert final_order==[model_offset+i for i in model_order(final_orbit)],('Transition order discontinuity',final_orbit)
+    final_triangles=[(mesh[i][0],[(x//2,y//2) for x,y in (project(v,final_matrices[group_ids[i]-model_group]) for v in mesh[i][0])],mesh[i][2]) for i in final_order]
+    model_triangles=[(model_mesh[i][0],[(x//2,y//2) for x,y in (project(v,final_matrices[model_ids[i]]) for v in model_mesh[i][0])],model_mesh[i][2]) for i in model_order(final_orbit)]
     seam_mismatch=int(np.count_nonzero(render(final_triangles,320,240)!=render(model_triangles,320,240)))
     assert seam_mismatch==0,('Transition pixel discontinuity',seam_mismatch)
     data=dict(gpu_hz=gpu_hz,render_size=[320,240],display_size=[640,480],refresh_hz=25_000_000/(800*521),

@@ -1,7 +1,7 @@
 from pathlib import Path
 import numpy as np
 from PIL import Image
-from build_vertex_lab import ROOT, scene
+from build_vertex_lab import ROOT
 
 
 def render(triangles,width=640,height=480):
@@ -42,10 +42,10 @@ def to_image(actual):
 
 
 def verify(output=None,frames=1,orbit=False,start=0,logo=False):
-    from orbit_scene import matrix,project,order,FRAME_COUNT
+    from orbit_scene import matrix,project,order,groups,scene,FRAME_COUNT
     from view_framebuffer import framebuffer_size
     output=Path(output or ROOT/'out/vertex_lab')
-    mesh=scene();images=[]
+    mesh=scene();group_ids=groups();images=[]
     if logo:
         from midiyas_logo import scene as logo_scene,matrix,project,order,groups,FRAME_COUNT
         mesh=logo_scene();group_ids=groups()
@@ -57,7 +57,7 @@ def verify(output=None,frames=1,orbit=False,start=0,logo=False):
         actual=actual.reshape(height,width)
         triangles=[]
         for i in order(angle):
-            m=matrix(angle,group_ids[i]) if logo else matrix(angle)
+            m=matrix(angle,group_ids[i])
             triangles.append((mesh[i][0],[(p[0]*width//640,p[1]*height//480)
                 for p in (project(v,m)[0] for v in mesh[i][0])],mesh[i][2]))
         expected=render(triangles,width,height)

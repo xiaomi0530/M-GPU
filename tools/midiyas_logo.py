@@ -3,11 +3,12 @@ from functools import lru_cache
 import json
 import math
 import numpy as np
+from mechanical_core import GROUP_COUNT as MODEL_GROUP_COUNT
 
 ROOT=Path(__file__).resolve().parents[1]
 Q=4096
 FRAME_COUNT=420
-GROUP_COUNT=17
+GROUP_COUNT=16+MODEL_GROUP_COUNT
 MODEL_START=372
 MODEL_OFFSET=558
 MODEL_GROUP=16
@@ -129,9 +130,9 @@ def geometry():
     for j in range(6):
         face([points[(j+1)%6],points[j],(0,0,-.12)],rgb(0,0,85) if j%2 else rgb(36,0,85),15)
     assert len(faces)==MODEL_OFFSET
-    from build_vertex_lab import scene as model_scene
-    for vertices,_,colors in model_scene():
-        faces.append((vertices,colors));group_ids.append(16)
+    from orbit_scene import scene as model_scene,groups as model_groups
+    for (vertices,_,colors),group in zip(model_scene(),model_groups()):
+        faces.append((vertices,colors));group_ids.append(MODEL_GROUP+group)
     return faces,group_ids,centers
 
 
@@ -151,7 +152,7 @@ def rotations(x,y,z):
 
 
 def visible(frame,group):
-    if group==16:return frame>=MODEL_START
+    if group>=MODEL_GROUP:return frame>=MODEL_START
     if frame>=MODEL_START:return False
     seconds=frame*.016672
     if seconds>=6.10 and group!=10:return False
@@ -168,10 +169,10 @@ def visible(frame,group):
 @lru_cache(maxsize=FRAME_COUNT*GROUP_COUNT)
 def matrix(frame,group=0):
     frame=max(0,min(frame,FRAME_COUNT-1))
-    if group==16:
+    if group>=MODEL_GROUP:
         from orbit_scene import matrix as orbit_matrix
         u=max(0,min(1,(frame-MODEL_START)/(FRAME_COUNT-MODEL_START-1)))
-        values=np.array(orbit_matrix(24*u*u),dtype=float).reshape((4,4),order='F')
+        values=np.array(orbit_matrix(24*u*u,group-MODEL_GROUP),dtype=float).reshape((4,4),order='F')
         scale=.055+.945*u*u*u*(10-15*u+6*u*u)
         values[:2]*=scale
         return [round(float(v)) for v in values.flatten(order='F')]
@@ -233,47 +234,10 @@ def scene():
 
 @lru_cache(maxsize=FRAME_COUNT)
 def order(frame):
-    triangles=scene();maps={};keys={};out={};ind={}
-    if frame==FRAME_COUNT-1:
-        from orbit_scene import order as orbit_order
-        return [MODEL_OFFSET+i for i in orbit_order(INTRO_NEXT_FRAME-1)]
-    if frame>=MODEL_START:
-        u=(frame-MODEL_START)/(FRAME_COUNT-MODEL_START-1)
-        angle=24*u*u*2*math.pi/128
-        camera=np.array([5.4*math.sin(angle),0,5.4*(1-math.cos(angle))])*Q
-    for i,(verts,_,colors) in enumerate(triangles):
-        group=groups()[i]
-        if not visible(frame,group):continue
-        if group==16:
-            points=np.array(verts)
-            if np.dot(np.cross(points[1]-points[0],points[2]-points[0]),camera-points.mean(0))<=0:continue
-        projections=[project(v,matrix(frame,group)) for v in verts]
-        p=np.array([r[0] for r in projections]);z=np.array([r[1] for r in projections]);x0,y0=p.min(0);x1,y1=p.max(0)
-        dx1,dy1=p[1]-p[0];dx2,dy2=p[2]-p[0];area=int(dx1*dy2-dy1*dx2)
-        if area==0 or (group!=16 and area<0):continue
-        y,x=np.mgrid[y0:y1+1,x0:x1+1];a=((p[1,0]-x)*(p[2,1]-y)-(p[1,1]-y)*(p[2,0]-x))/area;b=((p[2,0]-x)*(p[0,1]-y)-(p[2,1]-y)*(p[0,0]-x))/area;c=1-a-b
-        valid=(a>1e-6)&(b>1e-6)&(c>1e-6);depth=a*z[0]+b*z[1]+c*z[2]
-        maps[i]=(x0,y0,x1,y1,depth,valid);out[i]=set();ind[i]=0;keys[i]=float(z.mean())
-    for i in maps:
-        for j in maps:
-            if j<=i:continue
-            a,b=maps[i],maps[j];x0=max(a[0],b[0]);y0=max(a[1],b[1]);x1=min(a[2],b[2]);y1=min(a[3],b[3])
-            if x0>x1 or y0>y1:continue
-            sa=np.s_[y0-a[1]:y1-a[1]+1,x0-a[0]:x1-a[0]+1];sb=np.s_[y0-b[1]:y1-b[1]+1,x0-b[0]:x1-b[0]+1]
-            mask=a[5][sa]&b[5][sb];delta=(a[4][sa]-b[4][sb])[mask]
-            pos=np.any(delta>1e-5);neg=np.any(delta< -1e-5)
-            if pos and neg:
-                if len(set(triangles[i][2]+triangles[j][2]))==1:continue
-                raise ValueError(('Intersecting depth order',frame,i,j,groups()[i],groups()[j]))
-            if pos or neg:
-                far,near=(j,i) if pos else (i,j);out[far].add(near);ind[near]+=1
-    ordered=[]
-    while ind:
-        ready=[i for i in ind if ind[i]==0]
-        if not ready:raise RuntimeError(('cycle',frame,ind))
-        i=min(ready,key=lambda k:(keys[k],k));ordered.append(i);del ind[i]
-        for j in out[i]:ind[j]-=1
-    return ordered
+    from orbit_scene import ordered,order as model_order
+    if frame==FRAME_COUNT-1:return [MODEL_OFFSET+i for i in model_order(INTRO_NEXT_FRAME-1)]
+    ids=[i for i,group in enumerate(groups()) if visible(frame,group)]
+    return ordered(scene(),groups(),[matrix(frame,g) for g in range(GROUP_COUNT)],ids,('intro',frame))
 
 
 def generate():
@@ -294,11 +258,10 @@ def generate():
     storyboard=Image.new('RGB',(1280,960))
     for k,frame in enumerate((110,240,350,402)):storyboard.paste(images[frame],((k%2)*640,(k//2)*480))
     storyboard.save(output/'storyboard.png')
-    from orbit_scene import scene as model_scene,matrix as orbit_matrix,project as orbit_project,order as orbit_order
+    from orbit_scene import scene as model_scene,matrix as orbit_matrix,project as orbit_project,order as orbit_order,groups as model_groups,FRAME_COUNT as MODEL_FRAMES
     model=model_scene();continuation=[]
     for frame in range(INTRO_NEXT_FRAME,INTRO_NEXT_FRAME+64):
-        m=orbit_matrix(frame%128)
-        native=[(model[i][0],[(x//2,y//2) for x,y in [orbit_project(v,m)[0] for v in model[i][0]]],model[i][2]) for i in orbit_order(frame%128)]
+        native=[(model[i][0],[(x//2,y//2) for x,y in [orbit_project(v,orbit_matrix(frame%MODEL_FRAMES,model_groups()[i]))[0] for v in model[i][0]]],model[i][2]) for i in orbit_order(frame%MODEL_FRAMES)]
         continuation.append(to_image(render(native,320,240)).resize((640,480),Image.Resampling.NEAREST))
     combined=images+continuation
     duration=[round((i+1)*1.6672)*10-round(i*1.6672)*10 for i in range(len(combined))]

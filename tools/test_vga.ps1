@@ -4,7 +4,7 @@ $outputDir = Join-Path $projectRoot 'out/vga_current/tests'
 New-Item -ItemType Directory -Force -Path $outputDir | Out-Null
 $rtl = Get-ChildItem (Join-Path $projectRoot 'MGPU.srcs/sources_1/new/*.v') | ForEach-Object FullName
 $sequenceBinary = Join-Path $outputDir 'space_sequence_tb.vvp'
-& iverilog -g2012 -DSPACE_SCENE_STUB -s space_sequence_tb -o $sequenceBinary (Join-Path $projectRoot 'MGPU.srcs/sources_1/new/top.v') (Join-Path $projectRoot 'MGPU.srcs/sim_1/new/space_sequence_tb.v')
+& iverilog -g2012 -DSPACE_SCENE_STUB -s space_sequence_tb -o $sequenceBinary (Join-Path $projectRoot 'MGPU.srcs/sources_1/new/top.v') (Join-Path $projectRoot 'MGPU.srcs/sources_1/new/gpu_clock.v') (Join-Path $projectRoot 'MGPU.srcs/sim_1/new/space_sequence_tb.v')
 if ($LASTEXITCODE -ne 0) { throw 'Sequence test compilation failed' }
 & vvp $sequenceBinary
 if ($LASTEXITCODE -ne 0) { throw 'Sequence/geometry test failed' }
