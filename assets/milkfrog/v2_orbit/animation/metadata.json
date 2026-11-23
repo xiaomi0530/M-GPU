@@ -1,0 +1,173 @@
+{
+  "source": "milkfrog.blend",
+  "source_sha256": "3531d8c81c2d03d7f6a4f2ea1a491a8ad58dc1200316a105e81f915cf8d10654",
+  "source_lod": "B:8000 triangles",
+  "group_names": [
+    "torso",
+    "head",
+    "upper_arm_negative_y",
+    "forearm_hand_negative_y",
+    "upper_arm_positive_y",
+    "forearm_hand_positive_y",
+    "thigh_negative_y",
+    "calf_foot_negative_y",
+    "thigh_positive_y",
+    "calf_foot_positive_y",
+    "lower_jaw",
+    "eye_negative_y",
+    "eye_positive_y",
+    "mouth_interior",
+    "eyelid_arcs",
+    "neck_connector",
+    "foot_negative_y",
+    "foot_positive_y"
+  ],
+  "frames": 541,
+  "fps": 30,
+  "vertices": 4777,
+  "triangles": 9310,
+  "joints": {
+    "-1": {
+      "shoulder": [
+        -0.016,
+        -0.16,
+        0.178
+      ],
+      "elbow": [
+        0.112,
+        -0.242,
+        0.026
+      ],
+      "wrist": [
+        0.222,
+        -0.142,
+        0.009
+      ],
+      "hip": [
+        -0.018,
+        -0.136,
+        -0.225
+      ],
+      "knee": [
+        -0.025,
+        -0.157,
+        -0.347
+      ],
+      "ankle": [
+        -0.0567979,
+        -0.11905167,
+        -0.43
+      ]
+    },
+    "1": {
+      "shoulder": [
+        -0.016,
+        0.16,
+        0.178
+      ],
+      "elbow": [
+        0.112,
+        0.242,
+        0.026
+      ],
+      "wrist": [
+        0.222,
+        0.142,
+        0.009
+      ],
+      "hip": [
+        -0.018,
+        0.136,
+        -0.225
+      ],
+      "knee": [
+        -0.025,
+        0.157,
+        -0.347
+      ],
+      "ankle": [
+        -0.05808536,
+        0.1229324,
+        -0.43
+      ]
+    }
+  },
+  "matrix_convention": "Unchanged object-to-world animation matrices; downstream left-multiplies per-frame world-to-clip camera_matrices.npy.",
+  "reference": "assets/naiwa/reference_motion.json",
+  "limitations": [
+    "Rigid/affine-piece adaptation; not an exact recovered rig or pixel-for-pixel match.",
+    "Torso and upper/lower arms are reconstructed source-constrained surfaces to separate the fused hands/belly; hidden contact anatomy is an authored approximation.",
+    "Head, eye, hand, leg and foot surfaces are retained from the source LOD with local cutting and joint closure.",
+    "Mouth cavity, lips, teeth, tongue, eyelid skin and neck connector are newly constructed animation geometry in the working copy.",
+    "Source material sampled into per-corner sRGB colors; reconstructed regions use source-derived color interpolation; original .blend unchanged.",
+    "The B simplification RMS does not measure the additional animation retopology error."
+  ],
+  "adaptation_measurements": {
+    "torso": "30 horizontal cross sections and 40 angles; positive original-surface ray distance is a hard bound; front/back central diameters and unobstructed back-half width constrain a smooth ellipse beneath fused arms/hands.",
+    "arms": "7 transverse rings with 12 angles per segment; original-surface ray samples, radius limits and second-harmonic smoothing; measured exposed upper-arm radii approximately 0.069 to 0.084 source units.",
+    "hands": "Original triangles clipped internally at min(170-R,130-G)>=0 in sampled source color; boundary closures retain dark fingers without carrying unrelated belly corners.",
+    "neck_source_front_x_at_z": [
+      [
+        0.21,
+        0.133713
+      ],
+      [
+        0.23,
+        0.124261
+      ],
+      [
+        0.255,
+        0.116771
+      ],
+      [
+        0.28,
+        0.113397
+      ],
+      [
+        0.3,
+        0.114933
+      ]
+    ],
+    "pose": "Reference timing and fixed-scale projected bbox-center offsets are measurements; 3D joint angles and hidden motion remain authored estimates.",
+    "camera": "assets/naiwa/camera.json; fixed camera and fixed scale for all 541 frames; only root translation is fitted to the reference center trajectory.",
+    "fall": "Selected visible-feet pose parameters are stored in fall_pose_constraints.json; corrections blend over frames 406..417; hand targets interpolate measured reference landmarks and contact the transformed torso front surface.",
+    "landing_deformation": "World-Z compression blends from 1.0 to 0.8 over frames 412..417 and remains 0.8 afterward. This is an empirical nonrigid cartoon-pose fit, not measured physical depth or a recovered source rig. It is applied before final hand contact IK and does not alter the fixed camera or source file.",
+    "blender_affine": "Each GPU group is represented by a two-object SVD transform hierarchy to preserve shear at all 541 integer frames. GPU storage remains one full 4x4 affine transform per triangle group.",
+    "mouth": "Asymmetric smile cavity, three-dimensional curved tooth rows, and 541-frame observed mouth-mask constraints. Occluded frames 411..415 are excluded from expression fitting rather than forced visible.",
+    "eyes": "Original source eye surfaces retained; closed-eye arc geometry and eye_closure_curve.json follow inspected reference intervals, including the closed eyes at frame 186.",
+    "neck": "Seven source-surface ray-sampled neck cross sections with 24 angular samples form the continuous affine neck sleeve.",
+    "ankles": "Source triangles are clipped at local Z=-0.430, retaining interpolated source colors and closed ankle cut surfaces. Groups 16/17 articulate feet independently from calf groups 7/9. Both sides use measured cut-ring centers as the shared calf/foot joint.",
+    "motion_refinement": "motion_refinement.json separates planted crouch, upright jump, backward fall, head self-occlusion and arm/leg contact targets. Single-view depth and joint rotations remain authored fits."
+  },
+  "refinement_input_sha256": {
+    "eye_closure_curve.json": "758c8a19ed2f80d3be1a0e2faacbf4136cd3896c13bbb6754fcacbe335fd6697",
+    "motion_refinement.json": "bf63ea9f2cbcf81c294d75e9833fbe0d08851146b8d07a0ba657da1f2d165141",
+    "mouth_reference_masks.npz": "b6d2eddc26a7fb24d2ebe0c81d459d589f1b15460f334822fd04219d5ca90d5b",
+    "landing_landmarks.json": "e38cd1bbdf396fae2cd3d47edc8e494a8e62952647b4ffd0a4163c502d39190e",
+    "fall_pose_constraints.json": "9d20a4f50f7a31ccd8bcd41eda8378151dda834e9786a8be35c765d50b5b8f44"
+  },
+  "version": "milkfrog_orbit_v2",
+  "camera": "camera.json",
+  "geometry_adaptation": {
+    "method": "Closed three-dimensional posterior oral shell attached to the existing outer lip contour, in mouth group 13. Original front cavity, teeth, source surfaces, group count and all pose matrices are unchanged.",
+    "source_vertices": 4712,
+    "source_triangles": 9214,
+    "added_vertices": 65,
+    "added_triangles": 96,
+    "group": 13,
+    "boundary_vertices": 32,
+    "rear_ring_x": 0.035,
+    "rear_radial_scale": 0.82,
+    "exterior_color": "Existing lip color at its seam; inverse-distance samples of source-derived head/jaw/neck skin colors on the posterior shell.",
+    "limitations": "A V2 authored closure for side and rear viewing, not newly recovered source anatomy. Requires no-Z whole-orbit validation after cache construction.",
+    "source_geometry_sha256": "f5f4e44e45a4b408086dcdd6d1ae5e930fa400e99950fbfb07f4c81283e95622",
+    "geometry_sha256": "ac7b0c526563e01f025a90ac136e52a9c377df3fc51265e0a7daa20d1760ca3c"
+  },
+  "camera_motion": "One 360 degree world-Z orbit over the full original 541-frame laugh animation.",
+  "source_animation_sha256": {
+    "geometry.npz": "f5f4e44e45a4b408086dcdd6d1ae5e930fa400e99950fbfb07f4c81283e95622",
+    "matrices.npy": "184d3ec183130d21ea77797d3efc3f1fd6c68d2546ab2b5a76205f6109d5524f",
+    "eye_closure_curve.json": "758c8a19ed2f80d3be1a0e2faacbf4136cd3896c13bbb6754fcacbe335fd6697",
+    "motion_refinement.json": "bf63ea9f2cbcf81c294d75e9833fbe0d08851146b8d07a0ba657da1f2d165141"
+  }
+}

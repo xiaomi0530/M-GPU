@@ -1,0 +1,15 @@
+{
+  "method": "Closed three-dimensional posterior oral shell attached to the existing outer lip contour, in mouth group 13. Original front cavity, teeth, source surfaces, group count and all pose matrices are unchanged.",
+  "source_vertices": 4712,
+  "source_triangles": 9214,
+  "added_vertices": 65,
+  "added_triangles": 96,
+  "group": 13,
+  "boundary_vertices": 32,
+  "rear_ring_x": 0.035,
+  "rear_radial_scale": 0.82,
+  "exterior_color": "Existing lip color at its seam; inverse-distance samples of source-derived head/jaw/neck skin colors on the posterior shell.",
+  "limitations": "A V2 authored closure for side and rear viewing, not newly recovered source anatomy. Requires no-Z whole-orbit validation after cache construction.",
+  "source_geometry_sha256": "f5f4e44e45a4b408086dcdd6d1ae5e930fa400e99950fbfb07f4c81283e95622",
+  "geometry_sha256": "ac7b0c526563e01f025a90ac136e52a9c377df3fc51265e0a7daa20d1760ca3c"
+}

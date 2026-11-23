@@ -124,7 +124,7 @@ class FramebufferViewer:
         title = tk.Frame(top, bg=BG)
         title.pack(side="left", padx=20)
         self._label(title, "FRAMEBUFFER STUDIO", TEXT, 12, BG).pack(anchor="w")
-        self._label(title, "top.v → GPU → framebuffer · 实时观察与回放", MUTED, 9, BG).pack(anchor="w")
+        self._label(title, "top.sv → GPU → framebuffer · 实时观察与回放", MUTED, 9, BG).pack(anchor="w")
         self.live_button = ttk.Button(top, text="●  实时追踪", style="Accent.TButton", command=self.go_live)
         self.live_button.pack(side="right")
         ttk.Button(top, text="导出当前画面", command=self.export).pack(side="right", padx=8)
@@ -143,7 +143,7 @@ class FramebufferViewer:
         self.sim_fast = tk.BooleanVar(value=True)
         ttk.Combobox(simulation,textvariable=self.sim_stage,state="readonly",width=24,
                      values=("机械晶核（512 帧）","机械晶核（单帧）","MIDIYAS GPU 开屏（420 帧）")).pack(side="left")
-        self.sim_button=ttk.Button(simulation,text="运行 top.v",command=self.simulate_top)
+        self.sim_button=ttk.Button(simulation,text="运行 top.sv",command=self.simulate_top)
         self.sim_button.pack(side="left",padx=8)
         self.sim_stop=ttk.Button(simulation,text="停止仿真",command=self.sim_cancel.set,state="disabled")
         self.sim_stop.pack(side="left")
@@ -301,7 +301,7 @@ class FramebufferViewer:
                 from view_framebuffer import read_hex_framebuffer,rgb332_to_rgb888,save_with_pillow
                 pixels=read_hex_framebuffer(paths["framebuffer"])
                 save_with_pillow([rgb332_to_rgb888(v) for v in pixels],output/"framebuffer.png")
-                self.sim_messages.put(("done","top.v 仿真完成 · 可回放实际像素写入"))
+                self.sim_messages.put(("done","top.sv 仿真完成 · 可回放实际像素写入"))
             except SimulationCancelled:
                 self.sim_messages.put(("done","仿真已停止 · 已写入的轨迹可继续回放"))
             except Exception as exc:
@@ -317,7 +317,7 @@ class FramebufferViewer:
             self.sim_status.configure(text=text)
             if kind!="progress":
                 self.sim_button.configure(state="normal");self.sim_stop.configure(state="disabled")
-                if kind=="error":messagebox.showerror("top.v 仿真",text,parent=self.root)
+                if kind=="error":messagebox.showerror("top.sv 仿真",text,parent=self.root)
 
     def open_image_studio(self):
         if self.image_studio and not self.image_studio.closed:

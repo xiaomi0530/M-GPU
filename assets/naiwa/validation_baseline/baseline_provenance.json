@@ -1,0 +1,10 @@
+{
+  "source_directory_at_capture": "C:\\Users\\xiaom\\Documents\\Vivado_Project\\MGPU\\out\\milkfrog_board\\rtl",
+  "source_geometry_sha256": "9de836b4ff6c2da62e2b32ed20d89a352a6b541137a122a135cff588686493ca",
+  "source_matrices_sha256": "fe2e7de7eb6617eea0564c076cd4b1828a66b939a3e47531a9c98fc076f93e75",
+  "source_final_validation_sha256": "095ac7800f6e2721cdc761ba10963851e9541536efb638db9875e6d359a0609d",
+  "packed_archive_sha256": "b7dd6c32cd0a8538d9b3571a5a6bc46d2b4f028bdb79f514fb9e9781ac040e7b",
+  "all_541_frame_hashes_checked_against_previous_final_validation": true,
+  "note": "Future comparisons read this pinned archive even if production rtl output is replaced.",
+  "archived_source_directory": "C:\\Users\\xiaom\\Documents\\Vivado_Project\\MGPU\\out\\milkfrog_iteration2\\baseline_rtl"
+}

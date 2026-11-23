@@ -1,14 +1,20 @@
-# Configure the existing Vivado simulation set for the same top.v Studio flow.
+# Configure the existing Vivado simulation set for the same top.sv Studio flow.
 # Run: vivado -mode batch -source tools/setup_top_simulation.tcl
 set root [file normalize [file join [file dirname [info script]] ..]]
 open_project [file join $root MGPU.xpr]
-foreach source [glob [file join $root MGPU.srcs sources_1 new *.v]] {
+foreach source [glob [file join $root MGPU.srcs sources_1 new *.sv]] {
     if {[llength [get_files -quiet $source]]==0} {add_files -fileset sources_1 -norecurse $source}
 }
-set tb [file join $root MGPU.srcs sim_1 new top_tb.v]
+set tb [file join $root MGPU.srcs sim_1 new top_tb.sv]
 if {[llength [get_files -quiet $tb]]==0} {add_files -fileset sim_1 -norecurse $tb}
 set_property used_in_synthesis false [get_files $tb]
 set_property used_in_implementation false [get_files $tb]
+set_property file_type SystemVerilog [get_files *.sv]
+foreach memory [glob [file join $root MGPU.srcs sources_1 rom *.mem]] {
+    if {[llength [get_files -quiet $memory]] == 0} {add_files -fileset sources_1 -norecurse $memory}
+}
+set reference [get_files *scene_reference_pixels.mem]
+set_property used_in {simulation} $reference
 set sim [get_filesets sim_1]
 set_property top top_tb $sim
 set defs [get_property verilog_define $sim]

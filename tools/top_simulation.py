@@ -1,4 +1,4 @@
-"""Shared top.v compilation/execution for both Studios (no shell command strings)."""
+"""Shared top.sv compilation/execution for both Studios (no shell command strings)."""
 from pathlib import Path
 import shutil
 import subprocess
@@ -13,12 +13,12 @@ class SimulationCancelled(Exception):
 
 
 def design_resolution(project: Path):
-    source=(Path(project)/'MGPU.srcs/sources_1/new/top.v').read_text(encoding='utf-8')
+    source=(Path(project)/'MGPU.srcs/sources_1/new/top.sv').read_text(encoding='utf-8')
     values=[]
     for name in ('H_RES','V_RES'):
-        found=re.search(r'parameter\s+'+name+r'\s*=\s*(\d+)\b',source)
+        found=re.search(r'parameter\s+(?:int\s+)?'+name+r'\s*=\s*(\d+)\b',source)
         if not found:
-            raise ValueError(f'top.v 缺少可读取的 {name} 分辨率参数。')
+            raise ValueError(f'top.sv 缺少可读取的 {name} 分辨率参数。')
         values.append(int(found.group(1)))
     width,height=values
     if not (width>0 and height>0 and 640%width==0 and 480%height==0):
@@ -34,10 +34,12 @@ def run_top(project: Path, output: Path, cancel: threading.Event, *, testbench=N
     if not compiler or not runtime:
         raise RuntimeError('未找到 Icarus Verilog（iverilog / vvp）。')
     output.mkdir(parents=True,exist_ok=True)
-    testbench=Path(testbench or project/'MGPU.srcs/sim_1/new/top_tb.v')
-    sources=sorted((project/'MGPU.srcs/sources_1/new').glob('*.v'))
-    if not testbench.is_file() or not (project/'MGPU.srcs/sources_1/new/top.v').is_file():
-        raise RuntimeError('缺少 top.v 或 top_tb.v。')
+    from scene_rom import stage_rom
+    stage_rom(project, output)
+    testbench=Path(testbench or project/'MGPU.srcs/sim_1/new/top_tb.sv')
+    sources=sorted((project/'MGPU.srcs/sources_1/new').glob('*.sv'))
+    if not testbench.is_file() or not (project/'MGPU.srcs/sources_1/new/top.sv').is_file():
+        raise RuntimeError('缺少 top.sv 或 top_tb.sv。')
     binary=output/'top_simulation.vvp';logfile=output/'simulation.log'
     trace=output/'framebuffer.trace';framebuffer=output/'framebuffer.hex'
     if logo_hold_ms is None:logo_hold_ms=7000 if stage=='logo' and scene is None else 0
@@ -61,8 +63,8 @@ def run_top(project: Path, output: Path, cancel: threading.Event, *, testbench=N
     with logfile.open('w',encoding='utf-8') as log:
         for number,command in enumerate(commands):
             if cancel.is_set():raise SimulationCancelled()
-            if progress:progress('正在编译 top.v…' if number==0 else '正在运行 top.v，实时记录像素写回…')
-            process=subprocess.Popen(command,cwd=project,stdout=log,stderr=subprocess.STDOUT,
+            if progress:progress('正在编译 top.sv…' if number==0 else '正在运行 top.sv，实时记录像素写回…')
+            process=subprocess.Popen(command,cwd=output,stdout=log,stderr=subprocess.STDOUT,
                                      creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
             started=time.monotonic()
             try:
@@ -71,7 +73,7 @@ def run_top(project: Path, output: Path, cancel: threading.Event, *, testbench=N
                     if time.monotonic()-started>1800:
                         raise RuntimeError('仿真超过 30 分钟；可选择加速仿真或降低三角形数量。')
                 if process.returncode:
-                    raise RuntimeError(f'top.v 仿真失败，查看 {logfile}')
+                    raise RuntimeError(f'top.sv 仿真失败，查看 {logfile}')
             finally:
                 if process.poll() is None:
                     process.terminate()
@@ -81,3 +83,19 @@ def run_top(project: Path, output: Path, cancel: threading.Event, *, testbench=N
                   format='RGB332',buffers=2,trace_version=2)
     (output/'framebuffer.json').write_text(json.dumps(metadata,indent=2)+'\n',encoding='utf-8')
     return {'trace':trace,'framebuffer':framebuffer,'log':logfile,**metadata}
+
+
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--output', type=Path, default=Path('out/simulation'))
+    parser.add_argument('--scene', type=Path)
+    parser.add_argument('--stage', choices=('logo', 'animation'), default='animation')
+    parser.add_argument('--frames', type=int, default=1)
+    parser.add_argument('--dump-frames', action='store_true')
+    parser.add_argument('--board-clock', action='store_true')
+    args = parser.parse_args()
+    result = run_top(Path(__file__).resolve().parents[1], args.output, threading.Event(),
+                     scene=args.scene, stage=args.stage, frames=args.frames,
+                     dump_frames=args.dump_frames, fast=not args.board_clock, progress=print)
+    print(result['framebuffer'])

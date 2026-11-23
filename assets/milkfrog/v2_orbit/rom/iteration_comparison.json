@@ -1,0 +1,47 @@
+{
+  "initial": {
+    "mean": 130.6358595194085,
+    "percentile95": 403.0,
+    "maximum": 951,
+    "worst_frame": 408,
+    "total": 70674
+  },
+  "selected": {
+    "mean": 107.27541589648798,
+    "percentile95": 186.0,
+    "maximum": 279,
+    "worst_frame": 416,
+    "total": 58036
+  },
+  "critical_frames": [
+    {
+      "frame": 408,
+      "initial_color_violations": 951,
+      "selected_color_violations": 54,
+      "selected_software_cache_difference": 1
+    },
+    {
+      "frame": 409,
+      "initial_color_violations": 836,
+      "selected_color_violations": 56,
+      "selected_software_cache_difference": 0
+    },
+    {
+      "frame": 410,
+      "initial_color_violations": 608,
+      "selected_color_violations": 52,
+      "selected_software_cache_difference": 0
+    },
+    {
+      "frame": 411,
+      "initial_color_violations": 715,
+      "selected_color_violations": 77,
+      "selected_software_cache_difference": 8
+    }
+  ],
+  "source_geometry_sha256": "ac7b0c526563e01f025a90ac136e52a9c377df3fc51265e0a7daa20d1760ca3c",
+  "source_camera_matrices_sha256": "ea6984a7f6a3d09c872e5a195c086ae46bcb58ee7430559f5cfef7148f6579ec",
+  "selected_manifest_sha256": "90708be6c85865f1fd347fe01441017b5e54ccd3f68502daaf3e6ebe1862aa57",
+  "initial_manifest_sha256": "2e7c31edac2ef2f051c53e421730acef565a3c0903eeca1762a8c15aecc42988",
+  "method": "Same geometry, motion, quantized matrices and camera. Uniform orbit seeds compared with explicit transition-focused seeds and singleton caches at frames 408..411. Model-internal geometric diagnostic; not similarity to original video."
+}

@@ -1,0 +1,260 @@
+{
+  "version": "v2_orbit",
+  "status": "supported",
+  "target": "Nexys A7-100T / xc7a100tcsg324-1",
+  "frames": 541,
+  "fps": 30,
+  "resolution": [
+    320,
+    240
+  ],
+  "format": "RGB332",
+  "orbit_degrees": 360,
+  "hardware_depth_buffer": false,
+  "physical_board_tested": false,
+  "files": [
+    {
+      "path": "milkfrog_nexys_a7.bit",
+      "source": "out/milkfrog_orbit_v2/build/milkfrog_nexys_a7.bit",
+      "bytes": 3825913,
+      "sha256": "70936bdf531e1d2cd0383dde0df550ced69c3ff99efff35b872c3a9eeb96c54e"
+    },
+    {
+      "path": "milkfrog_orbit_rtl.mp4",
+      "source": "out/milkfrog_orbit_v2/rtl/milkfrog_board_rtl.mp4",
+      "bytes": 753705,
+      "sha256": "d0a3d0ea7cca764a79a9f9b74a4dcabaa95533bb971da4fcdf27c43bc89f5da8"
+    },
+    {
+      "path": "version1_vs_orbit_v2.mp4",
+      "source": "out/milkfrog_orbit_v2/rtl/version1_vs_orbit_v2.mp4",
+      "bytes": 2754760,
+      "sha256": "4d3246b03194bc2ccf17323630acd229ed3d6d769831e12d47d20c3e32f9d9ce"
+    },
+    {
+      "path": "orbit_preview.gif",
+      "source": "out/milkfrog_orbit_v2/rtl/orbit_preview.gif",
+      "bytes": 783798,
+      "sha256": "0bb128ba0df71552cca7946aea9ddcaf7767277b2b756e76a331ea82f9e68f2d"
+    },
+    {
+      "path": "orbit_keyframes.jpg",
+      "source": "out/milkfrog_orbit_v2/rtl/orbit_keyframes.jpg",
+      "bytes": 156991,
+      "sha256": "e10843bc08b747f00055f4952edef4771823ecdd19cacc9bc2f130409ca6f724"
+    },
+    {
+      "path": "orbit_review.jpg",
+      "source": "out/milkfrog_orbit_v2/rtl/review/orbit_review.jpg",
+      "bytes": 618809,
+      "sha256": "a034181eecc07e49e48d2170dc906eb89e053e7e3592f176a539af3ce4546d5e"
+    },
+    {
+      "path": "orbit_transitions.jpg",
+      "source": "out/milkfrog_orbit_v2/rtl/review/orbit_transitions.jpg",
+      "bytes": 340261,
+      "sha256": "9de29876de18bacbb6903e2d4a9bb1779b201d61c11eb81a7366a5ad0ba2374f"
+    },
+    {
+      "path": "reports/final_validation.json",
+      "source": "out/milkfrog_orbit_v2/rtl/final_validation.json",
+      "bytes": 126110,
+      "sha256": "575c2dbb6ac5de25fb64e3ef2d53f0898eee47b03ed592fadf306e49d1db27f9"
+    },
+    {
+      "path": "reports/orbit_review.json",
+      "source": "out/milkfrog_orbit_v2/rtl/review/orbit_review.json",
+      "bytes": 411990,
+      "sha256": "28d162266bf67ebb657c2a03a9c4ff7f8dd3b6dd84c27e340c1f03c846a5eea8"
+    },
+    {
+      "path": "reports/media_provenance.json",
+      "source": "out/milkfrog_orbit_v2/rtl/media_provenance.json",
+      "bytes": 449,
+      "sha256": "9c121d21e8ca7b15d2da8be4919d3b77cf1f0950c09b7aa3686bd7e162943913"
+    },
+    {
+      "path": "reports/editable_blender_validation.json",
+      "source": "out/milkfrog_orbit_v2/validation/editable_blender_validation.json",
+      "bytes": 10740,
+      "sha256": "111ffa094be003eedfa258aa0789a0b2411f16bfe3135efa5e17f054eec80bbb"
+    },
+    {
+      "path": "reports/build_validation.txt",
+      "source": "out/milkfrog_orbit_v2/build/build_validation.txt",
+      "bytes": 157,
+      "sha256": "ac60574d8f95764267911d38272a67c13dd0773078d6c854457ed087df7839f9"
+    },
+    {
+      "path": "reports/timing.rpt",
+      "source": "out/milkfrog_orbit_v2/build/timing.rpt",
+      "bytes": 71683,
+      "sha256": "fc159da0a8d4daa5a0c599b9c294421e7174f3457ee8f5e13ec3ddc262a4b1e5"
+    },
+    {
+      "path": "reports/utilization.rpt",
+      "source": "out/milkfrog_orbit_v2/build/utilization.rpt",
+      "bytes": 11548,
+      "sha256": "d251205e7ffbdea663928d3a834546b3b125ebe566f7fbf01d029e476058c34f"
+    },
+    {
+      "path": "reports/drc.rpt",
+      "source": "out/milkfrog_orbit_v2/build/drc.rpt",
+      "bytes": 51462,
+      "sha256": "3eed17710085d5f29393bdfe13b9a189f1f090fac7a526bbf65fc3e0f8188a1c"
+    },
+    {
+      "path": "reports/register_init.rpt",
+      "source": "out/milkfrog_orbit_v2/build/register_init.rpt",
+      "bytes": 65,
+      "sha256": "2cf9416c5845bf5b0569f248bc2c216dcc62e30bd2846a43af47c03a8c3e2c12"
+    },
+    {
+      "path": "reports/framebuffer_init.rpt",
+      "source": "out/milkfrog_orbit_v2/build/framebuffer_init.rpt",
+      "bytes": 71,
+      "sha256": "3aef0cb74f3c2b134ee587977625371ffc32227875491358e12aa4c68e8dd27c"
+    },
+    {
+      "path": "reports/icarus_comparison.json",
+      "source": "out/milkfrog_orbit_v2/rtl/icarus_40mhz/comparison.json",
+      "bytes": 765,
+      "sha256": "b7f0c5a5d28ba9bd71909ea56a431cda284314bb591bd6355cf80bb0e6ef4fe5"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3353,
+      "sha256": "74fc95a2041ee79cef981de6a167c14ea9a79b40e7663bd5eb925ebd042daf3b"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "milkfrog.blend",
+      "sha256": "3531d8c81c2d03d7f6a4f2ea1a491a8ad58dc1200316a105e81f915cf8d10654"
+    },
+    {
+      "path": "assets/milkfrog/v2_orbit/animation/camera.json",
+      "sha256": "1e36da8936e4e5e413ae1e4cfaa6e0dbdf707419a9ee000603aca2d85b52b337"
+    },
+    {
+      "path": "assets/milkfrog/v2_orbit/animation/camera_matrices.npy",
+      "sha256": "ea6984a7f6a3d09c872e5a195c086ae46bcb58ee7430559f5cfef7148f6579ec"
+    },
+    {
+      "path": "assets/milkfrog/v2_orbit/animation/camera_world.npy",
+      "sha256": "f3f893ea3fe784c0f453038b3f47877c1a268c1950ea229a3533cc92e1a3d01d"
+    },
+    {
+      "path": "assets/milkfrog/v2_orbit/animation/eye_closure_curve.json",
+      "sha256": "758c8a19ed2f80d3be1a0e2faacbf4136cd3896c13bbb6754fcacbe335fd6697"
+    },
+    {
+      "path": "assets/milkfrog/v2_orbit/animation/geometry.npz",
+      "sha256": "ac7b0c526563e01f025a90ac136e52a9c377df3fc51265e0a7daa20d1760ca3c"
+    },
+    {
+      "path": "assets/milkfrog/v2_orbit/animation/geometry_adaptation.json",
+      "sha256": "f1eb3e5c1003864193b02a0b219d1b07db49052b831b2149676c6d4d8373b5a9"
+    },
+    {
+      "path": "assets/milkfrog/v2_orbit/animation/matrices.npy",
+      "sha256": "184d3ec183130d21ea77797d3efc3f1fd6c68d2546ab2b5a76205f6109d5524f"
+    },
+    {
+      "path": "assets/milkfrog/v2_orbit/animation/metadata.json",
+      "sha256": "23d458f8ae49ca7c286ab5a6d48d966e40d71387ac22766b5af52ffcce10c512"
+    },
+    {
+      "path": "assets/milkfrog/v2_orbit/animation/milkfrog_laugh.blend",
+      "sha256": "1e43631d5c37af00d38b7cf22db362a2ee0883d22443891c1d686cdfe3c79e8a"
+    },
+    {
+      "path": "assets/milkfrog/v2_orbit/animation/motion_refinement.json",
+      "sha256": "bf63ea9f2cbcf81c294d75e9833fbe0d08851146b8d07a0ba657da1f2d165141"
+    },
+    {
+      "path": "assets/milkfrog/v2_orbit/rom/iteration_comparison.json",
+      "sha256": "bce86f9baa3a4bbce63a886896b85308778c912fd8962b3d24a095994dd34114"
+    },
+    {
+      "path": "assets/milkfrog/v2_orbit/rom/manifest.json",
+      "sha256": "90708be6c85865f1fd347fe01441017b5e54ccd3f68502daaf3e6ebe1862aa57"
+    },
+    {
+      "path": "assets/milkfrog/v2_orbit/rom/milkfrog_config.svh",
+      "sha256": "01b830779397cc092e26601c4ceba30a73f5e23e113610fd6cae9586521698ce"
+    },
+    {
+      "path": "assets/milkfrog/v2_orbit/rom/milkfrog_matrix.mem",
+      "sha256": "fd9f36491c29e2773aea7622e7e487230f6e4d00344d124cef83666e8246ebd2"
+    },
+    {
+      "path": "assets/milkfrog/v2_orbit/rom/milkfrog_order.mem",
+      "sha256": "d183391af5f30381732de45894bde4ce0216b1d5a36b406c302b8d64dd1c3281"
+    },
+    {
+      "path": "assets/milkfrog/v2_orbit/rom/milkfrog_order_meta.mem",
+      "sha256": "47324ef4fc224b6930d18fad7bafb4a41f6cfcd28beda3c4bf6d5ced7bbc5dbf"
+    },
+    {
+      "path": "assets/milkfrog/v2_orbit/rom/milkfrog_timeline.mem",
+      "sha256": "6a2041025afd71524207c5f08ca106051a12e1f58791efffc9a8117a3581a08a"
+    },
+    {
+      "path": "assets/milkfrog/v2_orbit/rom/milkfrog_triangle.mem",
+      "sha256": "902b685785f24bbcc4b24562b4aab920e110fe0c7f5336d02698d583cd29d3cb"
+    },
+    {
+      "path": "assets/milkfrog/v2_orbit/rom/milkfrog_vertex.mem",
+      "sha256": "da91a7f74d826c171f71446ce77c021596c4198ba490d91f92bbf9db79fa75b1"
+    },
+    {
+      "path": "assets/milkfrog/v2_orbit/rom/ordering_report.json",
+      "sha256": "90c308c23cb61e14413ba80fc430743335df3d190de0b9394d255fb2ec27554e"
+    },
+    {
+      "path": "MGPU.srcs/sources_1/new/divider_q16_16.sv",
+      "sha256": "4ade5184116f48b9fa2084a855d0c977a517f1a64a92a72ca60777c5e9ab2903"
+    },
+    {
+      "path": "MGPU.srcs/sources_1/new/divider_signed.sv",
+      "sha256": "a6a431ca687d584d3696e153ce152774bc06b428a7357079b8cde9b3e6a0d67e"
+    },
+    {
+      "path": "MGPU.srcs/sources_1/new/fifo.sv",
+      "sha256": "30ce403cb344a70edff096e35aa4edaece91c4177784f0c04be45a2a47fb61d6"
+    },
+    {
+      "path": "MGPU.srcs/sources_1/new/gpu_clock.sv",
+      "sha256": "884007a0717eadec63b96d8ad56724c327778c62b061102d63b9dfa0c47bbe8a"
+    },
+    {
+      "path": "MGPU.srcs/sources_1/new/mgpu.sv",
+      "sha256": "29179eb403ef0725ad6f4a9800742365a267459b14f12defd20c969fee7f517a"
+    },
+    {
+      "path": "MGPU.srcs/sources_1/new/rasterizer.sv",
+      "sha256": "e0dd9eb784b4db0d52070d64d86fdf02bc86c81622848f30c202525c48561577"
+    },
+    {
+      "path": "MGPU.srcs/sources_1/new/shader.sv",
+      "sha256": "b6a9cdd4ff2c6d350c2e519e50a039aec28cee3fb737dd747a680ecb24162aa1"
+    },
+    {
+      "path": "MGPU.srcs/sources_1/new/top.sv",
+      "sha256": "e0735beb3cf36c8203dbec203c939791779afbae8adcbcb9782c3c695227718f"
+    },
+    {
+      "path": "MGPU.srcs/sources_1/new/vertex_shader.sv",
+      "sha256": "31d86d4a1f9a162b1aa41ad8f5a71a2fb13a02c60e94a7638bc0cb2e6dea2e47"
+    },
+    {
+      "path": "MGPU.srcs/sources_1/new/vga.sv",
+      "sha256": "54a829622dc52f7e80ebb4372c411d43a5e2969a4a3a600a17bc7ed5a58cf047"
+    },
+    {
+      "path": "MGPU.srcs/sources_1/demo/milkfrog_top.sv",
+      "sha256": "90e9d4d1b9e7b063b0c543da2a1cb06385158052b3fb749580ecf4746564d16e"
+    }
+  ]
+}

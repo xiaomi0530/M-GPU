@@ -149,10 +149,10 @@ class ImageStudio:
                         command=self.redraw).pack(anchor="w", pady=10)
         self.generate_button = self.button(side, "生成三角 + top Testbench", self.generate, True)
         self.generate_button.pack(fill="x", pady=(4,8))
-        self.simulate_button = self.button(side, "通过 top.v 仿真并查看", self.simulate)
+        self.simulate_button = self.button(side, "通过 top.sv 仿真并查看", self.simulate)
         self.simulate_button.pack(fill="x")
         self.simulate_button.configure(state="disabled")
-        self.export_button = self.button(side,"导出上板 top.v",self.export_board)
+        self.export_button = self.button(side,"导出上板 top.sv",self.export_board)
         self.export_button.pack(fill="x",pady=(8,0))
         self.export_button.configure(state="disabled")
         self.cancel_button = ttk.Button(side, text="取消当前操作", command=self.cancel.set, state="disabled")
@@ -373,18 +373,18 @@ class ImageStudio:
             path=export_top(self.mesh,self.project)
             self.status.configure(text=f"已导出独立上板包：{path.parent}；原工程演示未覆盖。")
         except Exception as exc:
-            messagebox.showerror("导出上板 top.v",str(exc),parent=self.window)
+            messagebox.showerror("导出上板 top.sv",str(exc),parent=self.window)
 
     def simulate(self):
         if self.busy or not self.paths:
             return
         if not self.owner.claim_simulation(self):
-            messagebox.showinfo("仿真进行中","请先停止当前 top.v 仿真。",parent=self.window)
+            messagebox.showinfo("仿真进行中","请先停止当前 top.sv 仿真。",parent=self.window)
             return
         from top_simulation import run_top,SimulationCancelled
         self.cancel.clear()
         self.set_busy(True)
-        self.status.configure(text="正在编译 top.v · 图片通过顶层命令控制器进入 GPU。")
+        self.status.configure(text="正在编译 top.sv · 图片通过顶层命令控制器进入 GPU。")
         output=self.project/"out/studio_image"
         self.owner.watch_trace(output/"framebuffer.trace")
         self.owner.root.lift()
@@ -402,7 +402,7 @@ class ImageStudio:
                 actual=np.array([int(line,16) for line in results["framebuffer"].read_text().split()],dtype=np.uint8).reshape((height,width))
                 different=int(np.count_nonzero(actual!=expected))
                 if different:
-                    raise RuntimeError(f"top.v 输出与三角形预览有 {different:,} 个像素不同；日志：{results['log']}")
+                    raise RuntimeError(f"top.sv 输出与三角形预览有 {different:,} 个像素不同；日志：{results['log']}")
                 Image.fromarray(RGB[actual]).resize((640,480),Image.Resampling.NEAREST).save(output/"framebuffer.png")
                 self.messages.put(("simulated",None))
             except SimulationCancelled:
@@ -436,7 +436,7 @@ class ImageStudio:
                     self.status.configure(text="已按 GPU 分辨率划分三角形并生成场景与 testbench；预览放大至完整屏幕。" + suffix)
                     self.redraw()
                 elif kind == "simulated":
-                    self.status.configure(text="仿真通过 · top.v 输出与三角形预览逐像素一致。回放与图片在 out/studio_image/。")
+                    self.status.configure(text="仿真通过 · top.sv 输出与三角形预览逐像素一致。回放与图片在 out/studio_image/。")
                 elif kind == "cancelled":
                     self.status.configure(text="操作已取消。")
                 else:

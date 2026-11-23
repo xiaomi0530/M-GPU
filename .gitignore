@@ -10,8 +10,6 @@
 
 # Simulation, export and build outputs
 /out/
-/assets/logo/rgb332.npy
-/assets/lowpoly_space/background.npy
 
 # Generated files and logs
 *.jou
@@ -23,8 +21,11 @@
 *.trace
 *.dcp
 *.bit
+!/deliverables/milkfrog/v1_fixed/milkfrog_nexys_a7.bit
+!/deliverables/milkfrog/v2_orbit/milkfrog_nexys_a7.bit
 /clockInfo.txt
 /dfx_runtime.txt
+/xsim.dir/
 
 # Python and local environments
 __pycache__/

@@ -17,9 +17,9 @@ class ImageStudioTests(unittest.TestCase):
         self.folder = tempfile.TemporaryDirectory()
         self.addCleanup(self.folder.cleanup)
         self.project = Path(self.folder.name)
-        path = self.project/"MGPU.srcs/sim_1/new/top_tb.v"
+        path = self.project/"MGPU.srcs/sim_1/new/top_tb.sv"
         path.parent.mkdir(parents=True)
-        path.write_text((Path(__file__).resolve().parents[1]/"MGPU.srcs/sim_1/new/top_tb.v").read_text(),encoding="utf-8")
+        path.write_text((Path(__file__).resolve().parents[1]/"MGPU.srcs/sim_1/new/top_tb.sv").read_text(),encoding="utf-8")
         self.input_path = self.project/"alpha.png"
         Image.new("RGBA",(16,8),(255,0,255,128)).save(self.input_path)
         try:
@@ -62,7 +62,7 @@ class ImageStudioTests(unittest.TestCase):
         self.assertFalse(studio.busy)
         self.assertIsNotNone(studio.mesh)
         self.assertEqual(studio.mesh.exact_percent,100)
-        self.assertTrue((self.project/"out/top_image_tb.v").exists())
+        self.assertTrue((self.project/"out/top_image_tb.sv").exists())
         self.assertEqual(str(studio.export_button.cget("state")),"normal")
         self.assertTrue((self.project/"out/image_scene.tri").exists())
         studio.apply_fields("x",quiet=True)  # no-op focus-out must preserve result

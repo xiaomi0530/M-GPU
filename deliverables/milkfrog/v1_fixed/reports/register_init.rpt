@@ -1,0 +1,1 @@
+CELL=u_mgpu/u_rasterizer/frag_valid_reg REF_NAME=FDRE INIT=1'b0

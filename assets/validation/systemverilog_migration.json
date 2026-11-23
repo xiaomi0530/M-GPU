@@ -1,0 +1,731 @@
+{
+  "before_commit": "97a43eb1caaa1227143549da41d6ee73193a6789",
+  "files": [
+    {
+      "before": "MGPU.srcs/sim_1/new/double_buffer_tb.v",
+      "after": "MGPU.srcs/sim_1/new/double_buffer_tb.sv",
+      "before_sha256": "b20acee667b0d59b0a13a0edc970d8164553c156d6afc60a5fa62cc3e72a3a35",
+      "after_sha256": "92ab13cad0344e302b51c85b957ffe42ff8e6c07efc80a4d135d60111783cdff"
+    },
+    {
+      "before": "MGPU.srcs/sim_1/new/midiyas_boot_tb.v",
+      "after": "MGPU.srcs/sim_1/new/midiyas_boot_tb.sv",
+      "before_sha256": "57fe269d70e09d20e225c7be502fb62ee74d780efc2276ee436019d3a89008bc",
+      "after_sha256": "ecc4f0690f6a796cccb046cee47c5fa2a998c341c83159390a071d747d0c57b0"
+    },
+    {
+      "before": "MGPU.srcs/sim_1/new/milkfrog_board_sim.v",
+      "after": "MGPU.srcs/sim_1/new/milkfrog_board_sim.sv",
+      "before_sha256": "0356d8346d6915f9c5286c518495adcd48d30dc02f978c35700df5c0cc37631c",
+      "after_sha256": "f659bf488422a9510eaec66e503bc7e729dc799fbf496e4eae7595c7c36d618a"
+    },
+    {
+      "before": "MGPU.srcs/sim_1/new/milkfrog_board_tb.v",
+      "after": "MGPU.srcs/sim_1/new/milkfrog_board_tb.sv",
+      "before_sha256": "51d087b56dff63ef2eb8ccf36d3a67719abb99a1e325256672d45a5d86223bbc",
+      "after_sha256": "923f4cf941edbaf52b80d0b860ac5878a1dc3a708fa03810fc52da28efb79b74"
+    },
+    {
+      "before": "MGPU.srcs/sim_1/new/naiwa_icarus_tb.v",
+      "after": "MGPU.srcs/sim_1/new/naiwa_icarus_tb.sv",
+      "before_sha256": "b4356b8da18cede7618b10171fd4fee84fa4c67ed68a24975fecf3d604098100",
+      "after_sha256": "ee0fa38ecd05a12400e48e6a652798211c5d885e8862ca6399c93e656e1efb3a"
+    },
+    {
+      "before": "MGPU.srcs/sim_1/new/naiwa_sim.v",
+      "after": "MGPU.srcs/sim_1/new/naiwa_sim.sv",
+      "before_sha256": "87a940ee51c634a2eb66b7f833d940e2e7e4b875a61c3c898b9c0c5b9c75f4aa",
+      "after_sha256": "d9148d60cbcf05bdc8081690190f1cf9b17ef2bd1d0b343d290f6a29d120ca1a"
+    },
+    {
+      "before": "MGPU.srcs/sim_1/new/space_sequence_tb.v",
+      "after": "MGPU.srcs/sim_1/new/space_sequence_tb.sv",
+      "before_sha256": "bb276ae7216c3e6916f278eea08f2feff20ee7f2b229d6026d0f286c80bc8e7f",
+      "after_sha256": "983c0c81a843b8a16c98ce7d9cfde8191211cbc44889220b6bcc0f2bf825ee28"
+    },
+    {
+      "before": "MGPU.srcs/sim_1/new/top_clear_tb.v",
+      "after": "MGPU.srcs/sim_1/new/top_clear_tb.sv",
+      "before_sha256": "a440e6f9b3f4c07749b7ca847938d552286a7adce366b5a950d69a05d71a1cd9",
+      "after_sha256": "c75c384973d222a2413c321712f2a9241e4bd7aeb460a7209085405dbeca9c52"
+    },
+    {
+      "before": "MGPU.srcs/sim_1/new/top_tb.v",
+      "after": "MGPU.srcs/sim_1/new/top_tb.sv",
+      "before_sha256": "f062caa3555fcb549c02ac5c76c1f385a1095d807c7f2ffe12a751b31d2923d3",
+      "after_sha256": "29299891fb772eaaa8f33fb309a22455ba74f07b4a1671c45bd54e3780d9a8c4"
+    },
+    {
+      "before": "MGPU.srcs/sim_1/new/vga_tb.v",
+      "after": "MGPU.srcs/sim_1/new/vga_tb.sv",
+      "before_sha256": "c74bc79145e185822dc2328827a7e3c475bac94ff3b63ac130ce3cb4797f4eac",
+      "after_sha256": "c077c11e7fc166fa319083dc554177445466cbbd4fb4038d391ffbac9f477e4f"
+    },
+    {
+      "before": "MGPU.srcs/sources_1/demo/milkfrog_top.v",
+      "after": "MGPU.srcs/sources_1/demo/milkfrog_top.sv",
+      "before_sha256": "492e880c3566688d8161da099bd2914df08d40551d8004c15ec40dbd23bbeb8f",
+      "after_sha256": "90e9d4d1b9e7b063b0c543da2a1cb06385158052b3fb749580ecf4746564d16e"
+    },
+    {
+      "before": "MGPU.srcs/sources_1/new/divider_q16_16.v",
+      "after": "MGPU.srcs/sources_1/new/divider_q16_16.sv",
+      "before_sha256": "060d412104ea9331b688175166613d529c4a3831839af17325d89499056896c2",
+      "after_sha256": "4ade5184116f48b9fa2084a855d0c977a517f1a64a92a72ca60777c5e9ab2903"
+    },
+    {
+      "before": "MGPU.srcs/sources_1/new/divider_signed.v",
+      "after": "MGPU.srcs/sources_1/new/divider_signed.sv",
+      "before_sha256": "4e21738ee35ba50dc54f7b1945f784f668e6713ac867a1a982d5300084effe97",
+      "after_sha256": "a6a431ca687d584d3696e153ce152774bc06b428a7357079b8cde9b3e6a0d67e"
+    },
+    {
+      "before": "MGPU.srcs/sources_1/new/fifo.v",
+      "after": "MGPU.srcs/sources_1/new/fifo.sv",
+      "before_sha256": "5659785065d0f9f32719dc5c6f6a6fca16db742e1e8b9b49586637c0ffd56f8b",
+      "after_sha256": "30ce403cb344a70edff096e35aa4edaece91c4177784f0c04be45a2a47fb61d6"
+    },
+    {
+      "before": "MGPU.srcs/sources_1/new/gpu_clock.v",
+      "after": "MGPU.srcs/sources_1/new/gpu_clock.sv",
+      "before_sha256": "1754bcf6d23163bc1e65a5734c1ea325cebdb325573beafe54032ca0c58f7ac3",
+      "after_sha256": "884007a0717eadec63b96d8ad56724c327778c62b061102d63b9dfa0c47bbe8a"
+    },
+    {
+      "before": "MGPU.srcs/sources_1/new/mgpu.v",
+      "after": "MGPU.srcs/sources_1/new/mgpu.sv",
+      "before_sha256": "da29604ebe12d0ea6af62a1f1b6fc2cdffec5c35f43f1ba5103af219dae89bf7",
+      "after_sha256": "29179eb403ef0725ad6f4a9800742365a267459b14f12defd20c969fee7f517a"
+    },
+    {
+      "before": "MGPU.srcs/sources_1/new/rasterizer.v",
+      "after": "MGPU.srcs/sources_1/new/rasterizer.sv",
+      "before_sha256": "a32dabe57ba7807ba2e4503f74b12b2d814716570f5d2491a6f58bb118559836",
+      "after_sha256": "e0dd9eb784b4db0d52070d64d86fdf02bc86c81622848f30c202525c48561577"
+    },
+    {
+      "before": "MGPU.srcs/sources_1/new/shader.v",
+      "after": "MGPU.srcs/sources_1/new/shader.sv",
+      "before_sha256": "41f9fb63af95b7199ce8103c5766318cda9ed861a8775a88b35d26187a68fecc",
+      "after_sha256": "b6a9cdd4ff2c6d350c2e519e50a039aec28cee3fb737dd747a680ecb24162aa1"
+    },
+    {
+      "before": "MGPU.srcs/sources_1/new/top.v",
+      "after": "MGPU.srcs/sources_1/new/top.sv",
+      "before_sha256": "29c84dea843957ad3e2dc8422b44fe4c77fdb8dc7ffa00b1427344347d0a7dfd",
+      "after_sha256": "e0735beb3cf36c8203dbec203c939791779afbae8adcbcb9782c3c695227718f"
+    },
+    {
+      "before": "MGPU.srcs/sources_1/new/vertex_shader.v",
+      "after": "MGPU.srcs/sources_1/new/vertex_shader.sv",
+      "before_sha256": "86f93b9186d313d0760b4e06e5a17255eddf3c887a05cedf4ce45f421bc64d57",
+      "after_sha256": "31d86d4a1f9a162b1aa41ad8f5a71a2fb13a02c60e94a7638bc0cb2e6dea2e47"
+    },
+    {
+      "before": "MGPU.srcs/sources_1/new/vga.v",
+      "after": "MGPU.srcs/sources_1/new/vga.sv",
+      "before_sha256": "0d87a3e3426a7b3e13b1223b260e8c4525cf6ca4a3966107d9af7110618a8e87",
+      "after_sha256": "54a829622dc52f7e80ebb4372c411d43a5e2969a4a3a600a17bc7ed5a58cf047"
+    }
+  ],
+  "state_encodings": {
+    "milkfrog_top": [
+      {
+        "state": "TIMELINE_FETCH",
+        "before": "0",
+        "after": 0
+      },
+      {
+        "state": "TIMELINE_LOAD",
+        "before": "1",
+        "after": 1
+      },
+      {
+        "state": "ORDER_META_FETCH",
+        "before": "2",
+        "after": 2
+      },
+      {
+        "state": "ORDER_META_LOAD",
+        "before": "3",
+        "after": 3
+      },
+      {
+        "state": "CLEAR_ISSUE",
+        "before": "4",
+        "after": 4
+      },
+      {
+        "state": "CLEAR_WAIT",
+        "before": "5",
+        "after": 5
+      },
+      {
+        "state": "ORDER_FETCH",
+        "before": "6",
+        "after": 6
+      },
+      {
+        "state": "ORDER_LOAD",
+        "before": "7",
+        "after": 7
+      },
+      {
+        "state": "TRIANGLE_FETCH",
+        "before": "8",
+        "after": 8
+      },
+      {
+        "state": "TRIANGLE_LOAD",
+        "before": "9",
+        "after": 9
+      },
+      {
+        "state": "VERTEX0_FETCH",
+        "before": "10",
+        "after": 10
+      },
+      {
+        "state": "VERTEX0_LOAD",
+        "before": "11",
+        "after": 11
+      },
+      {
+        "state": "VERTEX1_FETCH",
+        "before": "12",
+        "after": 12
+      },
+      {
+        "state": "VERTEX1_LOAD",
+        "before": "13",
+        "after": 13
+      },
+      {
+        "state": "VERTEX2_FETCH",
+        "before": "14",
+        "after": 14
+      },
+      {
+        "state": "VERTEX2_LOAD",
+        "before": "15",
+        "after": 15
+      },
+      {
+        "state": "MATRIX0_FETCH",
+        "before": "16",
+        "after": 16
+      },
+      {
+        "state": "MATRIX0_LOAD",
+        "before": "17",
+        "after": 17
+      },
+      {
+        "state": "MATRIX1_FETCH",
+        "before": "18",
+        "after": 18
+      },
+      {
+        "state": "MATRIX1_LOAD",
+        "before": "19",
+        "after": 19
+      },
+      {
+        "state": "INTERPOLATE",
+        "before": "20",
+        "after": 20
+      },
+      {
+        "state": "ISSUE",
+        "before": "21",
+        "after": 21
+      },
+      {
+        "state": "WAIT_GPU",
+        "before": "22",
+        "after": 22
+      },
+      {
+        "state": "ADVANCE",
+        "before": "23",
+        "after": 23
+      },
+      {
+        "state": "PRESENT",
+        "before": "24",
+        "after": 24
+      },
+      {
+        "state": "SWAP_WAIT",
+        "before": "25",
+        "after": 25
+      },
+      {
+        "state": "HOLD",
+        "before": "26",
+        "after": 26
+      },
+      {
+        "state": "ERROR",
+        "before": "27",
+        "after": 27
+      }
+    ],
+    "divider_q16_16": [
+      {
+        "state": "IDLE",
+        "before": "3'd0",
+        "after": 0
+      },
+      {
+        "state": "CHECK",
+        "before": "3'd1",
+        "after": 1
+      },
+      {
+        "state": "PREP",
+        "before": "3'd2",
+        "after": 2
+      },
+      {
+        "state": "ITER",
+        "before": "3'd3",
+        "after": 3
+      },
+      {
+        "state": "FINISH",
+        "before": "3'd4",
+        "after": 4
+      },
+      {
+        "state": "DONE",
+        "before": "3'd5",
+        "after": 5
+      }
+    ],
+    "divider_signed": [
+      {
+        "state": "IDLE",
+        "before": "3'd0",
+        "after": 0
+      },
+      {
+        "state": "CHECK",
+        "before": "3'd1",
+        "after": 1
+      },
+      {
+        "state": "PREP",
+        "before": "3'd2",
+        "after": 2
+      },
+      {
+        "state": "ITER",
+        "before": "3'd3",
+        "after": 3
+      },
+      {
+        "state": "FINISH",
+        "before": "3'd4",
+        "after": 4
+      },
+      {
+        "state": "DONE",
+        "before": "3'd5",
+        "after": 5
+      }
+    ],
+    "mgpu": [
+      {
+        "state": "GPU_IDLE",
+        "before": "3'd0",
+        "after": 0
+      },
+      {
+        "state": "GPU_VS_START",
+        "before": "3'd1",
+        "after": 1
+      },
+      {
+        "state": "GPU_VS_WAIT",
+        "before": "3'd2",
+        "after": 2
+      },
+      {
+        "state": "GPU_CHECK",
+        "before": "3'd3",
+        "after": 3
+      },
+      {
+        "state": "GPU_LOAD",
+        "before": "3'd4",
+        "after": 4
+      },
+      {
+        "state": "GPU_RAST_START",
+        "before": "3'd5",
+        "after": 5
+      },
+      {
+        "state": "GPU_DRAW_WAIT",
+        "before": "3'd6",
+        "after": 6
+      },
+      {
+        "state": "GPU_DONE",
+        "before": "3'd7",
+        "after": 7
+      }
+    ],
+    "rasterizer": [
+      {
+        "state": "IDLE",
+        "before": "4'd0",
+        "after": 0
+      },
+      {
+        "state": "BOUND",
+        "before": "4'd1",
+        "after": 1
+      },
+      {
+        "state": "RAST_V_1",
+        "before": "4'd2",
+        "after": 2
+      },
+      {
+        "state": "RAST_V_2",
+        "before": "4'd3",
+        "after": 3
+      },
+      {
+        "state": "RAST_I_INI",
+        "before": "4'd4",
+        "after": 4
+      },
+      {
+        "state": "COLOR_INI_1",
+        "before": "4'd5",
+        "after": 5
+      },
+      {
+        "state": "COLOR_INI_2",
+        "before": "4'd6",
+        "after": 6
+      },
+      {
+        "state": "RAST_I_JUD",
+        "before": "4'd7",
+        "after": 7
+      },
+      {
+        "state": "RAST_I_NEX",
+        "before": "4'd9",
+        "after": 8
+      },
+      {
+        "state": "DONE",
+        "before": "4'd10",
+        "after": 9
+      },
+      {
+        "state": "WAIT",
+        "before": "4'd11",
+        "after": 10
+      },
+      {
+        "state": "DIV_WAIT",
+        "before": "4'd12",
+        "after": 11
+      }
+    ],
+    "shader": [
+      {
+        "state": "IDLE",
+        "before": "3'd0",
+        "after": 0
+      },
+      {
+        "state": "CHECK_FIFO",
+        "before": "3'd1",
+        "after": 1
+      },
+      {
+        "state": "GET_FRAG",
+        "before": "3'd2",
+        "after": 2
+      },
+      {
+        "state": "SHADE",
+        "before": "3'd3",
+        "after": 3
+      },
+      {
+        "state": "OUT_PIXL",
+        "before": "3'd6",
+        "after": 4
+      },
+      {
+        "state": "DONE",
+        "before": "3'd7",
+        "after": 5
+      }
+    ],
+    "top": [
+      {
+        "state": "FETCH",
+        "before": "0",
+        "after": 0
+      },
+      {
+        "state": "LOAD",
+        "before": "1",
+        "after": 1
+      },
+      {
+        "state": "ISSUE",
+        "before": "2",
+        "after": 2
+      },
+      {
+        "state": "WAIT_GPU",
+        "before": "3",
+        "after": 3
+      },
+      {
+        "state": "ADVANCE",
+        "before": "4",
+        "after": 4
+      },
+      {
+        "state": "HOLD",
+        "before": "5",
+        "after": 5
+      },
+      {
+        "state": "CLEAR_ISSUE",
+        "before": "6",
+        "after": 6
+      },
+      {
+        "state": "CLEAR_WAIT",
+        "before": "7",
+        "after": 7
+      },
+      {
+        "state": "INDEX",
+        "before": "8",
+        "after": 8
+      },
+      {
+        "state": "PRESENT",
+        "before": "9",
+        "after": 9
+      },
+      {
+        "state": "SWAP_WAIT",
+        "before": "10",
+        "after": 10
+      },
+      {
+        "state": "FETCH_B",
+        "before": "11",
+        "after": 11
+      }
+    ],
+    "vertex_shader": [
+      {
+        "state": "IDLE",
+        "before": "3'd0",
+        "after": 0
+      },
+      {
+        "state": "MVP_0",
+        "before": "3'd1",
+        "after": 1
+      },
+      {
+        "state": "MVP_1",
+        "before": "3'd2",
+        "after": 2
+      },
+      {
+        "state": "PD_START",
+        "before": "3'd3",
+        "after": 3
+      },
+      {
+        "state": "PD_WAIT",
+        "before": "3'd4",
+        "after": 4
+      },
+      {
+        "state": "VT",
+        "before": "3'd5",
+        "after": 5
+      },
+      {
+        "state": "DONE",
+        "before": "3'd6",
+        "after": 6
+      }
+    ]
+  },
+  "scope": "Reviewed source extension, automatic enum numbering, module declaration ordering and file-header migration; GPU datapath, interfaces and no-depth-buffer architecture preserved.",
+  "date": "2026-11-24",
+  "core_baseline_before": {
+    "divider_q16_16.v": "060d412104ea9331b688175166613d529c4a3831839af17325d89499056896c2",
+    "divider_signed.v": "4e21738ee35ba50dc54f7b1945f784f668e6713ac867a1a982d5300084effe97",
+    "fifo.v": "5659785065d0f9f32719dc5c6f6a6fca16db742e1e8b9b49586637c0ffd56f8b",
+    "gpu_clock.v": "1754bcf6d23163bc1e65a5734c1ea325cebdb325573beafe54032ca0c58f7ac3",
+    "mgpu.v": "da29604ebe12d0ea6af62a1f1b6fc2cdffec5c35f43f1ba5103af219dae89bf7",
+    "rasterizer.v": "a32dabe57ba7807ba2e4503f74b12b2d814716570f5d2491a6f58bb118559836",
+    "shader.v": "41f9fb63af95b7199ce8103c5766318cda9ed861a8775a88b35d26187a68fecc",
+    "top.v": "29c84dea843957ad3e2dc8422b44fe4c77fdb8dc7ffa00b1427344347d0a7dfd",
+    "vertex_shader.v": "86f93b9186d313d0760b4e06e5a17255eddf3c887a05cedf4ce45f421bc64d57",
+    "vga.v": "0d87a3e3426a7b3e13b1223b260e8c4525cf6ca4a3966107d9af7110618a8e87"
+  },
+  "core_baseline_after": {
+    "divider_q16_16.sv": "4ade5184116f48b9fa2084a855d0c977a517f1a64a92a72ca60777c5e9ab2903",
+    "divider_signed.sv": "a6a431ca687d584d3696e153ce152774bc06b428a7357079b8cde9b3e6a0d67e",
+    "fifo.sv": "30ce403cb344a70edff096e35aa4edaece91c4177784f0c04be45a2a47fb61d6",
+    "gpu_clock.sv": "884007a0717eadec63b96d8ad56724c327778c62b061102d63b9dfa0c47bbe8a",
+    "mgpu.sv": "29179eb403ef0725ad6f4a9800742365a267459b14f12defd20c969fee7f517a",
+    "rasterizer.sv": "e0dd9eb784b4db0d52070d64d86fdf02bc86c81622848f30c202525c48561577",
+    "shader.sv": "b6a9cdd4ff2c6d350c2e519e50a039aec28cee3fb737dd747a680ecb24162aa1",
+    "top.sv": "e0735beb3cf36c8203dbec203c939791779afbae8adcbcb9782c3c695227718f",
+    "vertex_shader.sv": "31d86d4a1f9a162b1aa41ad8f5a71a2fb13a02c60e94a7638bc0cb2e6dea2e47",
+    "vga.sv": "54a829622dc52f7e80ebb4372c411d43a5e2969a4a3a600a17bc7ed5a58cf047"
+  },
+  "style": {
+    "rtl_sv_files": 11,
+    "simulation_sv_files": 10,
+    "svh_configuration_headers": 2,
+    "rtl_timescale_directives": 1,
+    "rtl_timescale_exception": "gpu_clock.sv",
+    "simulation_timescale_directives": 10,
+    "wire_reg_declarations": 0,
+    "state_machines": 8,
+    "explicit_enum_assignments": 0,
+    "format_check": "PASS: Needs formatting: 0",
+    "gpu_clock_simulation_units": "User-confirmed 1ns / 1ps timescale file header preserves the #12.5 40 MHz Icarus model; no module-local timeunit/timeprecision."
+  },
+  "regression": {
+    "status": "PASS",
+    "rtl_tests": [
+      "vga_tb",
+      "top_clear_tb",
+      "space_sequence_tb",
+      "midiyas_boot_tb",
+      "double_buffer_tb",
+      "top_tb"
+    ],
+    "python_tests": 33,
+    "python_files_syntax_checked": 50,
+    "vivado_project_hdl_paths_checked": 11,
+    "log": "out/history_consolidation/regression.log",
+    "log_sha256": "39d79bbbb62357a122bef6cecf115e681918ee81df2efe7b88639fbedcd74ee2"
+  },
+  "versions": {
+    "v1_fixed": {
+      "captured_frames": 542,
+      "animation_frames": 541,
+      "pixels_compared_before_after": 41625600,
+      "pixels_compared_to_software": 41548800,
+      "mismatched_pixels": 0,
+      "all_cycle_and_write_counters_equal": true,
+      "frame_hash_list_sha256": "49fae94de06563b895501795c84cf94645340b493e3ecc2c8506ed33558a3688",
+      "before_after_frames_csv_sha256": "1028e90622f57cf842758552446628427cdec2795dd3dbfc954a2dbba7af6a41",
+      "controls": {
+        "pause_at_frame_boundary": true,
+        "pause_stable": true,
+        "resume_next_frame": true,
+        "reset_frame_zero_equal": true
+      },
+      "clock_crosscheck": {
+        "top": "milkfrog_top",
+        "gpu_mhz": 40,
+        "vga_mhz": 100,
+        "frames": 1,
+        "checks": [
+          {
+            "capture": 0,
+            "pixels": 76800,
+            "mismatches": 0,
+            "framebuffer_sha256": "b21e0434b58cd5c5bddbf140650ffbb4832f0230a698e48192919ed9badee6de"
+          }
+        ],
+        "presentation_intervals_ns": [],
+        "power_on_model": {
+          "signal": "u_milkfrog_board_sim.u_milkfrog_top.u_mgpu.u_rasterizer.frag_valid",
+          "cell": "u_mgpu/u_rasterizer/frag_valid_reg",
+          "primitive": "FDRE",
+          "init": "1'b0",
+          "applied": "One assignment at time zero; subsequent resets do not force this signal",
+          "evidence": "icarus_40mhz/register_init.rpt",
+          "evidence_sha256": "2cf9416c5845bf5b0569f248bc2c216dcc62e30bd2846a43af47c03a8c3e2c12"
+        }
+      },
+      "bitstream": {
+        "path": "out\\milkfrog_board\\build\\milkfrog_nexys_a7.bit",
+        "bytes": 3825913,
+        "sha256": "6bbe39becb173a0d1f3f107ecf7588d8d08abdba5a1937609f4f06ceaeca75af",
+        "validation": "PASS: milkfrog_top xc7a100tcsg324-1\nBRAM tiles: 123.5 / 135\nSetup slack: 1.065 ns\nHold slack: 0.029 ns\nDRC errors: 0\nFramebuffer zero INIT words: 6912\n"
+      },
+      "final_validation_path": "deliverables/milkfrog/v1_fixed/reports/final_validation.json",
+      "final_validation_sha256": "a84a1e6ef9da6ec4ac056b36cd7423609fecf1d9584c976fbfd07a23a22031c3",
+      "unchanged_model_animation_rom_inputs": 20
+    },
+    "v2_orbit": {
+      "captured_frames": 542,
+      "animation_frames": 541,
+      "pixels_compared_before_after": 41625600,
+      "pixels_compared_to_software": 41548800,
+      "mismatched_pixels": 0,
+      "all_cycle_and_write_counters_equal": true,
+      "frame_hash_list_sha256": "42b33aa42b1269862b065cdb091d5f61b4537ebc58c1583d3f35bea616aec881",
+      "before_after_frames_csv_sha256": "dcd52a8c84b3a9464aafab24acb7b61233ecc05c73b2426c9863896e1fb5d047",
+      "controls": {
+        "pause_at_frame_boundary": true,
+        "pause_stable": true,
+        "resume_next_frame": true,
+        "reset_frame_zero_equal": true
+      },
+      "clock_crosscheck": {
+        "top": "milkfrog_top",
+        "gpu_mhz": 40,
+        "vga_mhz": 100,
+        "frames": 1,
+        "checks": [
+          {
+            "capture": 0,
+            "pixels": 76800,
+            "mismatches": 0,
+            "framebuffer_sha256": "c757ed7a6ac4ee5a6bb6dba518b0d7afe7d763521b37ff3ef38f68b6a8de19f6"
+          }
+        ],
+        "presentation_intervals_ns": [],
+        "power_on_model": {
+          "signal": "u_milkfrog_board_sim.u_milkfrog_top.u_mgpu.u_rasterizer.frag_valid",
+          "cell": "u_mgpu/u_rasterizer/frag_valid_reg",
+          "primitive": "FDRE",
+          "init": "1'b0",
+          "applied": "One assignment at time zero; subsequent resets do not force this signal",
+          "evidence": "icarus_40mhz/register_init.rpt",
+          "evidence_sha256": "2cf9416c5845bf5b0569f248bc2c216dcc62e30bd2846a43af47c03a8c3e2c12"
+        }
+      },
+      "bitstream": {
+        "path": "out\\milkfrog_orbit_v2\\build\\milkfrog_nexys_a7.bit",
+        "bytes": 3825913,
+        "sha256": "70936bdf531e1d2cd0383dde0df550ced69c3ff99efff35b872c3a9eeb96c54e",
+        "validation": "PASS: milkfrog_top xc7a100tcsg324-1\nBRAM tiles: 126.0 / 135\nSetup slack: 0.821 ns\nHold slack: 0.045 ns\nDRC errors: 0\nFramebuffer zero INIT words: 6912\n"
+      },
+      "final_validation_path": "deliverables/milkfrog/v2_orbit/reports/final_validation.json",
+      "final_validation_sha256": "575c2dbb6ac5de25fb64e3ef2d53f0898eee47b03ed592fadf306e49d1db27f9",
+      "unchanged_model_animation_rom_inputs": 17
+    }
+  },
+  "visual_review_reuse": "Visual measurements and comparison media retained after verifying all current raw captures are byte-identical. Synthesis, timing, DRC, bitstreams and 40 MHz INIT proof were rebuilt for both variants using the user-confirmed gpu_clock.sv timescale exception.",
+  "physical_board_tested": false
+}

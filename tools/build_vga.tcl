@@ -5,8 +5,11 @@ set root [file normalize [file join [file dirname [info script]] ..]]
 set output [file join $root out vga_current]
 file mkdir $output
 cd $output
+foreach memory [glob [file join $root MGPU.srcs sources_1 rom *.mem]] {
+    file copy -force $memory $output
+}
 set_param general.maxThreads 4
-read_verilog [glob [file join $root MGPU.srcs sources_1 new *.v]]
+read_verilog -sv [glob [file join $root MGPU.srcs sources_1 new *.sv]]
 read_xdc [file join $root MGPU.srcs constrs_1 new nexys_a7_vga.xdc]
 synth_design -top top -part xc7a100tcsg324-1
 report_utilization -file [file join $output utilization_synth.rpt]
@@ -45,6 +48,6 @@ if {[llength $setup_paths] == 0 || [llength $hold_paths] == 0} {
     error "No timing paths found"
 }
 if {[get_property SLACK $setup_paths] < 0 || [get_property SLACK $hold_paths] < 0} {
-    error "Timing failed; see out/vga_current/timing.rpt (original GPU RTL was not modified)"
+    error "Timing failed; see out/vga_current/timing.rpt "
 }
 write_bitstream -force [file join $output nexys_a7_vga.bit]

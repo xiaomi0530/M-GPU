@@ -1,0 +1,49 @@
+{
+  "character": "奶蛙",
+  "action": "捧腹大笑",
+  "approval": "approved_full_18_second_action",
+  "retrieved_at_local": "2026-11-23T00:18:15.632002+08:00",
+  "media_rights": "Not verified; source repository or aggregator labels do not independently establish rights to the character or media.",
+  "assets": [
+    {
+      "file": "candidate_a_green.mp4",
+      "source_page": "https://github.com/Diyeego/naiwa-pet/blob/main/naiwa/laugh.mp4",
+      "download_url": "https://raw.githubusercontent.com/Diyeego/naiwa-pet/main/naiwa/laugh.mp4",
+      "role": "primary_motion_reference",
+      "bytes": 7573310,
+      "sha256": "4970130ac69f86097219548144b66cb124afe6d5f2ef4ad53cbc3cbbf1df364e"
+    },
+    {
+      "file": "sticker_laugh.gif",
+      "source_page": "https://naiwa.meme/sticker/s032/",
+      "download_url": "https://cdn.naiwa.meme/stickers/s032.gif",
+      "role": "secondary_motion_reference",
+      "bytes": 173875,
+      "sha256": "63ad27351653ea990ca35bad63f56ba717eb5db564554f292111cdce87aa6ebb"
+    },
+    {
+      "file": "sticker_pose.jpg",
+      "source_page": "https://naiwa.meme/sticker/s031/",
+      "download_url": "https://cdn.naiwa.meme/stickers/s031.jpg",
+      "role": "secondary_shape_reference",
+      "bytes": 64936,
+      "sha256": "1f77ea64239a4ecdcad7d6de30be9019123f7c1642f65d67182bee3f4a00ba9e"
+    }
+  ],
+  "review": {
+    "preview": "../../../out/reference_review/naiwa_laugh/preview.gif",
+    "keyframes": "../../../out/reference_review/naiwa_laugh/review_keyframes.jpg",
+    "transformation": "Preview and keyframes crop the central 960x1080 region, x=480, y=0; original MP4 is unchanged. GIF is 12 fps at 360x405.",
+    "observed_motion": "Hands on belly, head tilts back laughing, forward bend, hands rise to head, then a fall onto the back.",
+    "primary_video": {
+      "duration_seconds": 18.033333,
+      "width": 1920,
+      "height": 1080,
+      "fps": 30,
+      "frames": 541,
+      "audio": false
+    }
+  },
+  "related_watch_page": "https://naiwa.meme/video/v066/",
+  "approved_on": "2026-11-23"
+}

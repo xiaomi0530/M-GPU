@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "policy": "Both versions are supported peers with equal priority. Version numbers identify camera variants; neither version supersedes the other.",
+  "shared": {
+    "source_model": "milkfrog.blend",
+    "reference_directory": "assets/references/naiwa_laugh",
+    "measurement_and_lod_directory": "assets/naiwa",
+    "rtl_baseline": "assets/naiwa/hardware_baseline.json",
+    "core_directory": "MGPU.srcs/sources_1/new",
+    "scene_top": "MGPU.srcs/sources_1/demo/milkfrog_top.sv"
+  },
+  "versions": {
+    "v1_fixed": {
+      "label": "V1 · 固定镜头",
+      "status": "supported",
+      "animation": "assets/milkfrog/v1_fixed/animation",
+      "rom": "assets/milkfrog/v1_fixed/rom",
+      "delivery": "deliverables/milkfrog/v1_fixed",
+      "workflow": "docs/milkfrog_workflow.md",
+      "make_prefix": "milkfrog-v1",
+      "video": "milkfrog_board_rtl.mp4",
+      "preview": "rtl_preview.gif"
+    },
+    "v2_orbit": {
+      "label": "V2 · 360° 环绕镜头",
+      "status": "supported",
+      "animation": "assets/milkfrog/v2_orbit/animation",
+      "rom": "assets/milkfrog/v2_orbit/rom",
+      "delivery": "deliverables/milkfrog/v2_orbit",
+      "workflow": "docs/milkfrog_orbit_v2.md",
+      "make_prefix": "milkfrog-v2",
+      "video": "milkfrog_orbit_rtl.mp4",
+      "preview": "orbit_preview.gif"
+    }
+  }
+}

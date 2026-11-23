@@ -1,0 +1,45 @@
+{
+  "source": "C:\\Users\\xiaom\\Documents\\Vivado_Project\\MGPU\\milkfrog.blend",
+  "source_sha256": "3531d8c81c2d03d7f6a4f2ea1a491a8ad58dc1200316a105e81f915cf8d10654",
+  "source_vertices": 992242,
+  "source_triangles": 1984483,
+  "source_texture": [
+    "卡通胖人3d模型_basecolor",
+    4096,
+    4096
+  ],
+  "texture_sha256": "5d2e810f6d6777ca13643fd10136d764d6af1ac017440b319711f949b8913db1",
+  "method": "Blender Decimate collapse modifier; independent reduction from the supplied source for every candidate; UVs retained.",
+  "variants": {
+    "A": {
+      "target_triangles": 4000,
+      "vertices": 2000,
+      "triangles": 4000,
+      "seconds": 23.134081800002605
+    },
+    "B": {
+      "target_triangles": 8000,
+      "vertices": 4000,
+      "triangles": 8000,
+      "seconds": 23.46929499998805
+    },
+    "C": {
+      "target_triangles": 16000,
+      "vertices": 8000,
+      "triangles": 16000,
+      "seconds": 24.16724740000791
+    },
+    "D": {
+      "target_triangles": 32000,
+      "vertices": 16000,
+      "triangles": 32000,
+      "seconds": 22.939821299994946
+    },
+    "E": {
+      "target_triangles": 64000,
+      "vertices": 32000,
+      "triangles": 63999,
+      "seconds": 22.512488499996834
+    }
+  }
+}

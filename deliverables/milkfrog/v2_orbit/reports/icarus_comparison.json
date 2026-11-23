@@ -1,0 +1,24 @@
+{
+  "top": "milkfrog_top",
+  "gpu_mhz": 40,
+  "vga_mhz": 100,
+  "frames": 1,
+  "checks": [
+    {
+      "capture": 0,
+      "pixels": 76800,
+      "mismatches": 0,
+      "framebuffer_sha256": "c757ed7a6ac4ee5a6bb6dba518b0d7afe7d763521b37ff3ef38f68b6a8de19f6"
+    }
+  ],
+  "presentation_intervals_ns": [],
+  "power_on_model": {
+    "signal": "u_milkfrog_board_sim.u_milkfrog_top.u_mgpu.u_rasterizer.frag_valid",
+    "cell": "u_mgpu/u_rasterizer/frag_valid_reg",
+    "primitive": "FDRE",
+    "init": "1'b0",
+    "applied": "One assignment at time zero; subsequent resets do not force this signal",
+    "evidence": "icarus_40mhz/register_init.rpt",
+    "evidence_sha256": "2cf9416c5845bf5b0569f248bc2c216dcc62e30bd2846a43af47c03a8c3e2c12"
+  }
+}

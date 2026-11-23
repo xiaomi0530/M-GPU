@@ -1,0 +1,122 @@
+{
+  "source": "milkfrog.blend",
+  "source_sha256": "3531d8c81c2d03d7f6a4f2ea1a491a8ad58dc1200316a105e81f915cf8d10654",
+  "authority": "User supplied source mesh; geometry and object transforms unchanged.",
+  "basis_rows_right_up_toward_camera": [
+    [
+      -0.7350360637802407,
+      0.6780280119157689,
+      0.0
+    ],
+    [
+      -0.11655448634761291,
+      -0.12635429415196514,
+      0.9851140259186258
+    ],
+    [
+      0.667934904503945,
+      0.7240943359859326,
+      0.17190216967332675
+    ]
+  ],
+  "projected_bounds_xyz": [
+    [
+      -0.28830052939320844,
+      -0.519015138549973,
+      -0.25507076636354775
+    ],
+    [
+      0.2515672452789216,
+      0.48152081327009094,
+      0.29790011541865974
+    ]
+  ],
+  "projected_center_xyz": [
+    -0.018366642057143417,
+    -0.018747162639941056,
+    0.021414674527555994
+  ],
+  "native_resolution": [
+    320,
+    240
+  ],
+  "pixels_per_unit": 203.89072439516625,
+  "translation_x_px": 163.7447879537377,
+  "translation_y_px": 116.17762742898842,
+  "model_height_px": 204.0,
+  "model_screen_height_fraction": 0.85,
+  "model_bottom_px": 222.0,
+  "model_center_x_px": 160.0,
+  "model_bbox_native_xyxy": [
+    104.96298417224651,
+    18.0,
+    215.0370158277535,
+    222.0
+  ],
+  "projection": "sx = dot(right, world_vertex)*pixels_per_unit + translation_x_px; sy = -dot(up, world_vertex)*pixels_per_unit + translation_y_px",
+  "mvp_rows": [
+    [
+      -0.9366689718795306,
+      0.8640226406857533,
+      0.0,
+      0.02340492471086053
+    ],
+    [
+      -0.19803648877434427,
+      -0.21468723804236742,
+      1.67379676963656,
+      0.03185310475842984
+    ],
+    [
+      -1.9326439825582489,
+      -2.095139139774448,
+      -0.4973923230656676,
+      0.06196253794351611
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "mvp_q5_12_column_major": [
+    -3837,
+    -811,
+    -7916,
+    0,
+    3539,
+    -879,
+    -8582,
+    0,
+    0,
+    6856,
+    -2037,
+    0,
+    96,
+    130,
+    254,
+    4096
+  ],
+  "blender_ortho_scale": 1.5694681597177473,
+  "camera_world_target": [
+    0.029988818780062983,
+    0.005421931235533868,
+    -0.014786863848648591
+  ],
+  "depth_ndc_range": [
+    -0.8,
+    0.8
+  ],
+  "pixel_convention": "Continuous raster coordinates. Blender antialiases pixel centers; MGPU floors viewport coordinates and uses its own inclusive integer coverage rules.",
+  "reference_camera_fit": "camera_fit.json",
+  "limitation": "The view is fitted under an orthographic assumption; it is not recovered physical camera calibration.",
+  "composite_background_rgb": [
+    165,
+    249,
+    164
+  ],
+  "render_origin": "Blender Cycles emission basecolor baseline; not MGPU RTL output.",
+  "source_mesh_preserved": true,
+  "source_sha256_after": "3531d8c81c2d03d7f6a4f2ea1a491a8ad58dc1200316a105e81f915cf8d10654"
+}

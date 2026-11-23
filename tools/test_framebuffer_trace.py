@@ -136,7 +136,7 @@ class TraceTests(unittest.TestCase):
 
     def test_full_simulation_recording_matches_framebuffer(self):
         project = Path(__file__).resolve().parents[1]
-        path = project / "out/studio_top/framebuffer.trace"
+        path = project / "out/tests/framebuffer.trace"
         if not path.exists():
             self.skipTest("Run the RTL simulation first for end-to-end comparison")
         tail = TraceTail(path)
@@ -145,7 +145,7 @@ class TraceTests(unittest.TestCase):
         self.assertIsNone(tail.error)
         self.assertTrue(tail.model.complete)
         expected = bytes(int(line, 16) for line in
-                         (project / "out/studio_top/framebuffer.hex").read_text().splitlines())
+                         path.with_suffix('.hex').read_text().splitlines())
         self.assertEqual(tail.model.frame_at(tail.model.latest_ns), expected)
         # Check bounded, evenly spaced triangle boundaries. Replaying every
         # prefix is quadratic for board demos with tens of thousands of draws.

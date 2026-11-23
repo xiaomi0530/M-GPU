@@ -1,0 +1,6 @@
+PASS: milkfrog_top xc7a100tcsg324-1
+BRAM tiles: 126.0 / 135
+Setup slack: 0.821 ns
+Hold slack: 0.045 ns
+DRC errors: 0
+Framebuffer zero INIT words: 6912

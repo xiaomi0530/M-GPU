@@ -1,0 +1,2665 @@
+{
+  "coordinates": "native320x240 fixed reference mapping, xyoriginupperleft",
+  "method": "Human selection of semantic dark components on numbered reference contact sheet, followed by per-frame measurement. Hands merged is one shared visible color region, not two inferred wrists. Component centers are not anatomical joints; no3D angles measured.",
+  "limitations": [
+    "406..410 only one dark foot region is clearly visible; the other lower-right dark triangle is tail, not the second foot.",
+    "390..401 and405..410 overlapping hands cannot be reliably separated from a single dark component.",
+    "After415 near-foot shadow joins belly shadow, so an explicit toe/foot ROI isolates only its visible left portion. Do not equate this to the full foot center.",
+    "Source frames often repeat poses for2..3frames; motion blur at390/400/409..411 increases uncertainty."
+  ],
+  "frames": [
+    {
+      "frame": 390,
+      "observed_points": {
+        "hands_merged": {
+          "center_xy": [
+            143.97473997028231,
+            137.07578008915306
+          ],
+          "bbox_xyxy": [
+            124,
+            122,
+            169,
+            149
+          ],
+          "area_px": 673,
+          "component_index": 0,
+          "uncertainty_px": 3.0
+        },
+        "foot_screen_left": {
+          "center_xy": [
+            144.5787037037037,
+            200.64814814814815
+          ],
+          "bbox_xyxy": [
+            124,
+            181,
+            162,
+            210
+          ],
+          "area_px": 432,
+          "component_index": 1,
+          "uncertainty_px": 3.0
+        },
+        "foot_screen_right": {
+          "center_xy": [
+            195.69077306733166,
+            212.3865336658354
+          ],
+          "bbox_xyxy": [
+            181,
+            198,
+            208,
+            223
+          ],
+          "area_px": 401,
+          "component_index": 2,
+          "uncertainty_px": 3.0
+        }
+      },
+      "reference_bbox": [
+        112,
+        32,
+        219,
+        223
+      ],
+      "body_major_axis_screen_deg": 82.14585692782592,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 391,
+      "observed_points": {
+        "hands_merged": {
+          "center_xy": [
+            145.9984894259819,
+            156.77945619335347
+          ],
+          "bbox_xyxy": [
+            127,
+            137,
+            171,
+            169
+          ],
+          "area_px": 662,
+          "component_index": 0,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_left": {
+          "center_xy": [
+            145.1115459882583,
+            198.50880626223093
+          ],
+          "bbox_xyxy": [
+            124,
+            178,
+            162,
+            210
+          ],
+          "area_px": 511,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_right": {
+          "center_xy": [
+            195.4743935309973,
+            213.67385444743934
+          ],
+          "bbox_xyxy": [
+            181,
+            202,
+            208,
+            223
+          ],
+          "area_px": 371,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        }
+      },
+      "reference_bbox": [
+        112,
+        53,
+        220,
+        223
+      ],
+      "body_major_axis_screen_deg": 73.24082878110133,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 392,
+      "observed_points": {
+        "hands_merged": {
+          "center_xy": [
+            146.0090771558245,
+            156.7897125567322
+          ],
+          "bbox_xyxy": [
+            127,
+            137,
+            171,
+            169
+          ],
+          "area_px": 661,
+          "component_index": 0,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_left": {
+          "center_xy": [
+            145.15009746588694,
+            198.44639376218325
+          ],
+          "bbox_xyxy": [
+            124,
+            178,
+            162,
+            210
+          ],
+          "area_px": 513,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_right": {
+          "center_xy": [
+            195.4743935309973,
+            213.67385444743934
+          ],
+          "bbox_xyxy": [
+            181,
+            202,
+            208,
+            223
+          ],
+          "area_px": 371,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        }
+      },
+      "reference_bbox": [
+        112,
+        53,
+        220,
+        223
+      ],
+      "body_major_axis_screen_deg": 73.23479111952551,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 393,
+      "observed_points": {
+        "hands_merged": {
+          "center_xy": [
+            146.0090771558245,
+            156.7897125567322
+          ],
+          "bbox_xyxy": [
+            127,
+            137,
+            171,
+            169
+          ],
+          "area_px": 661,
+          "component_index": 0,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_left": {
+          "center_xy": [
+            145.15009746588694,
+            198.44639376218325
+          ],
+          "bbox_xyxy": [
+            124,
+            178,
+            162,
+            210
+          ],
+          "area_px": 513,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_right": {
+          "center_xy": [
+            195.45405405405404,
+            213.68648648648647
+          ],
+          "bbox_xyxy": [
+            181,
+            202,
+            208,
+            223
+          ],
+          "area_px": 370,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        }
+      },
+      "reference_bbox": [
+        112,
+        53,
+        220,
+        223
+      ],
+      "body_major_axis_screen_deg": 73.239067314048,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 394,
+      "observed_points": {
+        "hands_merged": {
+          "center_xy": [
+            144.5525568181818,
+            156.82386363636363
+          ],
+          "bbox_xyxy": [
+            116,
+            121,
+            170,
+            172
+          ],
+          "area_px": 704,
+          "component_index": 0,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_left": {
+          "center_xy": [
+            144.9251968503937,
+            198.78149606299212
+          ],
+          "bbox_xyxy": [
+            124,
+            180,
+            162,
+            210
+          ],
+          "area_px": 508,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_right": {
+          "center_xy": [
+            195.37292817679557,
+            213.92265193370164
+          ],
+          "bbox_xyxy": [
+            181,
+            202,
+            208,
+            223
+          ],
+          "area_px": 362,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        }
+      },
+      "reference_bbox": [
+        112,
+        57,
+        220,
+        223
+      ],
+      "body_major_axis_screen_deg": 71.66771746454488,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 395,
+      "observed_points": {
+        "hands_merged": {
+          "center_xy": [
+            144.82127659574468,
+            158.86808510638298
+          ],
+          "bbox_xyxy": [
+            116,
+            127,
+            171,
+            174
+          ],
+          "area_px": 705,
+          "component_index": 0,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_left": {
+          "center_xy": [
+            144.78884462151393,
+            199.06772908366534
+          ],
+          "bbox_xyxy": [
+            124,
+            181,
+            162,
+            210
+          ],
+          "area_px": 502,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_right": {
+          "center_xy": [
+            195.39154929577464,
+            214.15211267605633
+          ],
+          "bbox_xyxy": [
+            181,
+            202,
+            208,
+            223
+          ],
+          "area_px": 355,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        }
+      },
+      "reference_bbox": [
+        111,
+        61,
+        220,
+        223
+      ],
+      "body_major_axis_screen_deg": 70.34774421376461,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 396,
+      "observed_points": {
+        "hands_merged": {
+          "center_xy": [
+            144.10838150289018,
+            159.9985549132948
+          ],
+          "bbox_xyxy": [
+            115,
+            122,
+            169,
+            175
+          ],
+          "area_px": 692,
+          "component_index": 0,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_left": {
+          "center_xy": [
+            144.63709677419354,
+            199.3125
+          ],
+          "bbox_xyxy": [
+            124,
+            182,
+            162,
+            210
+          ],
+          "area_px": 496,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_right": {
+          "center_xy": [
+            195.28531073446328,
+            214.20338983050848
+          ],
+          "bbox_xyxy": [
+            181,
+            203,
+            208,
+            223
+          ],
+          "area_px": 354,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        }
+      },
+      "reference_bbox": [
+        108,
+        63,
+        221,
+        223
+      ],
+      "body_major_axis_screen_deg": 69.01740136436449,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 397,
+      "observed_points": {
+        "hands_merged": {
+          "center_xy": [
+            143.28529411764706,
+            160.82647058823528
+          ],
+          "bbox_xyxy": [
+            115,
+            129,
+            168,
+            175
+          ],
+          "area_px": 680,
+          "component_index": 0,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_left": {
+          "center_xy": [
+            144.5242914979757,
+            199.3765182186235
+          ],
+          "bbox_xyxy": [
+            124,
+            182,
+            162,
+            210
+          ],
+          "area_px": 494,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_right": {
+          "center_xy": [
+            195.25842696629215,
+            214.17696629213484
+          ],
+          "bbox_xyxy": [
+            181,
+            203,
+            208,
+            223
+          ],
+          "area_px": 356,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        }
+      },
+      "reference_bbox": [
+        105,
+        65,
+        221,
+        223
+      ],
+      "body_major_axis_screen_deg": 67.57725233571867,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 398,
+      "observed_points": {
+        "hands_merged": {
+          "center_xy": [
+            143.28529411764706,
+            160.82647058823528
+          ],
+          "bbox_xyxy": [
+            115,
+            129,
+            168,
+            175
+          ],
+          "area_px": 680,
+          "component_index": 0,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_left": {
+          "center_xy": [
+            144.55040322580646,
+            199.3326612903226
+          ],
+          "bbox_xyxy": [
+            124,
+            182,
+            162,
+            210
+          ],
+          "area_px": 496,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_right": {
+          "center_xy": [
+            195.25842696629215,
+            214.17696629213484
+          ],
+          "bbox_xyxy": [
+            181,
+            203,
+            208,
+            223
+          ],
+          "area_px": 356,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        }
+      },
+      "reference_bbox": [
+        105,
+        65,
+        221,
+        223
+      ],
+      "body_major_axis_screen_deg": 67.57472913412784,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 399,
+      "observed_points": {
+        "hands_merged": {
+          "center_xy": [
+            138.498417721519,
+            157.97784810126583
+          ],
+          "bbox_xyxy": [
+            114,
+            126,
+            163,
+            172
+          ],
+          "area_px": 632,
+          "component_index": 0,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_left": {
+          "center_xy": [
+            144.27435387673955,
+            198.94831013916502
+          ],
+          "bbox_xyxy": [
+            124,
+            180,
+            162,
+            210
+          ],
+          "area_px": 503,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_right": {
+          "center_xy": [
+            195.36164383561643,
+            213.84931506849315
+          ],
+          "bbox_xyxy": [
+            181,
+            202,
+            208,
+            223
+          ],
+          "area_px": 365,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        }
+      },
+      "reference_bbox": [
+        101,
+        62,
+        219,
+        223
+      ],
+      "body_major_axis_screen_deg": 66.64655520318934,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 400,
+      "observed_points": {
+        "hands_merged": {
+          "center_xy": [
+            122.45550847457628,
+            138.57627118644066
+          ],
+          "bbox_xyxy": [
+            105,
+            123,
+            144,
+            152
+          ],
+          "area_px": 472,
+          "component_index": 0,
+          "uncertainty_px": 3.0
+        },
+        "foot_screen_left": {
+          "center_xy": [
+            143.22246696035242,
+            197.51982378854626
+          ],
+          "bbox_xyxy": [
+            123,
+            177,
+            160,
+            210
+          ],
+          "area_px": 454,
+          "component_index": 1,
+          "uncertainty_px": 3.0
+        },
+        "foot_screen_right": {
+          "center_xy": [
+            189.2244094488189,
+            212.34251968503938
+          ],
+          "bbox_xyxy": [
+            180,
+            190,
+            201,
+            223
+          ],
+          "area_px": 254,
+          "component_index": 2,
+          "uncertainty_px": 3.0
+        }
+      },
+      "reference_bbox": [
+        103,
+        38,
+        211,
+        223
+      ],
+      "body_major_axis_screen_deg": 73.40934080779516,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 401,
+      "observed_points": {
+        "hands_merged": {
+          "center_xy": [
+            122.48407643312102,
+            138.5796178343949
+          ],
+          "bbox_xyxy": [
+            105,
+            123,
+            144,
+            152
+          ],
+          "area_px": 471,
+          "component_index": 0,
+          "uncertainty_px": 3.0
+        },
+        "foot_screen_left": {
+          "center_xy": [
+            143.22246696035242,
+            197.51982378854626
+          ],
+          "bbox_xyxy": [
+            123,
+            177,
+            160,
+            210
+          ],
+          "area_px": 454,
+          "component_index": 1,
+          "uncertainty_px": 3.0
+        },
+        "foot_screen_right": {
+          "center_xy": [
+            189.23320158102766,
+            212.3596837944664
+          ],
+          "bbox_xyxy": [
+            180,
+            190,
+            201,
+            223
+          ],
+          "area_px": 253,
+          "component_index": 2,
+          "uncertainty_px": 3.0
+        }
+      },
+      "reference_bbox": [
+        103,
+        38,
+        211,
+        223
+      ],
+      "body_major_axis_screen_deg": 73.40934080779516,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 402,
+      "observed_points": {
+        "hand_screen_left": {
+          "center_xy": [
+            105.04888888888888,
+            120.69777777777777
+          ],
+          "bbox_xyxy": [
+            98,
+            111,
+            112,
+            132
+          ],
+          "area_px": 225,
+          "component_index": 3,
+          "uncertainty_px": 1.5
+        },
+        "hand_screen_right": {
+          "center_xy": [
+            124.41791044776119,
+            127.19776119402985
+          ],
+          "bbox_xyxy": [
+            112,
+            119,
+            149,
+            138
+          ],
+          "area_px": 268,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_left": {
+          "center_xy": [
+            143.092050209205,
+            194.3347280334728
+          ],
+          "bbox_xyxy": [
+            123,
+            167,
+            159,
+            210
+          ],
+          "area_px": 478,
+          "component_index": 0,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_right": {
+          "center_xy": [
+            181.67592592592592,
+            208.34876543209876
+          ],
+          "bbox_xyxy": [
+            171,
+            187,
+            194,
+            221
+          ],
+          "area_px": 324,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        }
+      },
+      "reference_bbox": [
+        98,
+        31,
+        204,
+        221
+      ],
+      "body_major_axis_screen_deg": 79.3923314687478,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 403,
+      "observed_points": {
+        "hand_screen_left": {
+          "center_xy": [
+            100.48167539267016,
+            103.8848167539267
+          ],
+          "bbox_xyxy": [
+            92,
+            97,
+            114,
+            114
+          ],
+          "area_px": 191,
+          "component_index": 3,
+          "uncertainty_px": 1.5
+        },
+        "hand_screen_right": {
+          "center_xy": [
+            124.48339483394834,
+            112.4760147601476
+          ],
+          "bbox_xyxy": [
+            107,
+            106,
+            155,
+            123
+          ],
+          "area_px": 271,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_left": {
+          "center_xy": [
+            142.17966903073287,
+            195.8321513002364
+          ],
+          "bbox_xyxy": [
+            123,
+            172,
+            158,
+            210
+          ],
+          "area_px": 423,
+          "component_index": 0,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_right": {
+          "center_xy": [
+            173.58687258687257,
+            209.42857142857142
+          ],
+          "bbox_xyxy": [
+            165,
+            198,
+            183,
+            219
+          ],
+          "area_px": 259,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        }
+      },
+      "reference_bbox": [
+        92,
+        28,
+        197,
+        219
+      ],
+      "body_major_axis_screen_deg": 85.69083024545239,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 404,
+      "observed_points": {
+        "hand_screen_left": {
+          "center_xy": [
+            100.48167539267016,
+            103.8848167539267
+          ],
+          "bbox_xyxy": [
+            92,
+            97,
+            114,
+            114
+          ],
+          "area_px": 191,
+          "component_index": 3,
+          "uncertainty_px": 1.5
+        },
+        "hand_screen_right": {
+          "center_xy": [
+            124.59706959706959,
+            112.46520146520146
+          ],
+          "bbox_xyxy": [
+            107,
+            106,
+            156,
+            123
+          ],
+          "area_px": 273,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_left": {
+          "center_xy": [
+            142.17216981132074,
+            195.83962264150944
+          ],
+          "bbox_xyxy": [
+            123,
+            172,
+            158,
+            210
+          ],
+          "area_px": 424,
+          "component_index": 0,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_right": {
+          "center_xy": [
+            173.61627906976744,
+            209.43798449612405
+          ],
+          "bbox_xyxy": [
+            165,
+            198,
+            183,
+            219
+          ],
+          "area_px": 258,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        }
+      },
+      "reference_bbox": [
+        92,
+        28,
+        197,
+        219
+      ],
+      "body_major_axis_screen_deg": 85.69129427197045,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 405,
+      "observed_points": {
+        "hands_merged": {
+          "center_xy": [
+            103.41379310344827,
+            88.84729064039409
+          ],
+          "bbox_xyxy": [
+            91,
+            81,
+            115,
+            101
+          ],
+          "area_px": 203,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "foot_screen_left": {
+          "center_xy": [
+            138.1823708206687,
+            194.6079027355623
+          ],
+          "area_px": 329,
+          "manual_roi_xyxy": [
+            125,
+            182,
+            151,
+            209
+          ],
+          "uncertainty_px": 2.5
+        },
+        "foot_screen_right": {
+          "center_xy": [
+            158.9846547314578,
+            197.30179028132991
+          ],
+          "area_px": 391,
+          "manual_roi_xyxy": [
+            150,
+            183,
+            171,
+            213
+          ],
+          "uncertainty_px": 2.5
+        }
+      },
+      "reference_bbox": [
+        91,
+        26,
+        194,
+        212
+      ],
+      "body_major_axis_screen_deg": 94.40448118676053,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 406,
+      "observed_points": {
+        "hands_merged": {
+          "center_xy": [
+            118.4311377245509,
+            66.58682634730539
+          ],
+          "bbox_xyxy": [
+            110,
+            58,
+            127,
+            78
+          ],
+          "area_px": 167,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        },
+        "single_visible_foot": {
+          "center_xy": [
+            122.36263736263736,
+            183.8937728937729
+          ],
+          "bbox_xyxy": [
+            115,
+            174,
+            132,
+            196
+          ],
+          "area_px": 273,
+          "component_index": 0,
+          "uncertainty_px": 1.5
+        }
+      },
+      "reference_bbox": [
+        100,
+        38,
+        203,
+        196
+      ],
+      "body_major_axis_screen_deg": 118.09320946027138,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 407,
+      "observed_points": {
+        "hands_merged": {
+          "center_xy": [
+            118.4311377245509,
+            66.58682634730539
+          ],
+          "bbox_xyxy": [
+            110,
+            58,
+            127,
+            78
+          ],
+          "area_px": 167,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        },
+        "single_visible_foot": {
+          "center_xy": [
+            122.36263736263736,
+            183.8937728937729
+          ],
+          "bbox_xyxy": [
+            115,
+            174,
+            132,
+            196
+          ],
+          "area_px": 273,
+          "component_index": 0,
+          "uncertainty_px": 1.5
+        }
+      },
+      "reference_bbox": [
+        100,
+        38,
+        203,
+        196
+      ],
+      "body_major_axis_screen_deg": 118.09923944953151,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 408,
+      "observed_points": {
+        "hands_merged": {
+          "center_xy": [
+            118.4311377245509,
+            66.58682634730539
+          ],
+          "bbox_xyxy": [
+            110,
+            58,
+            127,
+            78
+          ],
+          "area_px": 167,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        },
+        "single_visible_foot": {
+          "center_xy": [
+            122.36263736263736,
+            183.8937728937729
+          ],
+          "bbox_xyxy": [
+            115,
+            174,
+            132,
+            196
+          ],
+          "area_px": 273,
+          "component_index": 0,
+          "uncertainty_px": 1.5
+        }
+      },
+      "reference_bbox": [
+        100,
+        38,
+        203,
+        196
+      ],
+      "body_major_axis_screen_deg": 118.09923944953151,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 409,
+      "observed_points": {
+        "hands_merged": {
+          "center_xy": [
+            145.02702702702703,
+            73.01801801801801
+          ],
+          "bbox_xyxy": [
+            134,
+            56,
+            156,
+            89
+          ],
+          "area_px": 444,
+          "component_index": 0,
+          "uncertainty_px": 3.0
+        },
+        "single_visible_foot": {
+          "center_xy": [
+            100.35254237288136,
+            178.0
+          ],
+          "bbox_xyxy": [
+            85,
+            168,
+            115,
+            188
+          ],
+          "area_px": 295,
+          "component_index": 1,
+          "uncertainty_px": 3.0
+        }
+      },
+      "reference_bbox": [
+        84,
+        54,
+        220,
+        189
+      ],
+      "body_major_axis_screen_deg": 138.1813569012609,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 410,
+      "observed_points": {
+        "hands_merged": {
+          "center_xy": [
+            145.02702702702703,
+            73.01801801801801
+          ],
+          "bbox_xyxy": [
+            134,
+            56,
+            156,
+            89
+          ],
+          "area_px": 444,
+          "component_index": 0,
+          "uncertainty_px": 3.0
+        },
+        "single_visible_foot": {
+          "center_xy": [
+            100.33445945945945,
+            178.0033783783784
+          ],
+          "bbox_xyxy": [
+            85,
+            168,
+            115,
+            188
+          ],
+          "area_px": 296,
+          "component_index": 1,
+          "uncertainty_px": 3.0
+        }
+      },
+      "reference_bbox": [
+        84,
+        54,
+        220,
+        189
+      ],
+      "body_major_axis_screen_deg": 138.19158857607664,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 411,
+      "observed_points": {
+        "hand_upper": {
+          "center_xy": [
+            169.1304347826087,
+            80.82608695652173
+          ],
+          "bbox_xyxy": [
+            165,
+            74,
+            173,
+            87
+          ],
+          "area_px": 69,
+          "component_index": 3,
+          "uncertainty_px": 3.0
+        },
+        "hand_lower": {
+          "center_xy": [
+            146.24183006535947,
+            109.41830065359477
+          ],
+          "bbox_xyxy": [
+            139,
+            103,
+            156,
+            118
+          ],
+          "area_px": 153,
+          "component_index": 1,
+          "uncertainty_px": 3.0
+        },
+        "foot_lower": {
+          "center_xy": [
+            91.04545454545455,
+            180.48636363636365
+          ],
+          "bbox_xyxy": [
+            75,
+            175,
+            109,
+            187
+          ],
+          "area_px": 220,
+          "component_index": 0,
+          "uncertainty_px": 3.0
+        },
+        "foot_upper": {
+          "center_xy": [
+            96.7872340425532,
+            150.5
+          ],
+          "bbox_xyxy": [
+            87,
+            144,
+            106,
+            158
+          ],
+          "area_px": 94,
+          "component_index": 2,
+          "uncertainty_px": 3.0
+        }
+      },
+      "reference_bbox": [
+        75,
+        69,
+        224,
+        192
+      ],
+      "body_major_axis_screen_deg": 153.07736527683082,
+      "mouth_visibility": "self_occluded"
+    },
+    {
+      "frame": 412,
+      "observed_points": {
+        "hand_upper": {
+          "center_xy": [
+            193.9157894736842,
+            128.29473684210527
+          ],
+          "bbox_xyxy": [
+            189,
+            122,
+            201,
+            136
+          ],
+          "area_px": 95,
+          "component_index": 4,
+          "uncertainty_px": 1.5
+        },
+        "hand_lower": {
+          "center_xy": [
+            153.10795454545453,
+            162.4318181818182
+          ],
+          "bbox_xyxy": [
+            146,
+            156,
+            162,
+            169
+          ],
+          "area_px": 176,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "foot_lower": {
+          "center_xy": [
+            83.32885906040268,
+            179.248322147651
+          ],
+          "bbox_xyxy": [
+            76,
+            170,
+            99,
+            192
+          ],
+          "area_px": 149,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        },
+        "foot_upper": {
+          "center_xy": [
+            107.45945945945945,
+            128.63963963963963
+          ],
+          "bbox_xyxy": [
+            104,
+            118,
+            115,
+            140
+          ],
+          "area_px": 111,
+          "component_index": 3,
+          "uncertainty_px": 1.5
+        }
+      },
+      "reference_bbox": [
+        75,
+        118,
+        224,
+        212
+      ],
+      "body_major_axis_screen_deg": 0.8364760427155318,
+      "mouth_visibility": "self_occluded"
+    },
+    {
+      "frame": 413,
+      "observed_points": {
+        "hand_upper": {
+          "center_xy": [
+            193.9157894736842,
+            128.29473684210527
+          ],
+          "bbox_xyxy": [
+            189,
+            122,
+            201,
+            136
+          ],
+          "area_px": 95,
+          "component_index": 4,
+          "uncertainty_px": 1.5
+        },
+        "hand_lower": {
+          "center_xy": [
+            153.10795454545453,
+            162.4318181818182
+          ],
+          "bbox_xyxy": [
+            146,
+            156,
+            162,
+            169
+          ],
+          "area_px": 176,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "foot_lower": {
+          "center_xy": [
+            83.42,
+            179.32
+          ],
+          "bbox_xyxy": [
+            76,
+            170,
+            99,
+            192
+          ],
+          "area_px": 150,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        },
+        "foot_upper": {
+          "center_xy": [
+            107.45945945945945,
+            128.63963963963963
+          ],
+          "bbox_xyxy": [
+            104,
+            118,
+            115,
+            140
+          ],
+          "area_px": 111,
+          "component_index": 3,
+          "uncertainty_px": 1.5
+        }
+      },
+      "reference_bbox": [
+        75,
+        118,
+        224,
+        212
+      ],
+      "body_major_axis_screen_deg": 0.845317130701801,
+      "mouth_visibility": "self_occluded"
+    },
+    {
+      "frame": 414,
+      "observed_points": {
+        "hand_upper": {
+          "center_xy": [
+            198.6875,
+            135.18055555555554
+          ],
+          "bbox_xyxy": [
+            194,
+            128,
+            205,
+            144
+          ],
+          "area_px": 144,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        },
+        "hand_lower": {
+          "center_xy": [
+            160.32876712328766,
+            175.44292237442923
+          ],
+          "bbox_xyxy": [
+            151,
+            168,
+            171,
+            184
+          ],
+          "area_px": 219,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "foot_lower": {
+          "center_xy": [
+            85.6,
+            176.45
+          ],
+          "bbox_xyxy": [
+            79,
+            168,
+            94,
+            188
+          ],
+          "area_px": 140,
+          "component_index": 3,
+          "uncertainty_px": 1.5
+        },
+        "foot_upper": {
+          "center_xy": [
+            113.02479338842976,
+            125.72727272727273
+          ],
+          "bbox_xyxy": [
+            109,
+            115,
+            119,
+            139
+          ],
+          "area_px": 121,
+          "component_index": 4,
+          "uncertainty_px": 1.5
+        }
+      },
+      "reference_bbox": [
+        79,
+        115,
+        225,
+        216
+      ],
+      "body_major_axis_screen_deg": 6.88502590360784,
+      "mouth_visibility": "self_occluded"
+    },
+    {
+      "frame": 415,
+      "observed_points": {
+        "hand_upper": {
+          "center_xy": [
+            185.98709677419356,
+            141.38064516129032
+          ],
+          "bbox_xyxy": [
+            179,
+            132,
+            197,
+            160
+          ],
+          "area_px": 155,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        },
+        "hand_lower": {
+          "center_xy": [
+            159.48214285714286,
+            176.50892857142858
+          ],
+          "bbox_xyxy": [
+            150,
+            169,
+            170,
+            185
+          ],
+          "area_px": 224,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "near_foot_visible_dark_part": {
+          "center_xy": [
+            91.625,
+            193.63333333333333
+          ],
+          "area_px": 120,
+          "manual_roi_xyxy": [
+            77,
+            187,
+            108,
+            212
+          ],
+          "uncertainty_px": 2.5
+        },
+        "far_foot_visible_dark_part": {
+          "center_xy": [
+            107.58252427184466,
+            136.7378640776699
+          ],
+          "area_px": 103,
+          "manual_roi_xyxy": [
+            85,
+            118,
+            133,
+            176
+          ],
+          "uncertainty_px": 2.5
+        }
+      },
+      "reference_bbox": [
+        80,
+        126,
+        226,
+        215
+      ],
+      "body_major_axis_screen_deg": 5.9921288735276335,
+      "mouth_visibility": "self_occluded"
+    },
+    {
+      "frame": 416,
+      "observed_points": {
+        "hand_upper": {
+          "center_xy": [
+            184.64779874213838,
+            145.0566037735849
+          ],
+          "bbox_xyxy": [
+            177,
+            136,
+            197,
+            160
+          ],
+          "area_px": 159,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        },
+        "hand_lower": {
+          "center_xy": [
+            152.06666666666666,
+            175.34285714285716
+          ],
+          "bbox_xyxy": [
+            144,
+            168,
+            162,
+            183
+          ],
+          "area_px": 210,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "near_foot_visible_dark_part": {
+          "center_xy": [
+            93.27044025157232,
+            201.11320754716982
+          ],
+          "area_px": 159,
+          "manual_roi_xyxy": [
+            77,
+            187,
+            108,
+            212
+          ],
+          "uncertainty_px": 2.5
+        },
+        "far_foot_visible_dark_part": {
+          "center_xy": [
+            105.25714285714285,
+            154.44761904761904
+          ],
+          "area_px": 105,
+          "manual_roi_xyxy": [
+            85,
+            118,
+            133,
+            176
+          ],
+          "uncertainty_px": 2.5
+        }
+      },
+      "reference_bbox": [
+        84,
+        135,
+        227,
+        215
+      ],
+      "body_major_axis_screen_deg": 4.063054495172594,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 417,
+      "observed_points": {
+        "hand_upper": {
+          "center_xy": [
+            185.98461538461538,
+            147.74871794871794
+          ],
+          "bbox_xyxy": [
+            177,
+            140,
+            201,
+            162
+          ],
+          "area_px": 195,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        },
+        "hand_lower": {
+          "center_xy": [
+            146.8318181818182,
+            180.4409090909091
+          ],
+          "bbox_xyxy": [
+            138,
+            173,
+            157,
+            189
+          ],
+          "area_px": 220,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "near_foot_visible_dark_part": {
+          "center_xy": [
+            96.36241610738256,
+            203.15436241610738
+          ],
+          "area_px": 149,
+          "manual_roi_xyxy": [
+            77,
+            187,
+            108,
+            212
+          ],
+          "uncertainty_px": 2.5
+        },
+        "far_foot_visible_dark_part": {
+          "center_xy": [
+            107.89344262295081,
+            158.77868852459017
+          ],
+          "area_px": 122,
+          "manual_roi_xyxy": [
+            85,
+            118,
+            133,
+            176
+          ],
+          "uncertainty_px": 2.5
+        }
+      },
+      "reference_bbox": [
+        87,
+        135,
+        228,
+        215
+      ],
+      "body_major_axis_screen_deg": 3.722864730132102,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 418,
+      "observed_points": {
+        "hand_upper": {
+          "center_xy": [
+            187.1153846153846,
+            149.1043956043956
+          ],
+          "bbox_xyxy": [
+            178,
+            142,
+            202,
+            161
+          ],
+          "area_px": 182,
+          "component_index": 3,
+          "uncertainty_px": 1.5
+        },
+        "hand_lower": {
+          "center_xy": [
+            148.13333333333333,
+            181.3761904761905
+          ],
+          "bbox_xyxy": [
+            140,
+            174,
+            158,
+            190
+          ],
+          "area_px": 210,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        },
+        "near_foot_visible_dark_part": {
+          "center_xy": [
+            95.11764705882354,
+            201.51871657754012
+          ],
+          "area_px": 187,
+          "manual_roi_xyxy": [
+            77,
+            187,
+            108,
+            212
+          ],
+          "uncertainty_px": 2.5
+        },
+        "far_foot_visible_dark_part": {
+          "center_xy": [
+            101.93939393939394,
+            150.5530303030303
+          ],
+          "area_px": 132,
+          "manual_roi_xyxy": [
+            85,
+            118,
+            133,
+            176
+          ],
+          "uncertainty_px": 2.5
+        }
+      },
+      "reference_bbox": [
+        85,
+        136,
+        228,
+        216
+      ],
+      "body_major_axis_screen_deg": 5.8934635222283305,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 419,
+      "observed_points": {
+        "hand_upper": {
+          "center_xy": [
+            187.1153846153846,
+            149.1043956043956
+          ],
+          "bbox_xyxy": [
+            178,
+            142,
+            202,
+            161
+          ],
+          "area_px": 182,
+          "component_index": 3,
+          "uncertainty_px": 1.5
+        },
+        "hand_lower": {
+          "center_xy": [
+            148.13333333333333,
+            181.3761904761905
+          ],
+          "bbox_xyxy": [
+            140,
+            174,
+            158,
+            190
+          ],
+          "area_px": 210,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        },
+        "near_foot_visible_dark_part": {
+          "center_xy": [
+            95.11764705882354,
+            201.51871657754012
+          ],
+          "area_px": 187,
+          "manual_roi_xyxy": [
+            77,
+            187,
+            108,
+            212
+          ],
+          "uncertainty_px": 2.5
+        },
+        "far_foot_visible_dark_part": {
+          "center_xy": [
+            101.90977443609023,
+            150.53383458646616
+          ],
+          "area_px": 133,
+          "manual_roi_xyxy": [
+            85,
+            118,
+            133,
+            176
+          ],
+          "uncertainty_px": 2.5
+        }
+      },
+      "reference_bbox": [
+        85,
+        136,
+        228,
+        216
+      ],
+      "body_major_axis_screen_deg": 5.904163144092593,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 420,
+      "observed_points": {
+        "hand_upper": {
+          "center_xy": [
+            186.98342541436463,
+            149.11602209944752
+          ],
+          "bbox_xyxy": [
+            178,
+            142,
+            202,
+            161
+          ],
+          "area_px": 181,
+          "component_index": 3,
+          "uncertainty_px": 1.5
+        },
+        "hand_lower": {
+          "center_xy": [
+            148.0521327014218,
+            181.38862559241707
+          ],
+          "bbox_xyxy": [
+            140,
+            174,
+            158,
+            190
+          ],
+          "area_px": 211,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        },
+        "near_foot_visible_dark_part": {
+          "center_xy": [
+            95.23809523809524,
+            200.994708994709
+          ],
+          "area_px": 189,
+          "manual_roi_xyxy": [
+            77,
+            187,
+            108,
+            212
+          ],
+          "uncertainty_px": 2.5
+        },
+        "far_foot_visible_dark_part": {
+          "center_xy": [
+            101.95138888888889,
+            147.78472222222223
+          ],
+          "area_px": 144,
+          "manual_roi_xyxy": [
+            85,
+            118,
+            133,
+            176
+          ],
+          "uncertainty_px": 2.5
+        }
+      },
+      "reference_bbox": [
+        85,
+        136,
+        228,
+        216
+      ],
+      "body_major_axis_screen_deg": 6.447688285361949,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 421,
+      "observed_points": {
+        "hand_upper": {
+          "center_xy": [
+            186.92857142857142,
+            148.62637362637363
+          ],
+          "bbox_xyxy": [
+            178,
+            141,
+            202,
+            161
+          ],
+          "area_px": 182,
+          "component_index": 3,
+          "uncertainty_px": 1.5
+        },
+        "hand_lower": {
+          "center_xy": [
+            148.00462962962962,
+            181.14814814814815
+          ],
+          "bbox_xyxy": [
+            140,
+            173,
+            158,
+            190
+          ],
+          "area_px": 216,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        },
+        "near_foot_visible_dark_part": {
+          "center_xy": [
+            95.82038834951456,
+            199.1504854368932
+          ],
+          "area_px": 206,
+          "manual_roi_xyxy": [
+            77,
+            187,
+            108,
+            212
+          ],
+          "uncertainty_px": 2.5
+        },
+        "far_foot_visible_dark_part": {
+          "center_xy": [
+            105.85987261146497,
+            139.3184713375796
+          ],
+          "area_px": 157,
+          "manual_roi_xyxy": [
+            85,
+            118,
+            133,
+            176
+          ],
+          "uncertainty_px": 2.5
+        }
+      },
+      "reference_bbox": [
+        86,
+        129,
+        228,
+        215
+      ],
+      "body_major_axis_screen_deg": 8.006568849492908,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 422,
+      "observed_points": {
+        "hand_upper": {
+          "center_xy": [
+            186.96666666666667,
+            148.6611111111111
+          ],
+          "bbox_xyxy": [
+            178,
+            141,
+            202,
+            161
+          ],
+          "area_px": 180,
+          "component_index": 3,
+          "uncertainty_px": 1.5
+        },
+        "hand_lower": {
+          "center_xy": [
+            148.00462962962962,
+            181.14814814814815
+          ],
+          "bbox_xyxy": [
+            140,
+            173,
+            158,
+            190
+          ],
+          "area_px": 216,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        },
+        "near_foot_visible_dark_part": {
+          "center_xy": [
+            95.82038834951456,
+            199.1504854368932
+          ],
+          "area_px": 206,
+          "manual_roi_xyxy": [
+            77,
+            187,
+            108,
+            212
+          ],
+          "uncertainty_px": 2.5
+        },
+        "far_foot_visible_dark_part": {
+          "center_xy": [
+            105.79354838709678,
+            139.21290322580646
+          ],
+          "area_px": 155,
+          "manual_roi_xyxy": [
+            85,
+            118,
+            133,
+            176
+          ],
+          "uncertainty_px": 2.5
+        }
+      },
+      "reference_bbox": [
+        86,
+        129,
+        228,
+        215
+      ],
+      "body_major_axis_screen_deg": 7.98273665616162,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 423,
+      "observed_points": {
+        "hand_upper": {
+          "center_xy": [
+            186.96666666666667,
+            148.6611111111111
+          ],
+          "bbox_xyxy": [
+            178,
+            141,
+            202,
+            161
+          ],
+          "area_px": 180,
+          "component_index": 3,
+          "uncertainty_px": 1.5
+        },
+        "hand_lower": {
+          "center_xy": [
+            148.02304147465438,
+            181.1290322580645
+          ],
+          "bbox_xyxy": [
+            140,
+            173,
+            158,
+            190
+          ],
+          "area_px": 217,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "near_foot_visible_dark_part": {
+          "center_xy": [
+            95.82038834951456,
+            199.1504854368932
+          ],
+          "area_px": 206,
+          "manual_roi_xyxy": [
+            77,
+            187,
+            108,
+            212
+          ],
+          "uncertainty_px": 2.5
+        },
+        "far_foot_visible_dark_part": {
+          "center_xy": [
+            105.79354838709678,
+            139.21290322580646
+          ],
+          "area_px": 155,
+          "manual_roi_xyxy": [
+            85,
+            118,
+            133,
+            176
+          ],
+          "uncertainty_px": 2.5
+        }
+      },
+      "reference_bbox": [
+        86,
+        129,
+        228,
+        215
+      ],
+      "body_major_axis_screen_deg": 7.957506030240523,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 424,
+      "observed_points": {
+        "hand_upper": {
+          "center_xy": [
+            187.0054644808743,
+            148.54644808743168
+          ],
+          "bbox_xyxy": [
+            178,
+            141,
+            202,
+            161
+          ],
+          "area_px": 183,
+          "component_index": 3,
+          "uncertainty_px": 1.5
+        },
+        "hand_lower": {
+          "center_xy": [
+            148.02304147465438,
+            181.1290322580645
+          ],
+          "bbox_xyxy": [
+            140,
+            173,
+            158,
+            190
+          ],
+          "area_px": 217,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "near_foot_visible_dark_part": {
+          "center_xy": [
+            96.4688995215311,
+            198.07655502392345
+          ],
+          "area_px": 209,
+          "manual_roi_xyxy": [
+            77,
+            187,
+            108,
+            212
+          ],
+          "uncertainty_px": 2.5
+        },
+        "far_foot_visible_dark_part": {
+          "center_xy": [
+            109.58235294117647,
+            134.9764705882353
+          ],
+          "area_px": 170,
+          "manual_roi_xyxy": [
+            85,
+            118,
+            133,
+            176
+          ],
+          "uncertainty_px": 2.5
+        }
+      },
+      "reference_bbox": [
+        87,
+        124,
+        228,
+        215
+      ],
+      "body_major_axis_screen_deg": 8.872851094956786,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 425,
+      "observed_points": {
+        "hand_upper": {
+          "center_xy": [
+            187.17837837837837,
+            148.5027027027027
+          ],
+          "bbox_xyxy": [
+            178,
+            141,
+            202,
+            161
+          ],
+          "area_px": 185,
+          "component_index": 3,
+          "uncertainty_px": 1.5
+        },
+        "hand_lower": {
+          "center_xy": [
+            148.04608294930875,
+            181.06451612903226
+          ],
+          "bbox_xyxy": [
+            140,
+            173,
+            158,
+            190
+          ],
+          "area_px": 217,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        },
+        "near_foot_visible_dark_part": {
+          "center_xy": [
+            97.4824120603015,
+            197.63316582914572
+          ],
+          "area_px": 199,
+          "manual_roi_xyxy": [
+            77,
+            187,
+            108,
+            212
+          ],
+          "uncertainty_px": 2.5
+        },
+        "far_foot_visible_dark_part": {
+          "center_xy": [
+            112.81176470588235,
+            132.56470588235294
+          ],
+          "area_px": 170,
+          "manual_roi_xyxy": [
+            85,
+            118,
+            133,
+            176
+          ],
+          "uncertainty_px": 2.5
+        }
+      },
+      "reference_bbox": [
+        89,
+        121,
+        228,
+        215
+      ],
+      "body_major_axis_screen_deg": 9.21462194875059,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 426,
+      "observed_points": {
+        "hand_upper": {
+          "center_xy": [
+            187.08602150537635,
+            148.3763440860215
+          ],
+          "bbox_xyxy": [
+            178,
+            141,
+            202,
+            161
+          ],
+          "area_px": 186,
+          "component_index": 3,
+          "uncertainty_px": 1.5
+        },
+        "hand_lower": {
+          "center_xy": [
+            148.08333333333334,
+            181.0462962962963
+          ],
+          "bbox_xyxy": [
+            140,
+            173,
+            158,
+            190
+          ],
+          "area_px": 216,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "near_foot_visible_dark_part": {
+          "center_xy": [
+            97.785,
+            197.55
+          ],
+          "area_px": 200,
+          "manual_roi_xyxy": [
+            77,
+            187,
+            108,
+            212
+          ],
+          "uncertainty_px": 2.5
+        },
+        "far_foot_visible_dark_part": {
+          "center_xy": [
+            115.01190476190476,
+            132.61309523809524
+          ],
+          "area_px": 168,
+          "manual_roi_xyxy": [
+            85,
+            118,
+            133,
+            176
+          ],
+          "uncertainty_px": 2.5
+        }
+      },
+      "reference_bbox": [
+        89,
+        120,
+        228,
+        215
+      ],
+      "body_major_axis_screen_deg": 8.793153817773117,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 427,
+      "observed_points": {
+        "hand_upper": {
+          "center_xy": [
+            187.08021390374333,
+            148.33689839572193
+          ],
+          "bbox_xyxy": [
+            178,
+            141,
+            202,
+            161
+          ],
+          "area_px": 187,
+          "component_index": 3,
+          "uncertainty_px": 1.5
+        },
+        "hand_lower": {
+          "center_xy": [
+            148.08333333333334,
+            181.0462962962963
+          ],
+          "bbox_xyxy": [
+            140,
+            173,
+            158,
+            190
+          ],
+          "area_px": 216,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "near_foot_visible_dark_part": {
+          "center_xy": [
+            96.98564593301435,
+            197.91866028708134
+          ],
+          "area_px": 209,
+          "manual_roi_xyxy": [
+            77,
+            187,
+            108,
+            212
+          ],
+          "uncertainty_px": 2.5
+        },
+        "far_foot_visible_dark_part": {
+          "center_xy": [
+            115.28735632183908,
+            132.78735632183907
+          ],
+          "area_px": 174,
+          "manual_roi_xyxy": [
+            85,
+            118,
+            133,
+            176
+          ],
+          "uncertainty_px": 2.5
+        }
+      },
+      "reference_bbox": [
+        88,
+        121,
+        228,
+        215
+      ],
+      "body_major_axis_screen_deg": 8.347658553828069,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 428,
+      "observed_points": {
+        "hand_upper": {
+          "center_xy": [
+            187.08021390374333,
+            148.33689839572193
+          ],
+          "bbox_xyxy": [
+            178,
+            141,
+            202,
+            161
+          ],
+          "area_px": 187,
+          "component_index": 3,
+          "uncertainty_px": 1.5
+        },
+        "hand_lower": {
+          "center_xy": [
+            148.08333333333334,
+            181.0462962962963
+          ],
+          "bbox_xyxy": [
+            140,
+            173,
+            158,
+            190
+          ],
+          "area_px": 216,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "near_foot_visible_dark_part": {
+          "center_xy": [
+            96.98564593301435,
+            197.91866028708134
+          ],
+          "area_px": 209,
+          "manual_roi_xyxy": [
+            77,
+            187,
+            108,
+            212
+          ],
+          "uncertainty_px": 2.5
+        },
+        "far_foot_visible_dark_part": {
+          "center_xy": [
+            115.28735632183908,
+            132.78735632183907
+          ],
+          "area_px": 174,
+          "manual_roi_xyxy": [
+            85,
+            118,
+            133,
+            176
+          ],
+          "uncertainty_px": 2.5
+        }
+      },
+      "reference_bbox": [
+        88,
+        121,
+        228,
+        215
+      ],
+      "body_major_axis_screen_deg": 8.353268328514815,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 429,
+      "observed_points": {
+        "hand_upper": {
+          "center_xy": [
+            187.0427807486631,
+            148.2192513368984
+          ],
+          "bbox_xyxy": [
+            178,
+            141,
+            202,
+            161
+          ],
+          "area_px": 187,
+          "component_index": 3,
+          "uncertainty_px": 1.5
+        },
+        "hand_lower": {
+          "center_xy": [
+            148.08333333333334,
+            181.0462962962963
+          ],
+          "bbox_xyxy": [
+            140,
+            173,
+            158,
+            190
+          ],
+          "area_px": 216,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "near_foot_visible_dark_part": {
+          "center_xy": [
+            96.38613861386139,
+            199.42079207920793
+          ],
+          "area_px": 202,
+          "manual_roi_xyxy": [
+            77,
+            187,
+            108,
+            212
+          ],
+          "uncertainty_px": 2.5
+        },
+        "far_foot_visible_dark_part": {
+          "center_xy": [
+            112.54335260115607,
+            134.77456647398844
+          ],
+          "area_px": 173,
+          "manual_roi_xyxy": [
+            85,
+            118,
+            133,
+            176
+          ],
+          "uncertainty_px": 2.5
+        }
+      },
+      "reference_bbox": [
+        87,
+        122,
+        228,
+        215
+      ],
+      "body_major_axis_screen_deg": 7.5957452561829655,
+      "mouth_visibility": "visible"
+    },
+    {
+      "frame": 430,
+      "observed_points": {
+        "hand_upper": {
+          "center_xy": [
+            187.04255319148936,
+            148.15425531914894
+          ],
+          "bbox_xyxy": [
+            178,
+            141,
+            202,
+            161
+          ],
+          "area_px": 188,
+          "component_index": 2,
+          "uncertainty_px": 1.5
+        },
+        "hand_lower": {
+          "center_xy": [
+            148.09302325581396,
+            181.0139534883721
+          ],
+          "bbox_xyxy": [
+            140,
+            173,
+            158,
+            190
+          ],
+          "area_px": 215,
+          "component_index": 1,
+          "uncertainty_px": 1.5
+        },
+        "near_foot_visible_dark_part": {
+          "center_xy": [
+            95.90306122448979,
+            200.47448979591837
+          ],
+          "area_px": 196,
+          "manual_roi_xyxy": [
+            77,
+            187,
+            108,
+            212
+          ],
+          "uncertainty_px": 2.5
+        },
+        "far_foot_visible_dark_part": {
+          "center_xy": [
+            105.27152317880794,
+            141.9933774834437
+          ],
+          "area_px": 151,
+          "manual_roi_xyxy": [
+            85,
+            118,
+            133,
+            176
+          ],
+          "uncertainty_px": 2.5
+        }
+      },
+      "reference_bbox": [
+        86,
+        131,
+        229,
+        215
+      ],
+      "body_major_axis_screen_deg": 5.430598310990462,
+      "mouth_visibility": "visible"
+    }
+  ],
+  "schema": "milkfrog-reference-landing-observations-1",
+  "source_video": "assets/references/naiwa_laugh/candidate_a_green.mp4",
+  "source_sha256": "4970130ac69f86097219548144b66cb124afe6d5f2ef4ad53cbc3cbbf1df364e",
+  "source_size_px": [
+    1920,
+    1080
+  ],
+  "source_fps": 30,
+  "frame_range": [
+    390,
+    430
+  ],
+  "display_mapping": {
+    "target_framebuffer": [
+      320,
+      240
+    ],
+    "initial_character_height_px": 204,
+    "initial_character_screen_height_fraction": 0.85,
+    "uniform_scale": 0.24256837098692033,
+    "translation_xy": [
+      -71.77407847800237,
+      -25.147443519619486
+    ],
+    "formula": "x_target = uniform_scale*x_source + tx; y_target = uniform_scale*y_source + ty",
+    "use": "Fixed image-plane comparison transform for every frame; never independently normalize each frame because that would erase the jump and fall.",
+    "warning": "This is a 2D crop/zoom mapping, not an inferred 3D camera calibration."
+  },
+  "measurement_provenance": {
+    "coordinate_type": "Measured visible 2D color regions, not inferred anatomical joints or3D ground truth",
+    "source_color_conversion": "OpenCV VideoCapture BGR-to-RGB; fixed warpAffine mapping320x240 using INTER_AREA",
+    "dark_threshold_srgb": "R<145 and G<135 and B<130",
+    "connected_components": "8-neighbor connected components; components witharea>=4 native pixels sorted largest first; semantic IDs selected on an indexed reference contact sheet",
+    "foreground_threshold": "Reject G>R+24 and G>B+24 and G>170",
+    "principal_axis": "Eigenvector of image-plane foreground-pixel covariance; modulo180degrees, not a3D body rotation",
+    "roi_scope": "manual_roi_xyxy appears directly in measurements where toe/foot shadow must be separated from belly shadow",
+    "review_evidence": "out/milkfrog_iteration2/review/landing_component_indices.jpg",
+    "archive_note": "All frame/point values are unchanged from the reviewed iteration2 data; added source integrity and permanent mapping metadata only."
+  }
+}

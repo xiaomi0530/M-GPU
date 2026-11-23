@@ -1,0 +1,32 @@
+*.v text eol=lf
+*.sv text eol=lf
+*.svh text eol=lf
+*.mem text eol=lf
+*.py text eol=lf
+*.tcl text eol=lf
+*.md text eol=lf
+*.ps1 text eol=lf
+*.cpp text eol=lf
+*.xpr text eol=lf
+.gitattributes text eol=lf
+.gitignore text eol=lf
+Makefile text eol=lf
+*.blend binary
+*.npy binary
+*.npz binary
+*.bit binary
+*.png binary
+*.jpg binary
+*.gif binary
+*.mp4 binary
+
+# Preserve the exact bytes of validated assets and delivery evidence.
+assets/naiwa/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+assets/milkfrog/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+assets/milkfrog/README.md text eol=lf
+assets/references/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+MGPU.srcs/sources_1/rom/*.mem -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+deliverables/milkfrog/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+deliverables/milkfrog/*/reports/*.rpt -whitespace
+deliverables/milkfrog/README.md text eol=lf
+deliverables/milkfrog/*/README.md text eol=lf

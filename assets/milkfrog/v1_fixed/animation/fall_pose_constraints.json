@@ -1,0 +1,84 @@
+{
+  "source_report": "out/naiwa/animation_review/fall_fit_rig_feet.json",
+  "fit_frame": 417,
+  "parameters": {
+    "body_camera_x_deg": 7.395419420432282,
+    "body_camera_y_deg": 12.571788870736722,
+    "body_camera_z_deg": -10.505504074437564,
+    "head_local_z_deg": -3.0082768344832402,
+    "head_local_y_deg": -7.889707052668057,
+    "translation_x_px": 2.0220660686588063,
+    "translation_y_px": -1.2859369548454926,
+    "negative_y_hip_delta_deg": 49.49535718380153,
+    "negative_y_knee_delta_deg": 2.64780682245902,
+    "positive_y_hip_delta_deg": 32.88488525301052,
+    "positive_y_knee_delta_deg": 69.8911350835152,
+    "positive_y_hand_roll_deg": -60.0
+  },
+  "reference": "assets/naiwa/reference_motion.json",
+  "fit_geometry_sha256": "c761920d939ceebfac93f1aa1208de6656044499264a533e4096af017e45e42f",
+  "fit_matrices_sha256": "4e97df9ab0b1137127e63406d22645b22e3674756c2d880ed265b4e64280b5c7",
+  "fitted_metrics": {
+    "iou": 0.7347455244165338,
+    "projected_cream_region_iou": 0.7020161290322581,
+    "score": 0.4169283566740711,
+    "bbox_xyxy": [
+      83.30889288722916,
+      128.9201912280891,
+      234.73523925008845,
+      226.47390494979877
+    ],
+    "landmarks_xy": {
+      "mouth": [
+        198.4439697636631,
+        175.82554540210535
+      ],
+      "hand_upper": [
+        186.0639714625446,
+        147.83776456599287
+      ],
+      "hand_lower": [
+        146.86007134363854,
+        180.4146967895363
+      ],
+      "near_pupil": [
+        210.48959069603424,
+        197.87994155292563
+      ],
+      "far_pupil": [
+        226.07064252816193,
+        183.51024729518008
+      ],
+      "far_foot": [
+        112.01449089402783,
+        155.72909044517354
+      ],
+      "near_toes": [
+        92.60509145915691,
+        207.2699450880346
+      ]
+    },
+    "landmark_errors_px": {
+      "mouth": 5.624574619988345,
+      "hand_upper": 0.0,
+      "hand_lower": 0.0,
+      "near_pupil": 4.03941560423044,
+      "far_pupil": 3.671389637067538,
+      "far_foot": 5.202370064804122,
+      "near_toes": 5.259250135811441
+    },
+    "screen_translation_xy": [
+      -14.366814050570891,
+      -5.825906031885193
+    ]
+  },
+  "limitations": "Selected visible-feet candidate fitted to image constraints; not ground-truth 3D joints. Blend corrections over frames 406..417. Feet and hands must remain visible. Lip index winding correction does not alter fit coordinates.",
+  "fitted_metrics_stage": "Selected pose before the subsequently approved world-Z0.8 landing compression, jaw25 opening and positive-Y hand roll -60 degrees.",
+  "final_adjustments": {
+    "landing_world_z_scale": 0.8,
+    "lying_jaw_baseline_deg": 25.0,
+    "mouth_opening_denominator": 45.0,
+    "positive_y_hand_roll_deg": -60.0,
+    "selection": "Reference actual-mouth pixel area and visible hand orientation review; contact centers, body shape fit and foot pose remain fixed."
+  }
+}

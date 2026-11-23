@@ -1,0 +1,8 @@
+{
+  "version1_video": "deliverables/milkfrog/v1_fixed/milkfrog_board_rtl.mp4",
+  "version1_video_sha256": "6380d4d2b562eae89cf2ba56602958d2abb5d3cdd8a380c8c746b4ad9f3a440f",
+  "camera_config_sha256": "1e36da8936e4e5e413ae1e4cfaa6e0dbdf707419a9ee000603aca2d85b52b337",
+  "frames": 541,
+  "fps": 30,
+  "comparison": "Decoded delivered V1 RTL video alongside native V2 RTL frame images. This is not a fixed-view source-reconstruction score."
+}
